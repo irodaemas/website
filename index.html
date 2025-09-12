@@ -114,7 +114,7 @@
       .kadar{font-weight:700;color:#012F2B}
       .harga-baru{color:#0E4D47;font-weight:700}
       .harga-lama{color:#335e5a;font-weight:700;opacity:.9}
-      .table-card{max-width:760px;margin:0 auto}
+      .table-card{max-width:1000px;margin:0 auto}
       .date-badge{
           font-size:20px;
           font-weight:700;
@@ -208,6 +208,14 @@
         *, *::before, *::after{animation: none !important; transition: none !important}
       }
 
+      @media (min-width: 1024px){
+        .table-card table{font-size:1.05rem}
+        .table-card th, .table-card td{padding:.9rem 1.1rem}
+      }
+      @media (min-width: 1280px){
+        .table-card{max-width:1120px}
+        .table-card table{font-size:1.08rem}
+      }
       @media (max-width: 1024px){
         .grid-4{grid-template-columns:repeat(3,minmax(0,1fr))}
         .cta-grid{grid-template-columns:1fr}
@@ -355,9 +363,8 @@
       <table aria-label="Tabel harga buyback perhiasan">
         <thead>
         <tr>
-          <th style="text-align:left">Kadar</th>
-          <th style="text-align:right">Harga Emas Baru (Rp)</th>
-          <th style="text-align:right">Harga Emas Lama (Rp)</th>
+          <th style="text-align:left;width:44%">Kadar</th>
+          <th style="text-align:right;width:56%">Harga (Rp)</th>
         </tr>
         </thead>
         <tbody id="goldPriceTable"></tbody>
@@ -578,9 +585,9 @@
             if (data && data.statusCode === 200 && data.data && data.data.current) {
                 const hargaEmas24Karat = Number(data.data.current.buy);
 
-                // Konfigurasi margin internal – ubah sesuai kebijakan
-                const MARGIN_BARU = 1.00; // 100% dari acuan
-                const MARGIN_LAMA = 0.95; // 95% dari acuan (contoh)
+                const MARGIN_ANTAM_BARU = 0.99;
+                const MARGIN_ANTAN_LAMA = 0.95;
+                const MARGIN = 0.90;
 
                 const round5k = (n) => Math.floor(n / 5000) * 5000; // kelipatan 5000 (bawah)
 
@@ -596,15 +603,28 @@
                 const tbody = document.getElementById('goldPriceTable');
                 tbody.innerHTML = '';
 
+                // Baris khusus sebelum 24K
+                const antamBaru = round5k(hargaEmas24Karat * MARGIN_ANTAM_BARU);
+                const antamLama = round5k(hargaEmas24Karat * MARGIN_ANTAN_LAMA);
+                tbody.insertAdjacentHTML('beforeend',
+                  `<tr style="height:34px">
+                     <td class="kadar">Antam Baru</td>
+                     <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${antamBaru.toLocaleString('id-ID')}</td>
+                   </tr>`);
+                tbody.insertAdjacentHTML('beforeend',
+                  `<tr style="height:34px">
+                     <td class="kadar">Antam Lama</td>
+                     <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${antamLama.toLocaleString('id-ID')}</td>
+                   </tr>`);
+
+                // Lanjutkan daftar kadar (24K ke bawah) – gunakan harga BARU sebagai referensi tunggal
                 karatList.forEach(({karat, purity}) => {
                     const base = hargaEmas24Karat * purity;
-                    const hargaBaru = round5k(base * MARGIN_BARU);
-                    const hargaLama = round5k(base * MARGIN_LAMA);
+                    const harga = round5k(base * MARGIN);
                     tbody.insertAdjacentHTML('beforeend',
                         `<tr style="height:34px">
                <td class="kadar">${karat}K</td>
-               <td class="harga-baru" style="text-align:right">Rp ${hargaBaru.toLocaleString('id-ID')}</td>
-               <td class="harga-lama" style="text-align:right">Rp ${hargaLama.toLocaleString('id-ID')}</td>
+               <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${harga.toLocaleString('id-ID')}</td>
              </tr>`);
                 });
             } else {
@@ -617,7 +637,6 @@
     }
 
     function displayDefaultPrices() {
-        // Nilai contoh untuk "Harga Emas Baru" (24K dkk). "Lama" dihitung 95% dari "Baru" dan dibulatkan 5k.
         const defaults = [
             { karat: 24, baru: 1310000 }, { karat: 23, baru: 1115000 }, { karat: 22, baru: 1075000 }, { karat: 21, baru: 1010000 },
             { karat: 20, baru: 985000 },  { karat: 19, baru: 925000 },  { karat: 18, baru: 905000 },  { karat: 17, baru: 850000 },
@@ -627,13 +646,28 @@
         const round5k = (n) => Math.floor(n / 5000) * 5000;
         const tbody = document.getElementById('goldPriceTable');
         tbody.innerHTML = '';
+
+        // Antam Baru/Lama dari 24K default
+        const d24 = defaults.find(d => d.karat === 24)?.baru || 0;
+        const antamBaru = round5k(d24);
+        const antamLama = round5k(d24 * 0.95);
+        tbody.insertAdjacentHTML('beforeend',
+          `<tr style="height:34px">
+             <td class="kadar">Antam Baru</td>
+             <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${antamBaru.toLocaleString('id-ID')}</td>
+           </tr>`);
+        tbody.insertAdjacentHTML('beforeend',
+          `<tr style="height:34px">
+             <td class="kadar">Antam Lama</td>
+             <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${antamLama.toLocaleString('id-ID')}</td>
+           </tr>`);
+
+        // Daftar kadar 24K ke bawah (harga tunggal = "baru")
         defaults.forEach(({karat, baru}) => {
-            const lama = round5k(baru * 0.95);
             tbody.insertAdjacentHTML('beforeend',
                 `<tr style="height:34px">
            <td class="kadar">${karat}K</td>
-           <td class="harga-baru" style="text-align:right">Rp ${baru.toLocaleString('id-ID')}</td>
-           <td class="harga-lama" style="text-align:right">Rp ${lama.toLocaleString('id-ID')}</td>
+           <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${round5k(baru).toLocaleString('id-ID')}</td>
          </tr>`);
         });
     }
