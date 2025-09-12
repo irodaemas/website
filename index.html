@@ -26,7 +26,6 @@
   <meta property="og:image:height" content="630"/>
   <link rel="alternate" href="https://rodaemasindonesia.com/" hreflang="id-ID"/>
   <link rel="alternate" href="https://rodaemasindonesia.com/" hreflang="x-default"/>
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml"/>
   <link rel="canonical" href="https://rodaemasindonesia.com/">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,7 +33,7 @@
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://pluang.com">
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
   <link rel="preload" as="image" href="asset1.webp?v=1" imagesizes="(max-width: 860px) 100vw, 50vw" imagesrcset="asset1.webp?v=1 1200w">
   <style>
@@ -111,7 +110,6 @@
       nav a{color:#d6fffb;text-decoration:none;font-weight:600;opacity:.9}
       nav a:hover{opacity:1}
       nav a, .foot a{display:inline-block; padding:.6rem .4rem; line-height:1.2}
-      nav a:focus-visible, .foot a:focus-visible{outline:3px solid rgba(212,175,55,.45); outline-offset:2px; border-radius:6px}
       .menu{display:flex;gap:1rem}
       .hamb{display:none}
       @media (max-width:860px){.menu{display:none}.hamb{display:inline-flex}}
@@ -144,8 +142,6 @@
       thead th{position:static;background:#012F2B;color:#fff}
       tbody tr:hover{background:#fbf9ef}
       .kadar{font-weight:700;color:#012F2B}
-      .harga-baru{color:#0E4D47;font-weight:700}
-      .harga-lama{color:#335e5a;font-weight:700;opacity:.9}
       .table-card{max-width:800px;margin:0 auto}
       .date-badge{
           font-size:20px;
@@ -161,7 +157,6 @@
       .gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px}
       .gallery video{width:100%;height:180px;object-fit:cover;border-radius:12px;display:block;pointer-events:none;user-select:none}
       /* Hide native controls in WebKit/Blink just in case */
-      .gallery video::-webkit-media-controls{display:none !important}
       @media (max-width:1024px){.gallery{grid-template-columns:repeat(4,1fr)}}
       @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
       /* ---------- footer ---------- */
@@ -185,7 +180,6 @@
       /* --- Layout utilities --- */
       .grid > * { min-width: 0; }
       .grid-1{grid-template-columns:1fr}
-      .grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
       .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
       .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
       .cta-grid{grid-template-columns:1.1fr .9fr}
@@ -221,10 +215,7 @@
           -webkit-background-clip: text; background-clip: text; color: transparent;
           animation: rainbowShift 8s linear infinite;
         }
-        @keyframes rainbowShift{ 0%{background-position:0% 50%} 100%{background-position:400% 50%} }
-        /* Scroll-reveal baseline */
-        .reveal{opacity:0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease}
-        .reveal.visible{opacity:1; transform:none}
+        @keyframes rainbowShift{ 0%{background-position:0 50%} 100%{background-position:400% 50%} }
 
         /* Hero subtle moving light overlay */
         .hero::after{content:""; position:absolute; inset:0; pointer-events:none;
@@ -234,7 +225,7 @@
           animation: floatBg 18s ease-in-out infinite alternate;
         }
         @keyframes floatBg{
-          0%{background-position: 0% 0%, 100% 0%}
+          0%{background-position: 0 0, 100% 0}
           100%{background-position: 10% 6%, 90% 8%}
         }
 
@@ -248,12 +239,10 @@
         .gallery > *:hover{transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow)}
 
         /* Number pulse */
-        .count.pulse, .num.pulse{animation: numpulse 1.2s ease 2}
         @keyframes numpulse{ 0%{text-shadow:none} 50%{text-shadow:0 0 10px rgba(212,175,55,.45)} 100%{text-shadow:none} }
 
         /* Date badge soft glow every minute tick */
         .date-badge{transition: box-shadow .6s ease}
-        .date-badge.glow{box-shadow: 0 0 0 6px rgba(212,175,55,.10)}
 
         /* WhatsApp FAB subtle bobbing to draw attention */
         .cta-float a.fab{animation: bob 12s ease-in-out infinite}
@@ -290,7 +279,6 @@
         .hero .wrap{grid-template-columns:1fr}
       }
   </style>
-</style>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -596,18 +584,20 @@
   <button class="fab" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas">↑</button>
 </div>
 
-</script>
 <script>
     (function(){
-        var ease = function(t){ return t<.5 ? 2*t*t : -1+(4-2*t)*t };
+        const ease = function (t) {
+            return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
+        };
 
         function animateNumber(el, to, duration){
-            var from = Number(el.getAttribute('data-from')||0);
-            var start = null; el.classList.add('pulse');
+            const from = Number(el.getAttribute('data-from') || 0);
+            let start = null;
+            el.classList.add('pulse');
             function step(ts){
                 if(!start) start = ts;
-                var p = Math.min(1, (ts-start)/duration);
-                var v = Math.round(from + (to-from)*ease(p));
+                const p = Math.min(1, (ts - start) / duration);
+                const v = Math.round(from + (to - from) * ease(p));
                 el.textContent = v.toLocaleString('id-ID');
                 if(p<1){ requestAnimationFrame(step); return; }
                 el.textContent = to.toLocaleString('id-ID');
@@ -618,22 +608,23 @@
         }
 
         // Observe numbers on first view
-        var io = new IntersectionObserver(function(entries){
-            entries.forEach(function(e){
-                if(e.isIntersecting){
-                    var el = e.target; var to = Number(el.getAttribute('data-to')||0);
+        const io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    const el = e.target;
+                    const to = Number(el.getAttribute('data-to') || 0);
                     animateNumber(el, to, 900);
                     io.unobserve(el);
                 }
             });
-        }, {threshold:.3});
+        }, {threshold: .3});
         document.querySelectorAll('.count, .num').forEach(function(n){ io.observe(n); });
 
         // Re-animate numbers after price table refresh
         document.addEventListener('prices:updated', function(){
             document.querySelectorAll('.num').forEach(function(n){
-                var to = Number(n.getAttribute('data-to')||0);
-                if(!n.getAttribute('data-from')) n.setAttribute('data-from', 0);
+                const to = Number(n.getAttribute('data-to') || 0);
+                if(!n.getAttribute('data-from')) n.setAttribute('data-from', '0');
                 animateNumber(n, to, 800);
             });
         });
@@ -642,18 +633,18 @@
 <script>
     // Fallback untuk gambar yang gagal dimuat: ganti dengan placeholder SVG bernuansa gold/teal
     (function(){
-      var placeholder = 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480">\
-          <defs>\
-            <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">\
-              <stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#013D39"/>\
-            </linearGradient>\
-          </defs>\
-          <rect width="800" height="480" fill="url(#g)"/>\
-          <text x="50%" y="52%" font-family="Inter,Arial" font-size="28" fill="white" text-anchor="middle">Roda Emas Indonesia</text>\
-        </svg>'
-      );
-      document.querySelectorAll('img').forEach(function(img){
+        const placeholder = 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480">\
+              <defs>\
+                <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">\
+                  <stop offset="0" stop-color="#D4AF37"/><stop offset="1" stop-color="#013D39"/>\
+                </linearGradient>\
+              </defs>\
+              <rect width="800" height="480" fill="url(#g)"/>\
+              <text x="50%" y="52%" font-family="Inter,Arial" font-size="28" fill="white" text-anchor="middle">Roda Emas Indonesia</text>\
+            </svg>'
+        );
+        document.querySelectorAll('img').forEach(function(img){
         img.addEventListener('error', function(){
           img.src = placeholder;
           img.style.objectFit = 'cover';
@@ -666,19 +657,19 @@
         try{ v.setAttribute('poster', placeholder); }catch(e){}
         // simple error fallback: replace with placeholder image
         v.addEventListener('error', function(){
-          var img = document.createElement('img');
-          img.src = placeholder;
+            const img = document.createElement('img');
+            img.src = placeholder;
           img.alt = 'video unavailable';
           img.style.objectFit = 'cover';
           img.style.background = '#013D39';
           v.replaceWith(img);
         }, { once: true });
-        // Ensure GIF-like behavior: no controls, auto play muted loop
+        // Ensure GIF-like behavior: no controls, autoplay muted loop
         try{ v.removeAttribute('controls'); v.controls = false; }catch(e){}
         v.muted = true; v.loop = true; v.playsInline = true; v.classList.add('reveal');
       });
 
-      // Auto play/pause videos only when visible (saves bandwidth & main thread)
+      // Autoplay/pause videos only when visible (saves bandwidth & main thread)
       try{
         const vio = new IntersectionObserver((entries)=>{
           entries.forEach(e=>{
@@ -711,18 +702,19 @@
     })();
 
     (function(){
-        var el = document.getElementById('typer');
+        const el = document.getElementById('typer');
         if(!el) return;
-        var phrases = ['COD ke Lokasi Anda','Harga Pasar Harian','Dana Cair ±5 Menit'];
+        const phrases = ['COD ke Lokasi Anda', 'Harga Pasar Harian', 'Dana Cair ±5 Menit'];
 
         if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
             el.textContent = phrases[0];
             return;
         }
 
-        var i=0,j=0,deleting=false;
+        let i = 0, j = 0, deleting = false;
+
         function tick(){
-            var cur=phrases[i];
+            const cur = phrases[i];
             if(!deleting){
                 j++; el.textContent=cur.slice(0,j);
                 if(j===cur.length){ deleting=true; return setTimeout(tick,1400); }
@@ -865,8 +857,7 @@
     fetchGoldPrice();
 </script>
 <script>
-    document.getElementById('yr').textContent = new Date().getFullYear();
-</script>
+    document.getElementById('yr').textContent = new Date().getFullYear().toString();
 </script>
 <script type="application/ld+json">
 {
