@@ -356,7 +356,7 @@
   <div class="container">
     <div class="accent-title">Harga Buyback</div>
     <h2 class="h2">
-      Tabel Perhiasan & Antam Hari Ini:
+      Tabel Perhiasan & Logam Mulia (LM) Hari Ini:
       <span id="currentDateTime" class="date-badge">—</span>
     </h2>
     <div class="card table-wrap table-card">
@@ -585,8 +585,8 @@
             if (data && data.statusCode === 200 && data.data && data.data.current) {
                 const hargaEmas24Karat = Number(data.data.current.buy);
 
-                const MARGIN_ANTAM_BARU = 0.99;
-                const MARGIN_ANTAN_LAMA = 0.95;
+                const MARGIN_LM_BARU = 0.99;
+                const MARGIN_LM_LAMA = 0.95;
                 const MARGIN = 0.90;
 
                 const round5k = (n) => Math.floor(n / 5000) * 5000; // kelipatan 5000 (bawah)
@@ -604,17 +604,17 @@
                 tbody.innerHTML = '';
 
                 // Baris khusus sebelum 24K
-                const antamBaru = round5k(hargaEmas24Karat * MARGIN_ANTAM_BARU);
-                const antamLama = round5k(hargaEmas24Karat * MARGIN_ANTAN_LAMA);
+                const lmBaru = round5k(hargaEmas24Karat * MARGIN_LM_BARU);
+                const lmLama = round5k(hargaEmas24Karat * MARGIN_LM_LAMA);
                 tbody.insertAdjacentHTML('beforeend',
                   `<tr style="height:34px">
-                     <td class="kadar">Antam Baru</td>
-                     <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${antamBaru.toLocaleString('id-ID')}</td>
+                     <td class="kadar">Logam Mulia (LM) Baru</td>
+                     <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${lmBaru.toLocaleString('id-ID')}</td>
                    </tr>`);
                 tbody.insertAdjacentHTML('beforeend',
                   `<tr style="height:34px">
-                     <td class="kadar">Antam Lama</td>
-                     <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${antamLama.toLocaleString('id-ID')}</td>
+                     <td class="kadar">Logam Mulia (LM) Lama</td>
+                     <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${lmLama.toLocaleString('id-ID')}</td>
                    </tr>`);
 
                 // Lanjutkan daftar kadar (24K ke bawah) – gunakan harga BARU sebagai referensi tunggal
@@ -649,17 +649,17 @@
 
         // Antam Baru/Lama dari 24K default
         const d24 = defaults.find(d => d.karat === 24)?.baru || 0;
-        const antamBaru = round5k(d24);
-        const antamLama = round5k(d24 * 0.95);
+        const lmBaru = round5k(d24);
+        const lmLama = round5k(d24 * 0.95);
         tbody.insertAdjacentHTML('beforeend',
           `<tr style="height:34px">
-             <td class="kadar">Antam Baru</td>
-             <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${antamBaru.toLocaleString('id-ID')}</td>
+             <td class="kadar">Logam Mulia (LM) Baru</td>
+             <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${lmBaru.toLocaleString('id-ID')}</td>
            </tr>`);
         tbody.insertAdjacentHTML('beforeend',
           `<tr style="height:34px">
-             <td class="kadar">Antam Lama</td>
-             <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${antamLama.toLocaleString('id-ID')}</td>
+             <td class="kadar">Logam Mulia (LM) Lama</td>
+             <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${lmLama.toLocaleString('id-ID')}</td>
            </tr>`);
 
         // Daftar kadar 24K ke bawah (harga tunggal = "baru")
