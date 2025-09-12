@@ -22,7 +22,7 @@
   <link rel="dns-prefetch" href="https://wa.me">
   <link rel="preconnect" href="https://wa.me">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="preload" as="image" href="asset1.png"/>
+  <link rel="preload" as="image" href="asset1.webp"/>
   <style>
       /* --- FAQ & Testimonial styles --- */
       details{border:1px solid #e4ecea;border-radius:12px;background:#fff;padding:.8rem 1rem}
@@ -73,6 +73,20 @@
       .h2{font-family:"Playfair Display",serif;font-size:clamp(1.6rem, 1.8vw + 1rem, 2.4rem);line-height:1.15;margin:0 0 .75rem}
       .h3{font-weight:800;font-size:1.1rem;letter-spacing:.02em;margin:0 0 .35rem;color:var(--deep)}
       .lead{font-size:1.1rem;color:#eaf5f4;max-width:60ch}
+      /* --- Text animations --- */
+      .typewriter {
+          font-weight:700;
+          color:#fff;
+          margin:.2rem 0 .4rem;
+          font-size:1.05rem;
+      }
+      .typewriter #typer {
+          border-right:2px solid rgba(255,255,255,.6);
+          white-space:nowrap;
+          overflow:hidden;
+          display:inline-block;
+          padding-right:.1rem;
+      }
       .grid{display:grid;gap:1.2rem}
       /* ---------- navbar ---------- */
       header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(1,61,57,.92), rgba(1,61,57,.86));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid rgba(255,255,255,.08)}
@@ -91,6 +105,8 @@
       .hero .glass{background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.06));border:1px solid rgba(255,255,255,.16);backdrop-filter:blur(8px);box-shadow:var(--shadow);padding:1rem;border-radius:14px}
       .stat{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;min-width:0}
       .stat b{font-size:1.3rem;color:var(--gold)}
+      .stat b small{font-size:.9rem;color:inherit;opacity:.9}
+      .count, .num{font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1}
       .stat span{overflow-wrap:anywhere;word-break:normal;white-space:normal}
       .glass.stat{min-width:0; overflow:hidden}
       @media (max-width:860px){.hero .wrap{grid-template-columns:1fr}}
@@ -114,7 +130,7 @@
       .kadar{font-weight:700;color:#012F2B}
       .harga-baru{color:#0E4D47;font-weight:700}
       .harga-lama{color:#335e5a;font-weight:700;opacity:.9}
-      .table-card{max-width:1000px;margin:0 auto}
+      .table-card{max-width:800px;margin:0 auto}
       .date-badge{
           font-size:20px;
           font-weight:700;
@@ -170,6 +186,18 @@
 
       /* ---------- micro interactions & animations ---------- */
       @media (prefers-reduced-motion: no-preference){
+        /* Text shimmer */
+        .text-shimmer {
+            background: linear-gradient(90deg,#ffffff 0%, #F2D16B 50%, #ffffff 100%);
+            -webkit-background-clip:text;
+            background-clip:text;
+            color:transparent;
+            background-size:200% auto;
+            animation: shimmer 2.8s linear infinite;
+        }
+        @keyframes shimmer {
+            to { background-position:-200% center }
+        }
         /* Scroll-reveal baseline */
         .reveal{opacity:0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease}
         .reveal.visible{opacity:1; transform:none}
@@ -195,6 +223,10 @@
         .gallery img, .gallery video{transition: transform .35s ease, box-shadow .35s ease}
         .gallery > *:hover{transform: translateY(-2px) scale(1.02); box-shadow: var(--shadow)}
 
+        /* Number pulse */
+        .count.pulse, .num.pulse{animation: numpulse 1.2s ease 2}
+        @keyframes numpulse{ 0%{text-shadow:none} 50%{text-shadow:0 0 10px rgba(212,175,55,.45)} 100%{text-shadow:none} }
+
         /* Date badge soft glow every minute tick */
         .date-badge{transition: box-shadow .6s ease}
         .date-badge.glow{box-shadow: 0 0 0 6px rgba(212,175,55,.10)}
@@ -206,15 +238,16 @@
 
       @media (prefers-reduced-motion: reduce){
         *, *::before, *::after{animation: none !important; transition: none !important}
+          .text-shimmer{ color:#fff }
       }
 
       @media (min-width: 1024px){
-        .table-card table{font-size:1.05rem}
-        .table-card th, .table-card td{padding:.9rem 1.1rem}
+        .table-card table{font-size:1rem}
+        .table-card th, .table-card td{padding:.8rem 1rem}
       }
       @media (min-width: 1280px){
-        .table-card{max-width:1120px}
-        .table-card table{font-size:1.08rem}
+        .table-card{max-width:880px}
+        .table-card table{font-size:1.02rem}
       }
       @media (max-width: 1024px){
         .grid-4{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -281,21 +314,25 @@
   <div class="container wrap">
     <div>
       <span class="chip">Layanan COD • Jabodetabek</span>
-      <h1 class="h1">Jual Emas & Berlian <br/>Lebih Aman, Cepat, & Nyaman</h1>
+      <h1 class="h1">
+        Jual Emas & Berlian <br/>
+        <span class="text-shimmer">Lebih Aman, Cepat, & Nyaman</span>
+      </h1>
+      <div class="typewriter" aria-live="polite"><span id="typer"></span></div>
       <p class="lead">Kami membeli <em>perhiasan emas</em>, <em>berlian</em>, <em>batu mulia</em>, <em>jam tangan mewah</em>, hingga <em>logam mulia</em>. Tim kami datang ke <strong>lokasi yang Anda tentukan</strong>—rumah, kantor, atau kafe—dengan proses transparan dan pembayaran langsung.</p>
       <div style="margin-top:1.2rem; display:flex; gap:.8rem; flex-wrap:wrap">
         <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener" data-track="wa-hero">WhatsApp Sekarang</a>
         <a class="btn btn-ghost" href="#fitur">Lihat Keunggulan</a>
       </div>
       <div class="grid grid-3 stats" style="margin-top:1.4rem">
-        <div class="glass stat"><b>± 5 Menit</b><span>Pencairan dana</span></div>
+        <div class="glass stat"><b><span class="count" data-to="5">0</span> <small>Menit</small></b><span>Pencairan dana</span></div>
         <div class="glass stat"><b>Harga Pasar</b><span>Buyback kompetitif</span></div>
         <div class="glass stat"><b>Transparan</b><span>Cek barang bersama</span></div>
       </div>
     </div>
     <div>
       <div class="card" style="padding:1rem;background:linear-gradient(180deg,#012E2B,#013D39)">
-        <img alt="Perhiasan emas – ilustrasi" src="asset1.png" decoding="async" fetchpriority="high" loading="eager" style="width:100%;height:420px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.18)"/>
+        <img alt="Perhiasan emas – ilustrasi" src="asset1.webp" decoding="async" fetchpriority="high" loading="eager" style="width:100%;height:420px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.18)"/>
       </div>
     </div>
   </div>
@@ -357,6 +394,7 @@
     <div class="accent-title">Harga Buyback</div>
     <h2 class="h2">
       Tabel Perhiasan & Logam Mulia (LM) Hari Ini:
+      <br>
       <span id="currentDateTime" class="date-badge">—</span>
     </h2>
     <div class="card table-wrap table-card">
@@ -521,6 +559,48 @@
 
 </script>
 <script>
+    (function(){
+        var ease = function(t){ return t<.5 ? 2*t*t : -1+(4-2*t)*t };
+
+        function animateNumber(el, to, duration){
+            var from = Number(el.getAttribute('data-from')||0);
+            var start = null; el.classList.add('pulse');
+            function step(ts){
+                if(!start) start = ts;
+                var p = Math.min(1, (ts-start)/duration);
+                var v = Math.round(from + (to-from)*ease(p));
+                el.textContent = v.toLocaleString('id-ID');
+                if(p<1){ requestAnimationFrame(step); return; }
+                el.textContent = to.toLocaleString('id-ID');
+                el.classList.remove('pulse');
+                el.setAttribute('data-from', to);
+            }
+            requestAnimationFrame(step);
+        }
+
+        // Observe numbers on first view
+        var io = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+                if(e.isIntersecting){
+                    var el = e.target; var to = Number(el.getAttribute('data-to')||0);
+                    animateNumber(el, to, 900);
+                    io.unobserve(el);
+                }
+            });
+        }, {threshold:.3});
+        document.querySelectorAll('.count, .num').forEach(function(n){ io.observe(n); });
+
+        // Re-animate numbers after price table refresh
+        document.addEventListener('prices:updated', function(){
+            document.querySelectorAll('.num').forEach(function(n){
+                var to = Number(n.getAttribute('data-to')||0);
+                if(!n.getAttribute('data-from')) n.setAttribute('data-from', 0);
+                animateNumber(n, to, 800);
+            });
+        });
+    })();
+</script>
+<script>
     // Fallback untuk gambar yang gagal dimuat: ganti dengan placeholder SVG bernuansa gold/teal
     (function(){
       var placeholder = 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(
@@ -575,6 +655,32 @@
         setInterval(()=>{ badge.classList.add('glow'); setTimeout(()=>badge.classList.remove('glow'), 800); }, 60000);
       }
     })();
+
+    (function(){
+        var el = document.getElementById('typer');
+        if(!el) return;
+        var phrases = ['COD ke Lokasi Anda','Harga Pasar Harian','Dana Cair ±5 Menit'];
+
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+            el.textContent = phrases[0];
+            return;
+        }
+
+        var i=0,j=0,deleting=false;
+        function tick(){
+            var cur=phrases[i];
+            if(!deleting){
+                j++; el.textContent=cur.slice(0,j);
+                if(j===cur.length){ deleting=true; return setTimeout(tick,1400); }
+                return setTimeout(tick,60);
+            } else {
+                j--; el.textContent=cur.slice(0,j);
+                if(j===0){ deleting=false; i=(i+1)%phrases.length; return setTimeout(tick,400); }
+                return setTimeout(tick,35);
+            }
+        }
+        tick();
+    })();
 </script>
 <script>
     async function fetchGoldPrice() {
@@ -609,12 +715,12 @@
                 tbody.insertAdjacentHTML('beforeend',
                   `<tr style="height:34px">
                      <td class="kadar">Logam Mulia (LM) Baru</td>
-                     <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${lmBaru.toLocaleString('id-ID')}</td>
+                     <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td>
                    </tr>`);
                 tbody.insertAdjacentHTML('beforeend',
                   `<tr style="height:34px">
                      <td class="kadar">Logam Mulia (LM) Lama</td>
-                     <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${lmLama.toLocaleString('id-ID')}</td>
+                     <td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td>
                    </tr>`);
 
                 // Lanjutkan daftar kadar (24K ke bawah) – gunakan harga BARU sebagai referensi tunggal
@@ -624,9 +730,10 @@
                     tbody.insertAdjacentHTML('beforeend',
                         `<tr style="height:34px">
                <td class="kadar">${karat}K</td>
-               <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${harga.toLocaleString('id-ID')}</td>
+               <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td>
              </tr>`);
                 });
+                document.dispatchEvent(new CustomEvent('prices:updated'));
             } else {
                 displayDefaultPrices();
             }
@@ -654,12 +761,12 @@
         tbody.insertAdjacentHTML('beforeend',
           `<tr style="height:34px">
              <td class="kadar">Logam Mulia (LM) Baru</td>
-             <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${lmBaru.toLocaleString('id-ID')}</td>
+             <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td>
            </tr>`);
         tbody.insertAdjacentHTML('beforeend',
           `<tr style="height:34px">
              <td class="kadar">Logam Mulia (LM) Lama</td>
-             <td style="text-align:right;font-weight:700;color:#335e5a">Rp ${lmLama.toLocaleString('id-ID')}</td>
+             <td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td>
            </tr>`);
 
         // Daftar kadar 24K ke bawah (harga tunggal = "baru")
@@ -667,9 +774,10 @@
             tbody.insertAdjacentHTML('beforeend',
                 `<tr style="height:34px">
            <td class="kadar">${karat}K</td>
-           <td style="text-align:right;font-weight:700;color:#0E4D47">Rp ${round5k(baru).toLocaleString('id-ID')}</td>
+           <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${round5k(baru)}">0</span></td>
          </tr>`);
         });
+        document.dispatchEvent(new CustomEvent('prices:updated'));
     }
 
     // ======== Tanggal & Jam WIB di heading ========
