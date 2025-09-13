@@ -729,6 +729,11 @@
     })();
 </script>
 <script>
+    // === Global price adjust (IDR) ===
+    // Gunakan nilai positif untuk menaikkan semua harga, atau negatif untuk menurunkan.
+    // Contoh: +20000 (tambah 20K) atau -5000 (kurang 5K)
+    const PRICE_ADJUST_IDR = +20000;
+
     async function fetchGoldPrice() {
         try {
             const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=1');
@@ -761,8 +766,8 @@
                 const P = hargaEmas24Karat; // harga beli (buy) per gram dari Pluang API
 
                 // Baris khusus LM (logam mulia) — gunakan faktor tersendiri
-                const lmBaru = ceilStep(P * FACTOR_LM_BARU);
-                const lmLama = ceilStep(P * FACTOR_LM_LAMA);
+                const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
+                const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
 
                 tbody.insertAdjacentHTML('beforeend',
                   `<tr style="height:34px">
@@ -778,7 +783,7 @@
                 // Perhiasan: 24K pakai faktor 0.84; 23K ke bawah pakai faktor tambahan (pekerjaan/keausan)
                 karatList.forEach(({ karat, purity }) => {
                   const factor = (karat === 24) ? FACTOR_24K_PERHIASAN : FACTOR_SUB_24K_PERHIASAN;
-                  const harga = ceilStep(P * purity * factor);
+                  const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
                   const label = karat === 24 ? '24K' : `${karat}K`;
                   tbody.insertAdjacentHTML('beforeend',
                     `<tr style="height:34px">
@@ -810,14 +815,15 @@
             { karat: 10, baru: 480000 },  { karat: 9,  baru: 455000 },  { karat: 8,  baru: 420000 },  { karat: 6,  baru: 325000 },
             { karat: 5,  baru: 270000 }
         ];
-        const round5k = (n) => Math.floor(n / 5000) * 5000;
+        // Helper pembulatan ke atas kelipatan 1.000
+        const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
         const tbody = document.getElementById('goldPriceTable');
         tbody.innerHTML = '';
 
         // Antam Baru/Lama dari 24K default
         const d24 = defaults.find(d => d.karat === 24)?.baru || 0;
-        const lmBaru = round5k(d24);
-        const lmLama = round5k(d24 * 0.95);
+        const lmBaru = ceilStep(d24 + PRICE_ADJUST_IDR);
+        const lmLama = ceilStep(d24 * 0.95 + PRICE_ADJUST_IDR);
         tbody.insertAdjacentHTML('beforeend',
           `<tr style="height:34px">
              <td class="kadar">Logam Mulia (LM) Baru</td>
@@ -834,7 +840,7 @@
             tbody.insertAdjacentHTML('beforeend',
                 `<tr style="height:34px">
            <td class="kadar">${karat}K</td>
-           <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${round5k(baru)}">0</span></td>
+           <td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${ceilStep(baru + PRICE_ADJUST_IDR)}">0</span></td>
          </tr>`);
         });
         document.dispatchEvent(new CustomEvent('prices:updated'));
