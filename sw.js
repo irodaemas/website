@@ -32,11 +32,15 @@ self.addEventListener('install', (event) => {
 // ===== Activate: cleanup lama
 self.addEventListener('activate', (event) => {
     event.waitUntil(
-        caches.keys().then((keys) =>
-            Promise.all(
+        (async () => {
+            if (self.registration.navigationPreload) {
+                try { await self.registration.navigationPreload.enable(); } catch (_) {}
+            }
+            const keys = await caches.keys();
+            return Promise.all(
                 keys.map((k) => (k !== CACHE_NAME && k !== FONT_CACHE ? caches.delete(k) : Promise.resolve()))
-            )
-        ).then(() => self.clients.claim())
+            );
+        })().then(() => self.clients.claim())
     );
 });
 
