@@ -59,8 +59,8 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(1,61,57,.92), rgba(1,61,57,.86));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid rgba(255,255,255,.08)}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
 .brand{display:flex;align-items:center;gap:.8rem;color:#fff;text-decoration:none}
-.brand svg{width:40px;height:40px}
-.brand img{width:40px;height:40px;display:block}
+.brand svg{width:32px;height:32px}
+.brand img{width:32px;height:32px;display:block}
 nav a{color:#d6fffb;text-decoration:none;font-weight:600;opacity:.9}
 nav a:hover{opacity:1}
 nav a, .foot a{display:inline-block; padding:.6rem .4rem; line-height:1.2}
