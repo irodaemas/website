@@ -33,7 +33,20 @@
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://pluang.com">
   <!-- PWA: manifest & app capability -->
-  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="anonymous">
+  <script>
+    (function(){
+      try{
+        fetch('./manifest.webmanifest', {cache:'no-store'}).then(function(r){
+          if(!r.ok){ console.warn('Manifest fetch status', r.status); }
+          return r.text();
+        }).then(function(txt){
+          try{ JSON.parse(txt); }
+          catch(e){ console.warn('Manifest is not valid JSON (maybe served as HTML/404)'); }
+        }).catch(function(err){ console.warn('Manifest fetch error', err); });
+      }catch(e){}
+    })();
+  </script>
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -121,6 +134,22 @@
       nav a, .foot a{display:inline-block; padding:.6rem .4rem; line-height:1.2}
       .menu{display:flex;gap:1rem}
       .hamb{display:none}
+
+      /* --- Scroll progress bar --- */
+      .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;
+          background:linear-gradient(90deg,var(--gold),var(--deep));z-index:100}
+
+      /* --- Micro icon animations --- */
+      .fab svg{transition: transform .2s ease, filter .2s ease}
+      .fab:hover svg{transform: scale(1.08)}
+      .fab:hover{box-shadow:0 12px 28px rgba(0,0,0,.28)}
+
+      /* --- Card hover tilt --- */
+      .feature, .t-card{transform-style:preserve-3d; will-change: transform}
+      @media (hover:hover) and (pointer:fine){
+          .feature, .t-card{transition: transform .15s ease}
+      }
+
       @media (max-width:860px){.menu{display:none}.hamb{display:inline-flex}}
       /* ---------- hero ---------- */
       /* --- Diamond blink/shine on hero image --- */
@@ -192,6 +221,9 @@
       .gallery{grid-template-columns:repeat(6,1fr)}
       .gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px}
       .gallery video{width:100%;height:180px;object-fit:cover;border-radius:12px;display:block;pointer-events:none;user-select:none}
+      /* LQIP blur-up */
+      .lqip{filter: blur(12px); transform: scale(1.02); transition: filter .5s ease, transform .5s ease}
+      .lqip.loaded{filter:none; transform:none}
       /* Hide native controls in WebKit/Blink just in case */
       @media (max-width:1024px){.gallery{grid-template-columns:repeat(4,1fr)}}
       @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
@@ -265,6 +297,11 @@
           100%{background-position: 10% 6%, 90% 8%}
         }
 
+        /* Parallax modifiers controlled by CSS vars */
+        .hero{ --parx: 0px; --pary: 0px }
+        .hero::after{ transform: translate(var(--parx), var(--pary)); transition: transform .08s linear }
+        .bling .shine{ will-change: transform }
+
         /* Buttons micro-press */
         .btn{transition: transform .15s ease, box-shadow .2s ease, filter .2s ease}
         .btn:hover{transform: translateY(-1px)}
@@ -290,6 +327,9 @@
           .text-shimmer{ color:#fff }
           .text-rainbow{ color:#fff }
       }
+
+      .confetti{position:fixed;left:0;top:0;width:100%;height:0;pointer-events:none;overflow:visible;z-index:120}
+      .confetti i{position:absolute;width:8px;height:12px;border-radius:2px;opacity:.9;will-change:transform}
 
       @media (min-width: 1024px){
         .table-card table{font-size:1rem}
@@ -371,6 +411,7 @@
     <a class="btn btn-gold hamb" href="#kontak">Hubungi</a>
   </div>
 </header>
+<div class="scroll-progress" aria-hidden="true"></div>
 
 <!-- ===================== HERO ===================== -->
 <section class="hero" id="home">
@@ -487,18 +528,18 @@
     <div class="accent-title">Dokumentasi</div>
     <h2 class="h2">Galeri Barang yang Pernah Dibeli</h2>
     <div class="grid gallery">
-      <img alt="Barang yang pernah diberli #1" src="asset2.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #2" src="asset3.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #3" src="asset4.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #4" src="asset5.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #5" src="asset6.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #6" src="asset7.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #7" src="asset8.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #8" src="asset9.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #9" src="asset10.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #10" src="asset11.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #11" src="asset12.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
-      <img alt="Barang yang pernah diberli #12" src="asset13.jpeg" loading="lazy" decoding="async" width="400" height="180"/>
+      <img alt="Barang yang pernah diberli #1" data-src="asset2.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #2" data-src="asset3.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #3" data-src="asset4.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #4" data-src="asset5.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #5" data-src="asset6.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #6" data-src="asset7.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #7" data-src="asset8.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #8" data-src="asset9.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #9" data-src="asset10.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #10" data-src="asset11.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #11" data-src="asset12.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+      <img alt="Barang yang pernah diberli #12" data-src="asset13.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
       <video src="asset14.mp4" muted loop playsinline preload="none" loading="lazy"></video>
       <video src="asset15.mp4" muted loop playsinline preload="none" loading="lazy"></video>
       <video src="asset16.mp4" muted loop playsinline preload="none" loading="lazy"></video>
@@ -627,6 +668,70 @@
 
 <script>
     (function(){
+        // ---- Scroll progress + Parallax ----
+        var bar = document.querySelector('.scroll-progress');
+        var ticking = false;
+        function onScroll(){
+            if(ticking) return; ticking = true;
+            requestAnimationFrame(function(){
+                var h = document.documentElement;
+                var max = h.scrollHeight - h.clientHeight; var p = max>0 ? (h.scrollTop/max)*100 : 0;
+                if(bar) bar.style.width = p + '%';
+                // Parallax hero translate
+                var y = h.scrollTop || document.body.scrollTop; var par = Math.min(40, y*0.04);
+                var hero = document.querySelector('.hero');
+                if(hero){ hero.style.setProperty('--pary', par+'px'); hero.style.setProperty('--parx', (par*-.2)+'px'); }
+                ticking = false;
+            });
+        }
+        window.addEventListener('scroll', onScroll, {passive:true});
+        onScroll();
+
+        // ---- Confetti on WA click ----
+        function confettiBurst(x,y){
+            var c = document.createElement('div'); c.className='confetti'; document.body.appendChild(c);
+            var colors = ['#D4AF37','#F2D16B','#ffffff','#9be7e1'];
+            for(var i=0;i<22;i++){
+                var p = document.createElement('i');
+                p.style.left = x + 'px'; p.style.top = y + 'px';
+                p.style.background = colors[i%colors.length];
+                c.appendChild(p);
+                (function(p){
+                    var dx = (Math.random()*2-1)*140; var dy = (Math.random()*-1)*220 - 80; var rz = (Math.random()*360)|0; var t = 700 + Math.random()*500;
+                    p.animate([
+                        { transform: 'translate3d(0,0,0) rotate(0deg)' },
+                        { transform: 'translate3d('+dx+'px,'+dy+'px,0) rotate('+rz+'deg)', opacity:.1 }
+                    ], { duration: t, easing:'cubic-bezier(.22,.61,.36,1)' }).onfinish = function(){ p.remove(); };
+                })(p);
+            }
+            setTimeout(function(){ c.remove(); }, 1200);
+        }
+        document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function(el){
+            el.addEventListener('click', function(){
+                var r = el.getBoundingClientRect(); confettiBurst(r.left + r.width/2, r.top + window.scrollY);
+            });
+        });
+
+        // ---- Hover tilt (desktop only) ----
+        if(window.matchMedia && window.matchMedia('(pointer:fine)').matches){
+            var cards = document.querySelectorAll('.feature, .t-card');
+            cards.forEach(function(card){
+                var rect;
+                card.addEventListener('mouseenter', function(){ rect = card.getBoundingClientRect(); });
+                card.addEventListener('mousemove', function(ev){
+                    if(!rect) rect = card.getBoundingClientRect();
+                    var px = (ev.clientX - rect.left)/rect.width - .5;
+                    var py = (ev.clientY - rect.top)/rect.height - .5;
+                    var rx = (py * -4); var ry = (px * 6);
+                    card.style.transform = 'perspective(700px) rotateX('+rx+'deg) rotateY('+ry+'deg) translateZ(0)';
+                });
+                card.addEventListener('mouseleave', function(){ card.style.transform = 'none'; });
+            });
+        }
+    })();
+</script>
+<script>
+    (function(){
         const ease = function (t) {
             return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
         };
@@ -685,6 +790,10 @@
               <text x="50%" y="52%" font-family="Inter,Arial" font-size="28" fill="white" text-anchor="middle">Roda Emas Indonesia</text>\
             </svg>'
         );
+        // Seed placeholder for LQIP images
+        document.querySelectorAll('img[data-src]').forEach(function(img){
+          if(!img.src) img.src = placeholder;
+        });
         document.querySelectorAll('img').forEach(function(img){
         img.addEventListener('error', function(){
           img.src = placeholder;
@@ -726,6 +835,27 @@
         }, {threshold: 0.5});
         document.querySelectorAll('video').forEach(v=>vio.observe(v));
       }catch(_){}
+
+      // ---- Lazy load images with blur-up ----
+      try{
+        const iio = new IntersectionObserver((entries)=>{
+          entries.forEach(e=>{
+            if(!e.isIntersecting) return;
+            const img = e.target; const real = img.getAttribute('data-src');
+            if(real){
+              img.addEventListener('load', function(){ img.classList.add('loaded'); }, { once:true });
+              img.src = real; img.removeAttribute('data-src');
+            }
+            iio.unobserve(img);
+          });
+        }, { rootMargin: '200px 0px' });
+        document.querySelectorAll('img[data-src]').forEach(img=>iio.observe(img));
+      }catch(_){
+        // Fallback: eager swap without IO
+        document.querySelectorAll('img[data-src]').forEach(function(img){
+          const real = img.getAttribute('data-src'); if(real){ img.addEventListener('load', function(){ img.classList.add('loaded'); }, { once:true }); img.src = real; img.removeAttribute('data-src'); }
+        });
+      }
 
       // ---- Scroll reveal ----
       const revealables = Array.from(document.querySelectorAll('section, .feature, .card, .stat, .gallery img, .gallery video'));
@@ -942,16 +1072,31 @@
       }catch(e){}
     }
     document.querySelectorAll('[data-track]').forEach(function(el){
-      el.addEventListener('click', function(){ track('cta_click', el.getAttribute('data-track')); });
+      el.addEventListener('click', function(){
+        var label = el.getAttribute('data-track');
+        track('cta_click', label);
+        if(label && label.indexOf('wa-')===0 && 'serviceWorker' in navigator){
+          try{
+            navigator.serviceWorker.ready.then(function(reg){
+              var tag = 'wa-click:' + label + ':' + Date.now();
+              if('sync' in reg){ reg.sync.register(tag).catch(function(){}); }
+              // Also try a best-effort beacon
+              if(navigator.sendBeacon){
+                try{ navigator.sendBeacon('/track', new Blob([JSON.stringify({e:'wa', label:label, t:Date.now()})], {type:'application/json'})); }catch(e){}
+              }
+            });
+          }catch(e){}
+        }
+      });
     });
   })();
 </script>
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){
-      navigator.serviceWorker.register('/sw.js').catch(function(err){
-        console.warn('SW registration failed', err);
-      });
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then(function(reg){ console.info('SW registered:', reg.scope); })
+        .catch(function(err){ console.warn('SW registration failed', err); });
     });
   }
 </script>
