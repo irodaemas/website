@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' 'unsafe-inline' https://pluang.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://pluang.com https://wa.me https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'self'; form-action 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' 'unsafe-inline' https://pluang.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://pluang.com https://wa.me; frame-ancestors 'self'; form-action 'self';" />
   <title>Roda Emas Indonesia – Jual Beli Emas COD</title>
   <meta name="description" content="Menerima jual emas, berlian, jam tangan mewah, batu mulia via buyback aman COD se‑Jabodetabek & sekitarnya, mengikuti harga pasar hari transaksi. Transparan, cepat, terpercaya."/>
   <meta name="theme-color" content="#013D39"/>
@@ -27,8 +27,9 @@
   <link rel="alternate" href="https://rodaemasindonesia.com/" hreflang="id-ID"/>
   <link rel="alternate" href="https://rodaemasindonesia.com/" hreflang="x-default"/>
   <link rel="canonical" href="https://rodaemasindonesia.com/">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Self-hosted fonts -->
+  <link rel="preload" href="assets/css/fonts.css" as="style">
+  <link rel="stylesheet" href="assets/css/fonts.css">
   <link rel="dns-prefetch" href="https://wa.me">
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://pluang.com">
@@ -50,9 +51,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Roda Emas">
-  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
+  
   <link rel="stylesheet" href="assets/css/styles.css">
   <link rel="preload" as="image" href="assets/img/asset1.webp" imagesizes="(max-width: 860px) 100vw, 50vw" imagesrcset="assets/img/asset1.webp 1200w">
   <script type="application/ld+json">
@@ -189,10 +188,68 @@
         <tbody id="goldPriceTable"></tbody>
       </table>
     </div>
-    <p style="color:#5a6a68;margin:.8rem 0 0">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
+    <p id="lastUpdatedInfo" style="color:#5a6a68;margin:.8rem 0 0">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
     <div style="margin-top:1rem"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
   </div>
 </section>
+
+<!-- ===================== KALKULATOR ===================== -->
+<section id="kalkulator" style="background:#fff">
+  <div class="container">
+    <div class="accent-title">Kalkulator Emas</div>
+    <h2 class="h2">Estimasi Buyback Hari Ini</h2>
+    <div class="card" style="padding:1rem">
+      <div class="grid grid-3" style="gap:1rem">
+        <div>
+          <label for="cal-cat" class="h3">Kategori</label>
+          <select id="cal-cat" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec">
+            <option value="lm_baru">Logam Mulia (LM) Baru</option>
+            <option value="lm_lama">Logam Mulia (LM) Lama</option>
+            <option value="perhiasan_24">Perhiasan 24K</option>
+            <option value="perhiasan_sub">Perhiasan &lt;24K</option>
+          </select>
+        </div>
+        <div>
+          <label for="cal-kadar" class="h3">Kadar</label>
+          <select id="cal-kadar" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec">
+            <option value="24">24K</option>
+            <option value="23">23K</option>
+            <option value="22">22K</option>
+            <option value="21">21K</option>
+            <option value="20">20K</option>
+            <option value="19">19K</option>
+            <option value="18">18K</option>
+            <option value="17">17K</option>
+            <option value="16">16K</option>
+            <option value="15">15K</option>
+            <option value="14">14K</option>
+            <option value="13">13K</option>
+            <option value="12">12K</option>
+            <option value="11">11K</option>
+            <option value="10">10K</option>
+            <option value="9">9K</option>
+            <option value="8">8K</option>
+            <option value="7">7K</option>
+            <option value="6">6K</option>
+            <option value="5">5K</option>
+          </select>
+        </div>
+        <div>
+          <label for="cal-berat" class="h3">Berat (gram)</label>
+          <input id="cal-berat" type="number" min="0" step="0.01" value="1" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec" />
+        </div>
+      </div>
+      <div style="margin-top:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <div>
+          <div style="color:#485856">Perkiraan total</div>
+          <div class="h2" id="cal-total" style="margin:0">Rp 0</div>
+          <div id="cal-note" style="color:#5a6a68;font-size:.95rem">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
+        </div>
+        <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
+      </div>
+    </div>
+  </div>
+  </section>
 
 <!-- ===================== FITUR ===================== -->
 <section id="fitur">

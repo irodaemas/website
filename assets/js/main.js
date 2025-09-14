@@ -176,6 +176,32 @@
 // Harga emas: fetch + fallback + waktu W.I.B
 const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
+let REI_LAST_BASE_P = null;
+const LAST_PRICE_KEY = 'rei_last_base_price_v1';
+function saveLastBasePrice(p){ try{ localStorage.setItem(LAST_PRICE_KEY, JSON.stringify({ p, t: Date.now() })); }catch(_){} }
+function readLastBasePrice(){ try{ const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY)||''); if(o && typeof o.p==='number') return o; }catch(_){} return null; }
+function displayFromBasePrice(P){
+  const PRICE_ADJUST_IDR = +50000;
+  const FACTOR_LM_BARU = 0.932; const FACTOR_LM_LAMA = 0.917; const FACTOR_24K_PERHIASAN = 0.862; const FACTOR_SUB_24K_PERHIASAN = 0.786;
+  const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
+  const tbody = document.getElementById('goldPriceTable'); if(!tbody) return;
+  tbody.innerHTML = '';
+  const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
+  const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
+  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
+  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
+  const karatList = [
+    {karat:24,purity:1},{karat:23,purity:0.9583},{karat:22,purity:0.9167},{karat:21,purity:0.875},{karat:20,purity:0.8333},{karat:19,purity:0.7917},{karat:18,purity:0.75},{karat:17,purity:0.7083},{karat:16,purity:0.6667},{karat:15,purity:0.625},{karat:14,purity:0.5833}
+  ];
+  karatList.forEach(({ karat, purity }) => {
+    const factor = (karat === 24) ? FACTOR_24K_PERHIASAN : FACTOR_SUB_24K_PERHIASAN;
+    const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
+    const label = karat === 24 ? '24K' : `${karat}K`;
+    tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
+  });
+  document.dispatchEvent(new CustomEvent('prices:updated'));
+}
+
 async function fetchGoldPrice() {
   try {
     const ctl = new AbortController();
@@ -185,6 +211,7 @@ async function fetchGoldPrice() {
     const data = await response.json();
     if (data && data.statusCode === 200 && data.data && data.data.current) {
       const hargaEmas24Karat = Number(data.data.current.buy);
+      REI_LAST_BASE_P = hargaEmas24Karat; saveLastBasePrice(hargaEmas24Karat);
       const FACTOR_LM_BARU = 0.932;
       const FACTOR_LM_LAMA = 0.917;
       const FACTOR_24K_PERHIASAN = 0.862;
@@ -208,12 +235,18 @@ async function fetchGoldPrice() {
         tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
       });
       document.dispatchEvent(new CustomEvent('prices:updated'));
+      // Inform last updated
+      var info = document.getElementById('lastUpdatedInfo'); if(info){ info.textContent = 'Terakhir diperbarui: ' + formatDateTimeIndo(new Date()); }
     } else {
-      displayDefaultPrices();
+      const last = readLastBasePrice();
+      if(last){ displayFromBasePrice(last.p); var info = document.getElementById('lastUpdatedInfo'); if(info){ info.textContent = 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)); } }
+      else { displayDefaultPrices(); }
     }
   } catch (err) {
     console.warn('Harga gagal dimuat, pakai default:', err?.name || err);
-    displayDefaultPrices();
+    const last = readLastBasePrice();
+    if(last){ displayFromBasePrice(last.p); var info = document.getElementById('lastUpdatedInfo'); if(info){ info.textContent = 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)); } }
+    else { displayDefaultPrices(); }
   }
 }
 function displayDefaultPrices() {
@@ -274,6 +307,48 @@ displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
 fetchGoldPrice();
 
+// Kalkulator Emas + WA Prefill
+(function(){
+  var cat = document.getElementById('cal-cat');
+  var kadar = document.getElementById('cal-kadar');
+  var berat = document.getElementById('cal-berat');
+  var total = document.getElementById('cal-total');
+  var wa = document.getElementById('wa-prefill');
+  if(!cat || !kadar || !berat || !total || !wa) return;
+  function ceilStep(n, step){ step = step||1000; return Math.ceil(n/step)*step; }
+  function formatIDR(n){ try{ return n.toLocaleString('id-ID'); }catch(_){ return String(n); } }
+  function purityFromK(k){ return Math.max(0, Math.min(1, Number(k||24)/24)); }
+  function compute(){
+    var P = REI_LAST_BASE_P || (readLastBasePrice()?.p) || 1200000; // fallback base
+    var c = cat.value;
+    var k = Number(kadar.value||24);
+    var g = Math.max(0, Number(berat.value||0));
+    var FACTOR_LM_BARU = 0.932, FACTOR_LM_LAMA=0.917, FACTOR_24K=0.862, FACTOR_SUB=0.786, ADJ=50000;
+    var perGram;
+    if(c==='lm_baru'){ perGram = ceilStep(P*FACTOR_LM_BARU + ADJ); k=24; }
+    else if(c==='lm_lama'){ perGram = ceilStep(P*FACTOR_LM_LAMA + ADJ); k=24; }
+    else if(c==='perhiasan_24'){ perGram = ceilStep(P*FACTOR_24K + ADJ); k=24; }
+    else { perGram = ceilStep(P*FACTOR_SUB*purityFromK(k) + ADJ); }
+    var est = ceilStep(perGram * g, 1000);
+    total.textContent = 'Rp ' + formatIDR(est);
+    var msg = `Halo Roda Emas Indonesia,%0A%0ASaya ingin konsultasi buyback:%0A- Kategori: ${labelCat(c)}%0A- Kadar: ${k}K%0A- Berat: ${g} gram%0A- Estimasi: Rp ${formatIDR(est)}%0A%0AMohon info lebih lanjut, terima kasih.`;
+    wa.href = 'https://wa.me/6285591088503?text=' + msg;
+  }
+  function labelCat(c){
+    switch(c){
+      case 'lm_baru': return 'Logam Mulia (LM) Baru';
+      case 'lm_lama': return 'Logam Mulia (LM) Lama';
+      case 'perhiasan_24': return 'Perhiasan 24K';
+      default: return 'Perhiasan <24K';
+    }
+  }
+  ['input','change'].forEach(function(ev){ cat.addEventListener(ev, compute); kadar.addEventListener(ev, compute); berat.addEventListener(ev, compute); });
+  // Disable kadar when not needed
+  function toggleKadar(){ var disable = (cat.value==='lm_baru'||cat.value==='lm_lama'||cat.value==='perhiasan_24'); kadar.disabled = disable; }
+  cat.addEventListener('change', function(){ toggleKadar(); compute(); });
+  toggleKadar(); compute();
+})();
+
 // Tahun pada footer
 var yrEl = document.getElementById('yr'); if(yrEl){ yrEl.textContent = new Date().getFullYear().toString(); }
 
@@ -307,10 +382,22 @@ var yrEl = document.getElementById('yr'); if(yrEl){ yrEl.textContent = new Date(
 })();
 
 // Service worker register
+// SW register + Update Toast
 if ('serviceWorker' in navigator) {
+  function showUpdateToast(){
+    var t = document.getElementById('sw-toast');
+    if(!t){ t = document.createElement('div'); t.id='sw-toast'; t.style.cssText='position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#013D39;color:#fff;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:999px;padding:.6rem .9rem;display:flex;align-items:center;gap:.8rem;z-index:200;'; t.innerHTML = '<span>Versi baru tersedia</span>'; var b=document.createElement('button'); b.className='btn btn-gold'; b.style.cssText='padding:.4rem .7rem;font-size:.95rem'; b.textContent='Refresh'; b.onclick=function(){ location.reload(); }; t.appendChild(b); document.body.appendChild(t);} else { t.style.display='flex'; }
+  }
   window.addEventListener('load', function(){
     navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then(function(reg){ console.info('SW registered:', reg.scope); })
+      .then(function(reg){
+        console.info('SW registered:', reg.scope);
+        if(reg.waiting){ showUpdateToast(); }
+        reg.addEventListener('updatefound', function(){
+          var nw = reg.installing;
+          if(nw){ nw.addEventListener('statechange', function(){ if(nw.state==='installed' && navigator.serviceWorker.controller){ showUpdateToast(); } }); }
+        });
+      })
       .catch(function(err){ console.warn('SW registration failed', err); });
   });
 }

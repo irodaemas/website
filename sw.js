@@ -12,6 +12,7 @@ const CORE_ASSETS = [
     './404.html',
     './manifest.webmanifest',
     './assets/css/styles.css',
+    './assets/css/fonts.css',
     './assets/js/main.js',
     './assets/img/logo.webp?v=1',
     './assets/img/asset1.webp',
