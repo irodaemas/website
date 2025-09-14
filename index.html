@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' 'unsafe-inline' https://pluang.com; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self' https://pluang.com https://wa.me; frame-ancestors 'self'; form-action 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' https://pluang.com 'sha256-VMze8vM9iA5eoGxZgMy2QJAu0Hascu5XdrfQ2zictRE=' 'sha256-lKSmt9/xy5jtn0F2bQ4hRVO7kwPtze8xYlDunJfkX88=' 'sha256-BybwlXa4RsTIZMbwN99QXwHYOG9Gi+1qAWr/wBQIl4M='; style-src 'self'; font-src 'self'; connect-src 'self' https://pluang.com https://wa.me; frame-ancestors 'self'; form-action 'self';" />
   <title>Roda Emas Indonesia – Jual Beli Emas COD</title>
   <meta name="description" content="Menerima jual emas, berlian, jam tangan mewah, batu mulia via buyback aman COD se‑Jabodetabek & sekitarnya, mengikuti harga pasar hari transaksi. Transparan, cepat, terpercaya."/>
   <meta name="theme-color" content="#013D39"/>
@@ -120,7 +120,7 @@
 <header>
   <div class="container nav">
     <a class="brand" href="#">
-      <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" style="width:34px;height:34px;object-fit:contain;border-radius:6px" width="34" height="34"/>
+      <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" width="34" height="34"/>
       <strong>Roda Emas Indonesia</strong>
     </a>
     <nav class="menu">
@@ -145,19 +145,19 @@
       </h1>
       <div class="typewriter" aria-live="polite"><span id="typer" class="text-rainbow"></span></div>
       <p class="lead">Di sini kami menerima jual dengan layanan buyback aman melalui <strong>COD se‑Jabodetabek & sekitarnya</strong>, mengikuti <strong>harga pasar pada hari transaksi</strong>. Terima: logam mulia; perhiasan emas (baru/lama, warisan/luar negeri, rusak/patah, bersurat/tanpa surat); berlian tanpa surat; jam tangan mewah; serta batu mulia (Safir, Rubi, Jamrud). Transparan, cepat, dan terpercaya.</p>
-      <div style="margin-top:1.2rem; display:flex; gap:.8rem; flex-wrap:wrap">
+      <div class="btn-row mt-12">
         <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-hero">WhatsApp Sekarang</a>
         <a class="btn btn-ghost" href="#fitur">Lihat Keunggulan</a>
       </div>
-      <div class="grid grid-3 stats" style="margin-top:1.4rem">
+      <div class="grid grid-3 stats mt-14">
         <div class="glass stat"><b><span class="count" data-to="5">0</span> <small>Menit</small></b><span>Pencairan dana</span></div>
         <div class="glass stat"><b>Harga Pasar</b><span>Buyback kompetitif</span></div>
         <div class="glass stat"><b>Transparan</b><span>Cek barang bersama</span></div>
       </div>
     </div>
     <div>
-      <div class="card bling" style="padding:1rem;background:linear-gradient(180deg,#012E2B,#013D39)">
-        <img alt="Perhiasan emas – ilustrasi" src="assets/img/asset1.webp" decoding="async" fetchpriority="high" loading="eager" style="width:100%;height:420px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.18)" width="1200" height="420"/>
+      <div class="card bling">
+        <img alt="Perhiasan emas – ilustrasi" src="assets/img/asset1.webp" decoding="async" fetchpriority="high" loading="eager" width="1200" height="420"/>
         <i class="shine" aria-hidden="true"></i>
         <i class="sparkle s1" aria-hidden="true"></i>
         <i class="sparkle s2" aria-hidden="true"></i>
@@ -169,7 +169,7 @@
 </section>
 
 <!-- ===================== HARGA BUYBACK ===================== -->
-<section id="harga" style="background:linear-gradient(180deg,#FFFDF5,#F9FFF8)">
+<section id="harga">
   <div class="container">
     <div class="accent-title">Harga Buyback</div>
     <h2 class="h2">
@@ -181,28 +181,28 @@
       <table aria-label="Tabel harga buyback perhiasan">
         <thead>
         <tr>
-          <th style="text-align:left;width:44%">Kadar</th>
-          <th style="text-align:right;width:56%">Harga (Rp)</th>
+          <th>Kadar</th>
+          <th>Harga (Rp)</th>
         </tr>
         </thead>
         <tbody id="goldPriceTable"></tbody>
       </table>
     </div>
-    <p id="lastUpdatedInfo" style="color:#5a6a68;margin:.8rem 0 0">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
-    <div style="margin-top:1rem"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
+    <p id="lastUpdatedInfo" class="text-note mt-10">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
+    <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
   </div>
 </section>
 
 <!-- ===================== KALKULATOR ===================== -->
-<section id="kalkulator" style="background:#fff">
+<section id="kalkulator">
   <div class="container">
     <div class="accent-title">Kalkulator Emas</div>
     <h2 class="h2">Estimasi Buyback Hari Ini</h2>
-    <div class="card" style="padding:1rem">
-      <div class="grid grid-3" style="gap:1rem">
+    <div class="card pad-1">
+      <div class="grid grid-3 gap-1">
         <div>
           <label for="cal-cat" class="h3">Kategori</label>
-          <select id="cal-cat" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec">
+          <select id="cal-cat" class="form-control">
             <option value="lm_baru">Logam Mulia (LM) Baru</option>
             <option value="lm_lama">Logam Mulia (LM) Lama</option>
             <option value="perhiasan_24">Perhiasan 24K</option>
@@ -211,7 +211,7 @@
         </div>
         <div>
           <label for="cal-kadar" class="h3">Kadar</label>
-          <select id="cal-kadar" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec">
+          <select id="cal-kadar" class="form-control">
             <option value="24">24K</option>
             <option value="23">23K</option>
             <option value="22">22K</option>
@@ -236,14 +236,14 @@
         </div>
         <div>
           <label for="cal-berat" class="h3">Berat (gram)</label>
-          <input id="cal-berat" type="number" min="0" step="0.01" value="1" style="width:100%;padding:.8rem;border-radius:10px;border:1px solid #e7eeec" />
+          <input id="cal-berat" type="number" min="0" step="0.01" value="1" class="form-control" />
         </div>
       </div>
-      <div style="margin-top:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+      <div class="flex-split mt-10">
         <div>
-          <div style="color:#485856">Perkiraan total</div>
-          <div class="h2" id="cal-total" style="margin:0">Rp 0</div>
-          <div id="cal-note" style="color:#5a6a68;font-size:.95rem">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
+          <div class="text-muted">Perkiraan total</div>
+          <div class="h2" id="cal-total" class="m-0">Rp 0</div>
+          <div id="cal-note" class="text-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
         </div>
         <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
       </div>
@@ -274,16 +274,16 @@
 </section>
 
 <!-- ===================== DITERIMA ===================== -->
-<section id="diterima" style="background:#fff">
+<section id="diterima">
   <div class="container">
     <div class="accent-title">Apa Saja yang Kami Beli</div>
     <h2 class="h2">Terima Berbagai Kondisi</h2>
-    <p style="color:#485856;max-width:70ch">Di sini kami menerima jual via buyback aman: <strong>logam mulia</strong>; <strong>perhiasan emas</strong> (baru/lama, warisan/luar negeri, rusak/patah, bersurat/tanpa surat); <strong>berlian tanpa surat</strong>; <strong>jam tangan mewah</strong>; serta <strong>batu mulia</strong> (Safir, Rubi, Jamrud). Tidak yakin tipe barang Anda? Kirim foto via WhatsApp—kami bantu cek.</p>
-    <div class="grid grid-4" style="margin-top:1rem">
-      <div class="card" style="padding:1rem"><div class="h3">Perhiasan Emas</div><p>Baru/lama, warisan, luar negeri, rusak/patah, bersurat/tanpa surat.</p></div>
-      <div class="card" style="padding:1rem"><div class="h3">Berlian & Batu Mulia</div><p>Berlian tanpa surat; Safir, Rubi, Jamrud.</p></div>
-      <div class="card" style="padding:1rem"><div class="h3">Logam Mulia</div><p>Antam/UBS, berbagai gramasi & kondisi.</p></div>
-      <div class="card" style="padding:1rem"><div class="h3">Jam Tangan Mewah</div><p>Rolex, AP, Omega, dll (by assessment).</p></div>
+    <p class="text-muted mw-70ch">Di sini kami menerima jual via buyback aman: <strong>logam mulia</strong>; <strong>perhiasan emas</strong> (baru/lama, warisan/luar negeri, rusak/patah, bersurat/tanpa surat); <strong>berlian tanpa surat</strong>; <strong>jam tangan mewah</strong>; serta <strong>batu mulia</strong> (Safir, Rubi, Jamrud). Tidak yakin tipe barang Anda? Kirim foto via WhatsApp—kami bantu cek.</p>
+    <div class="grid grid-4 mt-10">
+      <div class="card pad-1"><div class="h3">Perhiasan Emas</div><p>Baru/lama, warisan, luar negeri, rusak/patah, bersurat/tanpa surat.</p></div>
+      <div class="card pad-1"><div class="h3">Berlian & Batu Mulia</div><p>Berlian tanpa surat; Safir, Rubi, Jamrud.</p></div>
+      <div class="card pad-1"><div class="h3">Logam Mulia</div><p>Antam/UBS, berbagai gramasi & kondisi.</p></div>
+      <div class="card pad-1"><div class="h3">Jam Tangan Mewah</div><p>Rolex, AP, Omega, dll (by assessment).</p></div>
     </div>
   </div>
 </section>
@@ -294,9 +294,9 @@
     <div class="accent-title">Cara Kerja</div>
     <h2 class="h2">3 Langkah Mudah</h2>
     <div class="grid grid-3">
-      <div class="card" style="padding:1.2rem"><span class="chip">1</span><div class="h3">Kirim Foto Barang</div><p>Chat WhatsApp & kirimkan foto. Kami estimasi range harga awal.</p></div>
-      <div class="card" style="padding:1.2rem"><span class="chip">2</span><div class="h3">COD di Lokasi Anda</div><p>Jadwalkan pertemuan: rumah/kantor/kafe. Pengecekan dilakukan bersama.</p></div>
-      <div class="card" style="padding:1.2rem"><span class="chip">3</span><div class="h3">Deal & Cair</div><p>Setuju harga → pembayaran tunai/transfer <strong>langsung saat itu juga</strong>.</p></div>
+      <div class="card pad-12"><span class="chip">1</span><div class="h3">Kirim Foto Barang</div><p>Chat WhatsApp & kirimkan foto. Kami estimasi range harga awal.</p></div>
+      <div class="card pad-12"><span class="chip">2</span><div class="h3">COD di Lokasi Anda</div><p>Jadwalkan pertemuan: rumah/kantor/kafe. Pengecekan dilakukan bersama.</p></div>
+      <div class="card pad-12"><span class="chip">3</span><div class="h3">Deal & Cair</div><p>Setuju harga → pembayaran tunai/transfer <strong>langsung saat itu juga</strong>.</p></div>
     </div>
   </div>
 </section>
@@ -322,17 +322,17 @@
 </section>
 
 <!-- ===================== LOKASI ===================== -->
-<section id="lokasi" style="background:#fff">
+<section id="lokasi">
   <div class="container">
     <div class="accent-title">Lokasi Layanan</div>
     <h2 class="h2">COD ke Lokasi Anda – Jabodetabek</h2>
-    <p style="color:#485856;max-width:70ch;margin-top:.4rem">Melayani <strong>se‑Jabodetabek & sekitarnya</strong> dengan sistem janji temu. Tim kami datang ke lokasi pilihan Anda—rumah, kantor, atau kafe—dengan waktu yang <strong>fleksibel</strong> dan proses yang <strong>transparan</strong>.</p>
-    <div class="grid grid-3" style="margin-top:1rem">
-      <div class="card" style="padding:1rem"><div class="h3">Cakupan</div><p>Se‑Jabodetabek & area sekitar (by availability).</p></div>
-      <div class="card" style="padding:1rem"><div class="h3">Titik Temu</div><p>Rumah, kantor, atau kafe—sesuai kenyamanan Anda.</p></div>
-      <div class="card" style="padding:1rem"><div class="h3">Jadwal Fleksibel</div><p>Atur jam via WhatsApp; kami menyesuaikan.</p></div>
+    <p class="text-muted mw-70ch mt-04">Melayani <strong>se‑Jabodetabek & sekitarnya</strong> dengan sistem janji temu. Tim kami datang ke lokasi pilihan Anda—rumah, kantor, atau kafe—dengan waktu yang <strong>fleksibel</strong> dan proses yang <strong>transparan</strong>.</p>
+    <div class="grid grid-3 mt-10">
+      <div class="card pad-1"><div class="h3">Cakupan</div><p>Se‑Jabodetabek & area sekitar (by availability).</p></div>
+      <div class="card pad-1"><div class="h3">Titik Temu</div><p>Rumah, kantor, atau kafe—sesuai kenyamanan Anda.</p></div>
+      <div class="card pad-1"><div class="h3">Jadwal Fleksibel</div><p>Atur jam via WhatsApp; kami menyesuaikan.</p></div>
     </div>
-    <div style="margin-top:1rem"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-lokasi">Atur Jadwal COD</a></div>
+    <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-lokasi">Atur Jadwal COD</a></div>
   </div>
 </section>
 
@@ -343,60 +343,60 @@
     <h2 class="h2">Testimoni & Pengalaman</h2>
     <div class="t-list">
       <div class="t-card">
-        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Nadia</b><div style="color:#5d6b69;font-size:.9rem">Jakarta Selatan</div></div></div>
-        <p style="color:#42514f;margin:0">Proses cepat dan transparan. Kurang dari 10 menit dana cair. Recommended!</p>
+        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Nadia</b><div class="t-loc">Jakarta Selatan</div></div></div>
+        <p class="t-text m-0">Proses cepat dan transparan. Kurang dari 10 menit dana cair. Recommended!</p>
       </div>
       <div class="t-card">
-        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Andi</b><div style="color:#5d6b69;font-size:.9rem">Jakarta Barat</div></div></div>
-        <p style="color:#42514f;margin:0">Tim datang tepat waktu ke kantor. Harga buyback masuk akal dan jelas.</p>
+        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Andi</b><div class="t-loc">Jakarta Barat</div></div></div>
+        <p class="t-text m-0">Tim datang tepat waktu ke kantor. Harga buyback masuk akal dan jelas.</p>
       </div>
       <div class="t-card">
-        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Sri</b><div style="color:#5d6b69;font-size:.9rem">Depok</div></div></div>
-        <p style="color:#42514f;margin:0">Nyaman karena COD di rumah. Pemeriksaan barang dilakukan di depan saya.</p>
+        <div class="t-head"><div class="t-ava" aria-hidden="true"></div><div><b>Sri</b><div class="t-loc">Depok</div></div></div>
+        <p class="t-text m-0">Nyaman karena COD di rumah. Pemeriksaan barang dilakukan di depan saya.</p>
       </div>
     </div>
   </div>
 </section>
 
 <!-- ===================== FAQ ===================== -->
-<section id="faq" style="background:#fff">
+<section id="faq">
   <div class="container">
     <div class="accent-title">Pertanyaan Umum</div>
     <h2 class="h2">FAQ</h2>
     <div class="grid grid-1" role="list">
       <details>
         <summary>Apakah bisa COD di luar Jabodetabek?</summary>
-        <div style="color:#485856;margin-top:.5rem">Untuk saat ini fokus Jabodetabek. Di luar area, silakan hubungi kami dulu—kami akan konfirmasi ketersediaan tim.</div>
+        <div class="text-muted mt-05">Untuk saat ini fokus Jabodetabek. Di luar area, silakan hubungi kami dulu—kami akan konfirmasi ketersediaan tim.</div>
       </details>
       <details>
         <summary>Berapa lama proses pencairan dana?</summary>
-        <div style="color:#485856;margin-top:.5rem">Jika sudah sepakat harga, biasanya dana cair **±5 menit** via transfer atau tunai.</div>
+        <div class="text-muted mt-05">Jika sudah sepakat harga, biasanya dana cair **±5 menit** via transfer atau tunai.</div>
       </details>
       <details>
         <summary>Barang apa saja yang diterima?</summary>
-        <div style="color:#485856;margin-top:.5rem">Perhiasan emas & berlian (utuh/putus), logam mulia (Antam/UBS), batu mulia, dan jam tangan mewah (by assessment).</div>
+        <div class="text-muted mt-05">Perhiasan emas & berlian (utuh/putus), logam mulia (Antam/UBS), batu mulia, dan jam tangan mewah (by assessment).</div>
       </details>
       <details>
         <summary>Bagaimana cara menentukan harga?</summary>
-        <div style="color:#485856;margin-top:.5rem">Mengacu **harga pasar harian** dan hasil pengecekan keaslian/kemurnian di lokasi. Anda dapat memantau referensi di tabel harga.</div>
+        <div class="text-muted mt-05">Mengacu **harga pasar harian** dan hasil pengecekan keaslian/kemurnian di lokasi. Anda dapat memantau referensi di tabel harga.</div>
       </details>
     </div>
   </div>
 </section>
 
 <!-- ===================== CTA ===================== -->
-<section id="kontak" style="background:linear-gradient(180deg,#013D39,#012E2B);color:#fff">
-  <div class="container grid cta-grid" style="gap:2rem;align-items:center">
+<section id="kontak">
+  <div class="container grid cta-grid">
     <div>
-      <div class="accent-title" style="color:#fff">Hubungi Kami</div>
-      <h2 class="h2" style="color:#fff">Siap Jemput Barang Anda Hari Ini</h2>
+      <div class="accent-title">Hubungi Kami</div>
+      <h2 class="h2">Siap Jemput Barang Anda Hari Ini</h2>
       <p class="lead">Klik tombol di samping untuk konsultasi cepat via WhatsApp. Kami responsif & siap atur jadwal COD di tempat Anda.</p>
-      <div style="margin-top:1rem;display:flex;gap:.8rem;flex-wrap:wrap">
+      <div class="btn-row cta-actions">
         <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-cta">WhatsApp Sekarang</a>
         <a class="btn btn-ghost" href="tel:+6285591088503" data-track="tel-cta">Telepon</a>
       </div>
     </div>
-    <div class="card bg-hostess" role="img" aria-label="Ilustrasi customer service" style="padding:1rem"></div>
+    <div class="card bg-hostess pad-1" role="img" aria-label="Ilustrasi customer service"></div>
   </div>
 </section>
 
@@ -404,23 +404,23 @@
 <footer>
   <div class="container foot">
     <div>
-      <div style="display:flex;align-items:center;gap:.7rem;color:#fff;margin-bottom:.6rem">
-        <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" style="width:28px;height:28px;object-fit:contain;border-radius:6px" loading="lazy" decoding="async" width="28" height="28"/>
-        <strong style="color:#fff">Roda Emas Indonesia</strong>
+      <div class="brand mb-06">
+        <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" loading="lazy" decoding="async" width="28" height="28"/>
+        <strong>Roda Emas Indonesia</strong>
       </div>
-      <p style="margin:.2rem 0;color:#cbe8e5">Buyback aman via COD se‑Jabodetabek, mengikuti harga pasar hari transaksi. Transparan, cepat, dan terpercaya.</p>
+      <p class="my-02">Buyback aman via COD se‑Jabodetabek, mengikuti harga pasar hari transaksi. Transparan, cepat, dan terpercaya.</p>
     </div>
     <div>
-      <div class="h3" style="color:#fff">Kontak</div>
-      <ul style="list-style:none;padding:0;margin:.3rem 0;color:#dff7f4">
+      <div class="h3">Kontak</div>
+      <ul>
         <li><a href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-footer">WhatsApp: +62 855-9108-8503</a></li>
         <li><a href="tel:+6285591088503" data-track="tel-footer">Telepon: +62 855-9108-8503</a></li>
         <li><a href="#" aria-disabled="true" tabindex="-1">Jam Operasional: 08:00–22:00 WIB</a></li>
       </ul>
     </div>
     <div>
-      <div class="h3" style="color:#fff">Layanan</div>
-      <ul style="list-style:none;padding:0;margin:.3rem 0;color:#dff7f4">
+      <div class="h3">Layanan</div>
+      <ul>
         <li><a href="#diterima">Perhiasan Emas</a></li>
         <li><a href="#diterima">Berlian & Batu Mulia</a></li>
         <li><a href="#diterima">Logam Mulia</a></li>
@@ -437,7 +437,7 @@
     <!-- WhatsApp icon -->
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20.52 3.48A11.8 11.8 0 0 0 12 .6 11.4 11.4 0 0 0 .6 12.12a11.1 11.1 0 0 0 1.5 5.58L.6 23.4l5.88-1.5a11.1 11.1 0 0 0 5.64 1.5c6.54 0 11.88-5.34 11.88-11.88 0-3.18-1.26-6.12-3.48-8.46Z" stroke="#013D39" stroke-width="1.2"/><path d="M8.16 7.56c-.12-.42-.36-.42-.54-.42-.18 0-.48.06-.78.36-.3.3-1.02.96-1.02 2.34s1.02 2.7 1.16 2.88c.12.18 2.04 3.12 5.04 4.26.7.3 1.26.48 1.68.6.7.24 1.32.2 1.8.12.54-.12 1.68-.72 1.92-1.44.24-.72.24-1.32.18-1.44-.06-.12-.24-.18-.54-.3-.3-.12-1.74-.84-2.01-.93-.27-.09-.45-.15-.63.15-.18.3-.72.93-.9 1.11-.18.18-.36.21-.66.09-.3-.12-1.26-.46-2.4-1.47-.9-.78-1.5-1.74-1.68-2.04-.18-.3-.02-.45.1-.57.1-.1.24-.27.36-.39.12-.12.18-.21.27-.36.09-.15.03-.27-.03-.39-.06-.12-.54-1.32-.78-1.86Z" fill="#013D39"/></svg>
   </a>
-  <button class="fab" aria-label="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Kembali ke atas">↑</button>
+  <button class="fab" id="backToTop" aria-label="Back to top" title="Kembali ke atas">↑</button>
 </div>
 <script type="application/ld+json">
 {

@@ -182,3 +182,81 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 @media (max-width: 860px){
   .hero .bling{ display:none !important; }
 }
+
+/* === Inline style cleanup: utilities & moved rules === */
+/* Brand logo refinements */
+.brand img{ object-fit:contain; border-radius:6px }
+/* Spacing utilities */
+.mt-10{ margin-top:1rem }
+.mt-12{ margin-top:1.2rem }
+.mt-14{ margin-top:1.4rem }
+.m-0{ margin:0 }
+/* Flex helpers */
+.btn-row{ display:flex; gap:.8rem; flex-wrap:wrap }
+.flex-split{ display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap }
+/* Padding utilities */
+.pad-1{ padding:1rem }
+.pad-12{ padding:1.2rem }
+/* Form control */
+.form-control{ width:100%; padding:.8rem; border-radius:10px; border:1px solid #e7eeec }
+/* Text helpers */
+.text-muted{ color:#485856 }
+.text-note{ color:#5a6a68; font-size:.95rem }
+/* 404 Ghost button override */
+.page-404 .btn-ghost{ color: var(--deep); border-color: rgba(1,61,57,.28) }
+.page-404 .btn-ghost:hover{ background: rgba(1,61,57,.06) }
+.page-404 .btn.btn-gold{ color: var(--deep) }
+/* Center actions on 404 */
+.page-404 .btn-wrap{ display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap }
+
+/* Section backgrounds moved from inline */
+#harga{ background:linear-gradient(180deg,#FFFDF5,#F9FFF8) }
+#kalkulator, #diterima, #lokasi, #faq{ background:#fff }
+
+/* Hero visuals moved from inline */
+.card.bling{ padding:1rem; background:linear-gradient(180deg,#012E2B,#013D39) }
+.hero .bling img{ width:100%; height:420px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,.18) }
+
+/* Harga table header alignment */
+.table-card th:first-child{ text-align:left; width:44% }
+.table-card th:last-child{ text-align:right; width:56% }
+
+/* Kalkulator helpers */
+#cal-total.h2{ margin:0 }
+
+/* CTA section styling moved from inline */
+#kontak{ background:linear-gradient(180deg,#013D39,#012E2B); color:#fff }
+#kontak .accent-title, #kontak .h2{ color:#fff }
+#kontak .cta-actions{ margin-top:1rem }
+
+/* Footer cleanup */
+.foot strong{ color:#fff }
+.foot .h3{ color:#fff }
+.foot p{ color:#cbe8e5 }
+.foot ul{ color:#dff7f4; list-style:none; padding:0; margin:.3rem 0 }
+.foot .brand img{ width:28px; height:28px; object-fit:contain; border-radius:6px }
+
+/* Testimonial subtext */
+.t-loc{ color:#5d6b69; font-size:.9rem }
+
+/* Minor utilities */
+.mw-70ch{ max-width:70ch }
+.mt-04{ margin-top:.4rem }
+.mt-05{ margin-top:.5rem }
+.mb-06{ margin-bottom:.6rem }
+.my-02{ margin:.2rem 0 }
+.gap-1{ gap:1rem }
+.t-text{ color:#42514f }
+
+/* Align items center for CTA grid wrapper */
+.cta-grid{ align-items:center }
+
+/* 404 page styles */
+.page-404{ min-height:100vh; display:flex; flex-direction:column; background:linear-gradient(180deg,#FFFDF5,#F9FFF8) }
+.page-404 main{ flex:1; display:grid; place-items:center; padding:48px 16px }
+.nf-card{ max-width:760px; text-align:center; padding:32px 24px }
+.page-404 .chip{ margin:auto }
+.page-404 .h2{ margin-top:.6rem }
+.page-404 .lead{ margin:.6rem 0 1.2rem; color:#5a6a68 }
+.subnote{ margin-top:1rem; color:#7b8c8a; font-size:.95rem }
+.path-badge{ background:rgba(1,61,57,.06); padding:.2rem .4rem; border-radius:6px; display:inline-block }
