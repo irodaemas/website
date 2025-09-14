@@ -217,24 +217,37 @@ async function fetchGoldPrice() {
   }
 }
 function displayDefaultPrices() {
+  // Fixed default prices (IDR)
+  const LM_BARU_DEFAULT = 1916000;
+  const LM_LAMA_DEFAULT = 1886000;
   const defaults = [
-    { karat: 24, baru: 1310000 }, { karat: 23, baru: 1115000 }, { karat: 22, baru: 1075000 }, { karat: 21, baru: 1010000 },
-    { karat: 20, baru: 985000 },  { karat: 19, baru: 925000 },  { karat: 18, baru: 905000 },  { karat: 17, baru: 850000 },
-    { karat: 16, baru: 785000 },  { karat: 15, baru: 725000 },  { karat: 14, baru: 685000 },  { karat: 12, baru: 575000 },
-    { karat: 10, baru: 480000 },  { karat: 9,  baru: 455000 },  { karat: 8,  baru: 420000 },  { karat: 6,  baru: 325000 },
-    { karat: 5,  baru: 270000 }
+    { karat: 24, baru: 1776000 },
+    { karat: 23, baru: 1558000 },
+    { karat: 22, baru: 1493000 },
+    { karat: 21, baru: 1427000 },
+    { karat: 20, baru: 1361000 },
+    { karat: 19, baru: 1296000 },
+    { karat: 18, baru: 1230000 },
+    { karat: 17, baru: 1165000 },
+    { karat: 16, baru: 1099000 },
+    { karat: 15, baru: 1034000 },
+    { karat: 14, baru: 968000 },
+    { karat: 12, baru: 837000 },
+    { karat: 10, baru: 706000 },
+    { karat: 9,  baru: 640000 },
+    { karat: 8,  baru: 575000 },
+    { karat: 6,  baru: 444000 },
+    { karat: 5,  baru: 378000 }
   ];
-  const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
   const tbody = document.getElementById('goldPriceTable');
   if(!tbody) return;
   tbody.innerHTML = '';
-  const d24 = defaults.find(d => d.karat === 24)?.baru || 0;
-  const lmBaru = ceilStep(d24 + PRICE_ADJUST_IDR);
-  const lmLama = ceilStep(d24 * 0.95 + PRICE_ADJUST_IDR);
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
+  // Exact LM rows (no adjustment)
+  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${LM_BARU_DEFAULT}">0</span></td></tr>`);
+  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${LM_LAMA_DEFAULT}">0</span></td></tr>`);
+  // Per-karat rows (no adjustment)
   defaults.forEach(({karat, baru}) => {
-    tbody.insertAdjacentHTML('beforeend', `<tr style=\"height:34px\"><td class=\"kadar\">${karat}K</td><td style=\"text-align:right;font-weight:700;color:#0E4D47\">Rp <span class=\"num\" data-to=\"${ceilStep(baru + PRICE_ADJUST_IDR)}\">0</span></td></tr>`);
+    tbody.insertAdjacentHTML('beforeend', `<tr style=\"height:34px\"><td class=\"kadar\">${karat}K</td><td style=\"text-align:right;font-weight:700;color:#0E4D47\">Rp <span class=\"num\" data-to=\"${baru}\">0</span></td></tr>`);
   });
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
@@ -314,4 +327,3 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('hashchange', apply);
   apply();
 })();
-
