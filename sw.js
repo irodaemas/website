@@ -13,7 +13,7 @@ const CORE_ASSETS = [
     './assets/css/styles.css',
     './assets/js/main.js',
     './assets/img/logo.webp?v=1',
-    './assets/img/asset1.webp?v=1',
+    './assets/img/asset1.webp',
     './assets/img/wm.webp',
     './offline.html'
 ];
