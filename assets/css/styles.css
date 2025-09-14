@@ -146,7 +146,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .cta-grid{grid-template-columns:1.1fr .9fr}
 /* --- Background utility for hostess image --- */
-.bg-hostess{ background: url('./wm.webp') center/cover no-repeat; border-color: rgba(255,255,255,.14) !important; min-height:300px; border-radius:12px; }
+.bg-hostess{ background: url('../img/wm.webp') center/cover no-repeat; border-color: rgba(255,255,255,.14) !important; min-height:300px; border-radius:12px; }
 /* ---------- micro interactions & animations ---------- */
 @media (prefers-reduced-motion: no-preference){
   .text-shimmer { background: linear-gradient(90deg,#ffffff 0%, #F2D16B 50%, #ffffff 100%); -webkit-background-clip:text; background-clip:text; color:transparent; background-size:200% auto; animation: shimmer 2.8s linear infinite; }
