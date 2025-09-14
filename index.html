@@ -32,6 +32,15 @@
   <link rel="dns-prefetch" href="https://wa.me">
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://pluang.com">
+  <!-- PWA: manifest & app capability -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Roda Emas">
+  <link rel="apple-touch-icon" href="logo.webp?v=1">
+  <link rel="icon" sizes="192x192" href="logo.webp?v=1" type="image/webp">
+  <link rel="icon" sizes="512x512" href="logo.webp?v=1" type="image/webp">
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
@@ -936,6 +945,15 @@
       el.addEventListener('click', function(){ track('cta_click', el.getAttribute('data-track')); });
     });
   })();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(err){
+        console.warn('SW registration failed', err);
+      });
+    });
+  }
 </script>
 </body>
 </html>
