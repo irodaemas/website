@@ -175,3 +175,8 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 @media (min-width: 1280px){ .table-card{max-width:880px} .table-card table{font-size:1.02rem} }
 @media (max-width: 1024px){ .grid-4{grid-template-columns:repeat(3,minmax(0,1fr))} .cta-grid{grid-template-columns:1fr} }
 @media (max-width: 720px){ .h1{font-size:clamp(1.8rem,7vw,2.4rem)} .lead{font-size:1rem} .grid-4{grid-template-columns:repeat(2,minmax(0,1fr))} .grid-3{grid-template-columns:1fr} .gallery{grid-template-columns:repeat(2,1fr)} .stats{grid-template-columns:1fr} .stat{flex-direction:column; align-items:flex-start; gap:.25rem} .stat b{font-size:1.05rem} .hero .wrap{grid-template-columns:1fr} }
+
+/* Hide hero visual on mobile */
+@media (max-width: 860px){
+  .hero .bling{ display:none !important; }
+}

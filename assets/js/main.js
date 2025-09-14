@@ -174,7 +174,7 @@
 })();
 
 // Harga emas: fetch + fallback + waktu W.I.B
-const PRICE_ADJUST_IDR = +20000;
+const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
 async function fetchGoldPrice() {
   try {
