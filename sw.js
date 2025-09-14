@@ -1,5 +1,5 @@
 /* Roda Emas Indonesia – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'rodaemas-v2';
+const CACHE_NAME = 'rodaemas-v3';
 const FONT_CACHE = 'rodaemas-fonts-v1';
 
 // Base URL (scope) – agar aman saat di subfolder
@@ -12,7 +12,8 @@ const CORE_ASSETS = [
     './manifest.webmanifest',
     './logo.webp?v=1',
     './asset1.webp?v=1',
-    './wm.webp'
+    './wm.webp',
+    './offline.html'
 ];
 
 // ===== Install: precache core assets
@@ -46,7 +47,8 @@ async function handleNavigate(request) {
     } catch (e) {
         const cache = await caches.open(CACHE_NAME);
         const cached = await cache.match('./index.html');
-        return cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
+        const offline = await cache.match('./offline.html');
+        return offline || cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
     }
 }
 

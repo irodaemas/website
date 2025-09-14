@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://rodaemasindonesia.com/sitemap.xml
+
