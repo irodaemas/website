@@ -10,12 +10,11 @@
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Roda Emas Indonesia – Jual Beli Emas COD"/>
   <meta property="og:description" content="Layanan buyback emas, berlian, batu mulia, jam tangan mewah via COD. Datang ke lokasi Anda di Jabodetabek."/>
-  <meta property="og:image" content="logo.webp?v=1"/>
+  <meta property="og:image" content="https://rodaemasindonesia.com/android-chrome-512x512.png"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Roda Emas Indonesia – Jual Beli Emas COD"/>
   <meta name="twitter:description" content="Layanan buyback emas, berlian, batu mulia, jam tangan mewah via COD. Datang ke lokasi Anda di Jabodetabek."/>
-  <meta name="twitter:image" content="logo.webp?v=1"/>
-  <link rel="icon" href="logo.webp?v=1" type="image/webp"/>
+  <meta name="twitter:image" content="https://rodaemasindonesia.com/android-chrome-512x512.png"/>
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
   <meta name="author" content="Roda Emas Indonesia"/>
   <meta name="language" content="id-ID"/>
@@ -33,27 +32,23 @@
   <link rel="preconnect" href="https://wa.me">
   <link rel="preconnect" href="https://pluang.com">
   <!-- PWA: manifest & app capability -->
-  <link rel="manifest" href="./manifest.webmanifest" crossorigin="anonymous">
-  <script>
-    (function(){
-      try{
-        fetch('./manifest.webmanifest', {cache:'no-store'}).then(function(r){
-          if(!r.ok){ console.warn('Manifest fetch status', r.status); }
-          return r.text();
-        }).then(function(txt){
-          try{ JSON.parse(txt); }
-          catch(e){ console.warn('Manifest is not valid JSON (maybe served as HTML/404)'); }
-        }).catch(function(err){ console.warn('Manifest fetch error', err); });
-      }catch(e){}
-    })();
-  </script>
+  <link rel="manifest" href="/manifest.webmanifest">
+
+  <!-- Favicon standar -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+
+  <!-- Apple Touch (iOS/iPadOS) -->
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+  <!-- Android / PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Roda Emas">
-  <link rel="apple-touch-icon" href="logo.webp?v=1">
-  <link rel="icon" sizes="192x192" href="logo.webp?v=1" type="image/webp">
-  <link rel="icon" sizes="512x512" href="logo.webp?v=1" type="image/webp">
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap"></noscript>
@@ -224,7 +219,6 @@
       /* LQIP blur-up */
       .lqip{filter: blur(12px); transform: scale(1.02); transition: filter .5s ease, transform .5s ease}
       .lqip.loaded{filter:none; transform:none}
-      /* Hide native controls in WebKit/Blink just in case */
       @media (max-width:1024px){.gallery{grid-template-columns:repeat(4,1fr)}}
       @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
       /* ---------- footer ---------- */
@@ -363,7 +357,7 @@
     "description": "Layanan buyback emas, berlian, batu mulia, jam tangan mewah via COD di Jabodetabek.",
     "areaServed": "Jabodetabek",
     "telephone": "+6285591088503",
-    "url": "",
+    "url": "https://rodaemasindonesia.com/",
     "image": "logo.webp",
     "sameAs": [
       "https://wa.me/6285591088503"

@@ -2,16 +2,19 @@
   "name": "Roda Emas Indonesia",
   "short_name": "Roda Emas",
   "description": "Jual beli emas, berlian, logam mulia via COD di Jabodetabek. Cepat, transparan, amanah.",
-  "id": "./",
-  "start_url": "./?source=pwa",
-  "scope": "./",
+  "id": "/",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#013D39",
   "theme_color": "#013D39",
   "lang": "id-ID",
   "icons": [
-    { "src": "logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ]
 }
