@@ -116,12 +116,12 @@ tbody tr:hover{background:#fbf9ef}
 .table-card{max-width:800px;margin:0 auto}
 .date-badge{font-size:20px;font-weight:700;color:#013D39;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.45);padding:.2rem .5rem;border-radius:8px}
 /* ---------- gallery ---------- */
-.gallery{grid-template-columns:repeat(6,1fr)}
+.gallery{grid-template-columns:repeat(5,1fr)}
 .gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px}
 .gallery video{width:100%;height:180px;object-fit:cover;border-radius:12px;display:block;pointer-events:none;user-select:none}
 .lqip{filter: blur(12px); transform: scale(1.02); transition: filter .5s ease, transform .5s ease}
 .lqip.loaded{filter:none; transform:none}
-@media (max-width:1024px){.gallery{grid-template-columns:repeat(4,1fr)}}
+@media (max-width:1024px){.gallery{grid-template-columns:repeat(3,1fr)}}
 @media (max-width:720px){.gallery{grid-template-columns:repeat(2,1fr)}}
 /* ---------- footer ---------- */
 footer{background:#012A27;color:#c9e9e6;border-top:1px solid rgba(255,255,255,.08)}
