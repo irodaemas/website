@@ -13,6 +13,8 @@ const CORE_ASSETS = [
     './manifest.webmanifest',
     './assets/css/styles.css',
     './assets/css/fonts.css',
+    './assets/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2',
+    './assets/fonts/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2',
     './assets/js/main.js',
     './assets/img/logo.webp?v=1',
     './assets/img/asset1.webp',

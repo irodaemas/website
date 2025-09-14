@@ -1,47 +1,37 @@
 // Extracted from inline scripts in index.html
 
 (function(){
-  // ---- Scroll progress + Parallax ----
+  // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
   var bar = document.querySelector('.scroll-progress');
-  var ticking = false;
+  var hero = document.querySelector('.hero');
+  var lastSP = -1, lastPar = -1, ticking = false, maxScroll = 1;
+  function recalc(){
+    var h = document.documentElement;
+    maxScroll = Math.max(1, h.scrollHeight - h.clientHeight);
+  }
   function onScroll(){
     if(ticking) return; ticking = true;
     requestAnimationFrame(function(){
       var h = document.documentElement;
-      var max = h.scrollHeight - h.clientHeight; var p = max>0 ? (h.scrollTop/max)*100 : 0;
-      if(bar) bar.style.width = p + '%';
-      // Parallax hero translate
-      var y = h.scrollTop || document.body.scrollTop; var par = Math.min(40, y*0.04);
-      var hero = document.querySelector('.hero');
-      if(hero){ hero.style.setProperty('--pary', par+'px'); hero.style.setProperty('--parx', (par*-.2)+'px'); }
+      var p = (h.scrollTop / maxScroll) * 100;
+      var sp = Math.max(0, Math.min(20, Math.round(p/5))); // 0..20
+      if(bar && sp !== lastSP){ if(lastSP>=0) bar.classList.remove('sp-'+lastSP); bar.classList.add('sp-'+sp); lastSP = sp; }
+      // Parallax hero translate mapped to classes (no inline style)
+      var y = h.scrollTop || document.body.scrollTop; var par = Math.max(0, Math.min(20, Math.round(Math.min(40, y*0.04)/2)));
+      if(hero && par !== lastPar){ if(lastPar>=0) hero.classList.remove('par-'+lastPar); hero.classList.add('par-'+par); lastPar = par; }
       ticking = false;
     });
   }
   window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
+  window.addEventListener('resize', function(){ recalc(); onScroll(); }, {passive:true});
+  document.addEventListener('prices:updated', function(){ recalc(); onScroll(); });
+  recalc(); onScroll();
 
-  // ---- Confetti on WA click ----
-  function confettiBurst(x,y){
-    var c = document.createElement('div'); c.className='confetti'; document.body.appendChild(c);
-    var colors = ['#D4AF37','#F2D16B','#ffffff','#9be7e1'];
-    for(var i=0;i<22;i++){
-      var p = document.createElement('i');
-      p.style.left = x + 'px'; p.style.top = y + 'px';
-      p.style.background = colors[i%colors.length];
-      c.appendChild(p);
-      (function(p){
-        var dx = (Math.random()*2-1)*140; var dy = (Math.random()*-1)*220 - 80; var rz = (Math.random()*360)|0; var t = 700 + Math.random()*500;
-        p.animate([
-          { transform: 'translate3d(0,0,0) rotate(0deg)' },
-          { transform: 'translate3d('+dx+'px,'+dy+'px,0) rotate('+rz+'deg)', opacity:.1 }
-        ], { duration: t, easing:'cubic-bezier(.22,.61,.36,1)' }).onfinish = function(){ p.remove(); };
-      })(p);
-    }
-    setTimeout(function(){ c.remove(); }, 1200);
-  }
+  // ---- WA click pulse (no inline styles) ----
   document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function(el){
     el.addEventListener('click', function(){
-      var r = el.getBoundingClientRect(); confettiBurst(r.left + r.width/2, r.top + window.scrollY);
+      el.classList.add('pulse');
+      setTimeout(function(){ el.classList.remove('pulse'); }, 500);
     });
   });
 

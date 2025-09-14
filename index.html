@@ -215,7 +215,6 @@
         <div>
           <label for="cal-kadar" class="h3">Kadar</label>
           <select id="cal-kadar" class="form-control">
-            <option value="24">24K</option>
             <option value="23">23K</option>
             <option value="22">22K</option>
             <option value="21">21K</option>
@@ -242,11 +241,11 @@
           <input id="cal-berat" type="number" min="0" step="0.01" value="1" class="form-control" />
         </div>
       </div>
-      <div class="flex-split mt-10">
-        <div>
-          <div class="text-muted">Perkiraan total</div>
-          <div class="h2" id="cal-total" class="m-0">Rp 0</div>
-          <div id="cal-note" class="text-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
+      <div class="calc-box mt-10">
+        <div class="calc-info">
+          <div class="calc-label">Perkiraan total</div>
+          <div id="cal-total" class="calc-amount">Rp 0</div>
+          <div id="cal-note" class="calc-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
         </div>
         <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
       </div>

@@ -224,6 +224,13 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 /* Kalkulator helpers */
 #cal-total.h2{ margin:0 }
 
+/* Kalkulator result box */
+.calc-box{ display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem; border:1px solid #e7eeec; border-radius:12px; background:linear-gradient(180deg,#F9FFF8,#FFFDF5); box-shadow: 0 10px 26px rgba(1,61,57,.06) }
+.calc-info{ line-height:1.2 }
+.calc-label{ color:#485856; font-weight:600; letter-spacing:.02em }
+.calc-amount{ font-family:"Playfair Display",serif; font-weight:700; font-size:clamp(1.6rem, 1.2vw + 1rem, 2rem); color:#0E4D47; margin:.3rem 0 .55rem }
+.calc-note{ color:#5a6a68; font-size:.95rem }
+
 /* CTA section styling moved from inline */
 #kontak{ background:linear-gradient(180deg,#013D39,#012E2B); color:#fff }
 #kontak .accent-title, #kontak .h2{ color:#fff }
