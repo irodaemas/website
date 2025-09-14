@@ -1,5 +1,5 @@
 /* Roda Emas Indonesia – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'rodaemas-v3';
+const CACHE_NAME = 'rodaemas-v4';
 const FONT_CACHE = 'rodaemas-fonts-v1';
 
 // Base URL (scope) – agar aman saat di subfolder
@@ -10,6 +10,8 @@ const CORE_ASSETS = [
     './',
     './index.html',
     './manifest.webmanifest',
+    './styles.css',
+    './main.js',
     './logo.webp?v=1',
     './asset1.webp?v=1',
     './wm.webp',
