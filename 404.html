@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' 'unsafe-inline' https://pluang.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://pluang.com https://wa.me https://fonts.googleapis.com https://fonts.gstatic.com; frame-ancestors 'self'; form-action 'self';" />
+  <title>Halaman Tidak Ditemukan (404) – Roda Emas Indonesia</title>
+  <meta name="description" content="Maaf, halaman yang Anda cari tidak ditemukan. Kembali ke beranda atau hubungi kami via WhatsApp untuk bantuan cepat."/>
+  <meta name="robots" content="noindex, nofollow"/>
+  <meta name="theme-color" content="#013D39"/>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="icon" href="assets/icons/favicon.ico" type="image/x-icon">
+  <style>
+    /* Penyesuaian warna untuk background terang di 404 */
+    .btn-ghost{ color: var(--deep); border-color: rgba(1,61,57,.28); }
+    .btn-ghost:hover{ background: rgba(1,61,57,.06); }
+    .btn.btn-gold{ color: var(--deep); }
+    /* Pastikan grup tombol selalu rata tengah */
+    .btn-wrap{ display:flex; gap:.8rem; justify-content:center; flex-wrap:wrap }
+  </style>
+</head>
+<body style="min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(180deg,#FFFDF5,#F9FFF8)">
+  <!-- Navbar disamakan strukturnya dengan index.html -->
+  <header>
+    <div class="container nav">
+      <a class="brand" href="./">
+        <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" style="width:34px;height:34px;object-fit:contain;border-radius:6px" width="34" height="34"/>
+        <strong>Roda Emas Indonesia</strong>
+      </a>
+      <nav class="menu">
+        <a href="./#fitur">Fitur</a>
+        <a href="./#diterima">Yang Diterima</a>
+        <a href="./#harga">Harga Buyback</a>
+        <a href="./#kontak">Kontak</a>
+      </nav>
+      <a class="btn btn-gold hamb" href="./#kontak">Hubungi</a>
+    </div>
+  </header>
+
+  <main class="container" style="flex:1;display:grid;place-items:center;padding:48px 16px">
+    <section class="card" style="max-width:760px;text-align:center;padding:32px 24px">
+      <div class="chip" style="margin:auto">Error 404</div>
+      <h1 class="h2" style="margin-top:.6rem">Halaman Tidak Ditemukan</h1>
+      <p class="lead" style="margin:.6rem 0 1.2rem;color:#5a6a68">
+        Maaf, URL yang Anda buka tidak tersedia atau sudah dipindahkan.
+      </p>
+      <div class="btn-wrap">
+        <a class="btn btn-gold" href="./">Kembali ke Beranda</a>
+        <a class="btn btn-ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
+      </div>
+      <div style="margin-top:1rem;color:#7b8c8a;font-size:.95rem">
+        <code id="path" style="background:rgba(1,61,57,.06);padding:.2rem .4rem;border-radius:6px;display:inline-block"></code>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER (match index) ===================== -->
+  <footer>
+    <div class="container foot">
+      <div>
+        <div style="display:flex;align-items:center;gap:.7rem;color:#fff;margin-bottom:.6rem">
+          <img src="assets/img/logo.webp?v=1" alt="Roda Emas Indonesia" style="width:28px;height:28px;object-fit:contain;border-radius:6px" loading="lazy" decoding="async" width="28" height="28"/>
+          <strong style="color:#fff">Roda Emas Indonesia</strong>
+        </div>
+        <p style="margin:.2rem 0;color:#cbe8e5">Buyback aman via COD se‑Jabodetabek, mengikuti harga pasar hari transaksi. Transparan, cepat, dan terpercaya.</p>
+      </div>
+      <div>
+        <div class="h3" style="color:#fff">Kontak</div>
+        <ul style="list-style:none;padding:0;margin:.3rem 0;color:#dff7f4">
+          <li><a href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">WhatsApp: +62 855-9108-8503</a></li>
+          <li><a href="tel:+6285591088503">Telepon: +62 855-9108-8503</a></li>
+          <li><a href="#" aria-disabled="true" tabindex="-1">Jam Operasional: 08:00–22:00 WIB</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="h3" style="color:#fff">Layanan</div>
+        <ul style="list-style:none;padding:0;margin:.3rem 0;color:#dff7f4">
+          <li><a href="./#diterima">Perhiasan Emas</a></li>
+          <li><a href="./#diterima">Berlian & Batu Mulia</a></li>
+          <li><a href="./#diterima">Logam Mulia</a></li>
+          <li><a href="./#diterima">Jam Tangan Mewah</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container copy">© <span id="yr"></span> Roda Emas Indonesia • Jual Beli Emas & Berlian COD — Cepat, Transparan, Aman</div>
+  </footer>
+
+  <script>
+    (function(){
+      var y = document.getElementById('y');
+      if (y) y.textContent = new Date().getFullYear();
+      var yr = document.getElementById('yr');
+      if (yr) yr.textContent = new Date().getFullYear();
+      var p = document.getElementById('path');
+      if (p) p.textContent = (location.pathname + location.search) || '/';
+    })();
+  </script>
+</body>
+</html>

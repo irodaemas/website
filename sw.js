@@ -1,5 +1,5 @@
 /* Roda Emas Indonesia – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'rodaemas-v5';
+const CACHE_NAME = 'rodaemas-v6';
 const FONT_CACHE = 'rodaemas-fonts-v1';
 
 // Base URL (scope) – agar aman saat di subfolder
@@ -9,6 +9,7 @@ const BASE = self.registration.scope; // e.g. http://localhost:63342/Roda%20Emas
 const CORE_ASSETS = [
     './',
     './index.html',
+    './404.html',
     './manifest.webmanifest',
     './assets/css/styles.css',
     './assets/js/main.js',
@@ -43,6 +44,17 @@ async function handleNavigate(request) {
     // Network-first untuk HTML (navigate)
     try {
         const fresh = await fetch(request);
+        // Jika server mengembalikan 404, tampilkan 404.html dari cache (lebih cepat & konsisten)
+        if (fresh && fresh.status === 404) {
+            const cache = await caches.open(CACHE_NAME);
+            const notFound = await cache.match('./404.html');
+            if (notFound) {
+                const body = await notFound.blob();
+                return new Response(body, { status: 404, statusText: 'Not Found', headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+            }
+            return fresh;
+        }
+        // Cache halaman yang valid untuk navigasi cepat berikutnya
         const cache = await caches.open(CACHE_NAME);
         cache.put(request, fresh.clone());
         return fresh;
