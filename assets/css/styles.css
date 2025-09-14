@@ -230,6 +230,12 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .calc-label{ color:#485856; font-weight:600; letter-spacing:.02em }
 .calc-amount{ font-family:"Playfair Display",serif; font-weight:700; font-size:clamp(1.6rem, 1.2vw + 1rem, 2rem); color:#0E4D47; margin:.3rem 0 .55rem }
 .calc-note{ color:#5a6a68; font-size:.95rem }
+/* Prevent calculator button from becoming circle on narrow screens */
+.calc-box .btn{ white-space:nowrap; border-radius:12px }
+@media (max-width: 520px){
+  .calc-box{ flex-direction:column; align-items:stretch }
+  .calc-box .btn{ width:100%; text-align:center }
+}
 
 /* CTA section styling moved from inline */
 #kontak{ background:linear-gradient(180deg,#013D39,#012E2B); color:#fff }
