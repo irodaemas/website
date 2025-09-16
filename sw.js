@@ -23,6 +23,8 @@ const CORE_ASSETS = [
     './blog/index.html',
     './blog/keuntungan-jual-emas-cod/',
     './blog/keuntungan-jual-emas-cod/index.html',
+    './blog/panduan-menilai-keaslian-emas-sebelum-cod/',
+    './blog/panduan-menilai-keaslian-emas-sebelum-cod/index.html',
     './offline.html'
 ];
 
