@@ -170,6 +170,40 @@ let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 function saveLastBasePrice(p){ try{ localStorage.setItem(LAST_PRICE_KEY, JSON.stringify({ p, t: Date.now() })); }catch(_){} }
 function readLastBasePrice(){ try{ const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY)||''); if(o && typeof o.p==='number') return o; }catch(_){} return null; }
+function updatePriceSchema(items){
+  try{
+    var el = document.getElementById('priceItemList');
+    if(!items || !items.length){ if(el) el.remove(); return; }
+    var data = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "@id": "https://rodaemasindonesia.com/#price-list",
+      "name": "Referensi Harga Buyback Emas & Perhiasan",
+      "itemListElement": items.map(function(item, idx){
+        return {
+          "@type": "ListItem",
+          "position": idx + 1,
+          "name": item.name,
+          "item": {
+            "@type": "Offer",
+            "name": item.name + " Buyback",
+            "price": item.price,
+            "priceCurrency": "IDR",
+            "availability": "https://schema.org/InStock",
+            "itemOffered": {"@id": "https://rodaemasindonesia.com/#service"}
+          }
+        };
+      })
+    };
+    if(!el){
+      el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = 'priceItemList';
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(data);
+  }catch(_){ }
+}
 function displayFromBasePrice(P){
   const PRICE_ADJUST_IDR = +50000;
   const FACTOR_LM_BARU = 0.932; const FACTOR_LM_LAMA = 0.917; const FACTOR_24K_PERHIASAN = 0.862; const FACTOR_SUB_24K_PERHIASAN = 0.786;
@@ -177,10 +211,13 @@ function displayFromBasePrice(P){
   const tbody = document.getElementById('goldPriceTable'); if(!tbody) return;
   tbody.setAttribute('aria-busy','true');
   tbody.innerHTML = '';
+  const priceEntries = [];
   const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
   const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
   tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
+  priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: lmBaru });
   tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
+  priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: lmLama });
   const karatList = [
     {karat:24,purity:1},{karat:23,purity:0.9583},{karat:22,purity:0.9167},{karat:21,purity:0.875},{karat:20,purity:0.8333},{karat:19,purity:0.7917},{karat:18,purity:0.75},{karat:17,purity:0.7083},{karat:16,purity:0.6667},{karat:15,purity:0.625},{karat:14,purity:0.5833}
   ];
@@ -189,8 +226,10 @@ function displayFromBasePrice(P){
     const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
     const label = karat === 24 ? '24K' : `${karat}K`;
     tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
+    priceEntries.push({ name: `Perhiasan ${label}`, price: harga });
   });
   tbody.setAttribute('aria-busy','false');
+  updatePriceSchema(priceEntries);
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
 
@@ -216,8 +255,11 @@ async function fetchGoldPrice() {
       tbody.innerHTML = '';
       const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
       const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
+      const priceEntries = [];
       tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
+      priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: lmBaru });
       tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
+      priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: lmLama });
       const karatList = [
         {karat:24,purity:1},{karat:23,purity:0.9583},{karat:22,purity:0.9167},{karat:21,purity:0.875},{karat:20,purity:0.8333},{karat:19,purity:0.7917},{karat:18,purity:0.75},{karat:17,purity:0.7083},{karat:16,purity:0.6667},{karat:15,purity:0.625},{karat:14,purity:0.5833},{karat:12,purity:0.5},{karat:10,purity:0.4167},{karat:9,purity:0.375},{karat:8,purity:0.3333},{karat:6,purity:0.25},{karat:5,purity:0.2083}
       ];
@@ -226,8 +268,10 @@ async function fetchGoldPrice() {
         const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
         const label = karat === 24 ? '24K' : `${karat}K`;
         tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
+        priceEntries.push({ name: `Perhiasan ${label}`, price: harga });
       });
       tbody.setAttribute('aria-busy','false');
+      updatePriceSchema(priceEntries);
       document.dispatchEvent(new CustomEvent('prices:updated'));
       // Inform last updated
       var info = document.getElementById('lastUpdatedInfo'); if(info){ info.textContent = 'Terakhir diperbarui: ' + formatDateTimeIndo(new Date()); }
@@ -271,13 +315,18 @@ function displayDefaultPrices() {
   tbody.setAttribute('aria-busy','true');
   tbody.innerHTML = '';
   // Exact LM rows (no adjustment)
+  const priceEntries = [];
   tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${LM_BARU_DEFAULT}">0</span></td></tr>`);
+  priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: LM_BARU_DEFAULT });
   tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${LM_LAMA_DEFAULT}">0</span></td></tr>`);
+  priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: LM_LAMA_DEFAULT });
   // Per-karat rows (no adjustment)
   defaults.forEach(({karat, baru}) => {
     tbody.insertAdjacentHTML('beforeend', `<tr style=\"height:34px\"><td class=\"kadar\">${karat}K</td><td style=\"text-align:right;font-weight:700;color:#0E4D47\">Rp <span class=\"num\" data-to=\"${baru}\">0</span></td></tr>`);
+    priceEntries.push({ name: `Perhiasan ${karat}K`, price: baru });
   });
   tbody.setAttribute('aria-busy','false');
+  updatePriceSchema(priceEntries);
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
 function formatDateTimeIndo(date) {
