@@ -391,6 +391,7 @@ fetchGoldPrice();
   // Disable kadar when not needed
   function toggleKadar(){ var disable = (cat.value==='lm_baru'||cat.value==='lm_lama'||cat.value==='perhiasan_24'); kadar.disabled = disable; }
   cat.addEventListener('change', function(){ toggleKadar(); compute(); });
+  document.addEventListener('prices:updated', compute);
   toggleKadar(); compute();
 })();
 
