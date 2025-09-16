@@ -230,6 +230,7 @@ function displayFromBasePrice(P){
   const FACTOR_LM_BARU = 0.932; const FACTOR_LM_LAMA = 0.917; const FACTOR_24K_PERHIASAN = 0.862; const FACTOR_SUB_24K_PERHIASAN = 0.786;
   const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
   const tbody = document.getElementById('goldPriceTable'); if(!tbody) return;
+  tbody.setAttribute('aria-busy','true');
   tbody.innerHTML = '';
   const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
   const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
@@ -244,6 +245,7 @@ function displayFromBasePrice(P){
     const label = karat === 24 ? '24K' : `${karat}K`;
     tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
   });
+  tbody.setAttribute('aria-busy','false');
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
 
@@ -265,6 +267,7 @@ async function fetchGoldPrice() {
       const P = hargaEmas24Karat;
       const tbody = document.getElementById('goldPriceTable');
       if(!tbody) return;
+      tbody.setAttribute('aria-busy','true');
       tbody.innerHTML = '';
       const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
       const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
@@ -279,6 +282,7 @@ async function fetchGoldPrice() {
         const label = karat === 24 ? '24K' : `${karat}K`;
         tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
       });
+      tbody.setAttribute('aria-busy','false');
       document.dispatchEvent(new CustomEvent('prices:updated'));
       // Inform last updated
       var info = document.getElementById('lastUpdatedInfo'); if(info){ info.textContent = 'Terakhir diperbarui: ' + formatDateTimeIndo(new Date()); }
@@ -319,6 +323,7 @@ function displayDefaultPrices() {
   ];
   const tbody = document.getElementById('goldPriceTable');
   if(!tbody) return;
+  tbody.setAttribute('aria-busy','true');
   tbody.innerHTML = '';
   // Exact LM rows (no adjustment)
   tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${LM_BARU_DEFAULT}">0</span></td></tr>`);
@@ -327,6 +332,7 @@ function displayDefaultPrices() {
   defaults.forEach(({karat, baru}) => {
     tbody.insertAdjacentHTML('beforeend', `<tr style=\"height:34px\"><td class=\"kadar\">${karat}K</td><td style=\"text-align:right;font-weight:700;color:#0E4D47\">Rp <span class=\"num\" data-to=\"${baru}\">0</span></td></tr>`);
   });
+  tbody.setAttribute('aria-busy','false');
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
 function formatDateTimeIndo(date) {

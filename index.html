@@ -198,10 +198,10 @@
           <th>Harga (Rp)</th>
         </tr>
         </thead>
-        <tbody id="goldPriceTable"></tbody>
+        <tbody id="goldPriceTable" aria-live="polite" aria-busy="true"></tbody>
       </table>
     </div>
-    <p id="lastUpdatedInfo" class="text-note mt-10">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
+    <p id="lastUpdatedInfo" class="text-note mt-10" role="status" aria-live="polite">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
     <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
   </div>
 </section>
@@ -254,7 +254,7 @@
       <div class="calc-box mt-10">
         <div class="calc-info">
           <div class="calc-label">Perkiraan total</div>
-          <div id="cal-total" class="calc-amount">Rp 0</div>
+          <div id="cal-total" class="calc-amount" role="status" aria-live="polite" aria-atomic="true" aria-describedby="cal-note">Rp 0</div>
           <div id="cal-note" class="calc-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
         </div>
         <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
