@@ -72,7 +72,11 @@ nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .scroll-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--deep));z-index:100}
 /* --- Micro icon animations --- */
 .fab svg{transition: transform .2s ease, filter .2s ease}
+.fab img{transition: transform .2s ease, filter .2s ease}
+.cta-float .fab svg{ width:32px; height:32px }
+.cta-float .fab img{ width:32px; height:32px }
 .fab:hover svg{transform: scale(1.08)}
+.fab:hover img{transform: scale(1.08)}
 .fab:hover{box-shadow:0 12px 28px rgba(0,0,0,.28)}
 /* --- Card hover tilt --- */
 .feature, .t-card{transform-style:preserve-3d; will-change: transform}
@@ -132,8 +136,9 @@ footer{background:#012A27;color:#c9e9e6;border-top:1px solid rgba(255,255,255,.0
 .copy{padding:.9rem 0;border-top:1px solid rgba(255,255,255,.1);color:#9dccca}
 @media (max-width:860px){.foot{grid-template-columns:1fr}}
 /* ---------- floating ---------- */
-.cta-float{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.6rem;z-index:60}
-.fab{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--deep);box-shadow:var(--shadow);border:none;cursor:pointer}
+.cta-float{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:.7rem;z-index:60}
+.fab{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--deep);box-shadow:var(--shadow);border:none;cursor:pointer}
+.cta-float #backToTop{ font-size:28px; line-height:1 }
 .fab:hover{filter:brightness(1.05)}
 /* --- Fixes: image fallback sizes & text overflow --- */
 img { max-width: 100%; height: auto; display: block; }
