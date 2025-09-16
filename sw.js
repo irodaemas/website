@@ -19,6 +19,10 @@ const CORE_ASSETS = [
     './assets/img/logo.webp?v=1',
     './assets/img/asset1.webp',
     './assets/img/wm.webp',
+    './blog/',
+    './blog/index.html',
+    './blog/keuntungan-jual-emas-cod/',
+    './blog/keuntungan-jual-emas-cod/index.html',
     './offline.html'
 ];
 
@@ -125,7 +129,7 @@ self.addEventListener('sync', (event) => {
         try {
             const parts = event.tag.split(':'); // ['wa-click', 'label', 'ts']
             const label = parts[1] || 'wa';
-            await fetch(`./track?e=wa&label=${encodeURIComponent(label)}&t=${Date.now()}`, {
+            await fetch(`/track?e=wa&label=${encodeURIComponent(label)}&t=${Date.now()}`, {
                 method: 'GET',
                 credentials: 'omit'
             });
