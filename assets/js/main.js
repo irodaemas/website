@@ -163,61 +163,6 @@
   }
 })();
 
-// -------------------- A/B lightweight (CTA text + section order + tracking) --------------------
-(function(){
-  try{
-    // Decide variant: override via ?ab=A|B, otherwise persist in localStorage
-    function pickVariant(){
-      const q = new URLSearchParams(location.search).get('ab');
-      if(q === 'A' || q === 'B'){ localStorage.setItem('rei_ab_variant', q); return q; }
-      const cur = localStorage.getItem('rei_ab_variant');
-      if(cur === 'A' || cur === 'B') return cur;
-      const v = Math.random() < 0.5 ? 'A' : 'B';
-      localStorage.setItem('rei_ab_variant', v);
-      return v;
-    }
-    const VARIANT = pickVariant();
-    window.REI_AB_VARIANT = VARIANT;
-
-    // UI tweaks for Variant B
-    function applyUI(){
-      if(VARIANT !== 'B') return;
-      // Change hero CTA text
-      const heroWA = document.querySelector('[data-track="wa-hero"]');
-      if(heroWA){ heroWA.textContent = 'Konsultasi Gratis'; }
-      const heroGhost = document.querySelector('a.btn.btn-ghost[href="#fitur"]');
-      if(heroGhost){ heroGhost.textContent = 'Pelajari Keunggulan'; }
-      // Swap section order: show Keunggulan (#fitur) before Harga (#harga)
-      const fitur = document.getElementById('fitur');
-      const harga = document.getElementById('harga');
-      if(fitur && harga && harga.parentElement){ try{ harga.parentElement.insertBefore(fitur, harga); }catch(_){} }
-    }
-    if(document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', applyUI); } else { applyUI(); }
-
-    // Scroll depth tracking per session
-    const KEY = 'rei_ab_scroll_depth_sent';
-    let sent = {};
-    try{ sent = JSON.parse(sessionStorage.getItem(KEY) || '{}'); }catch(_){}
-    function abTrack(evt, label){
-      try{
-        const full = label + '|' + VARIANT;
-        if (window.gtag) { window.gtag('event', evt, { 'event_label': full }); }
-        else if (window.dataLayer) { window.dataLayer.push({ 'event': evt, 'label': full }); }
-        else { console.log('[ab]', evt, full); }
-      }catch(_){}
-    }
-    function onDepth(){
-      const h = document.documentElement; const max = Math.max(1, h.scrollHeight - h.clientHeight);
-      const p = Math.round((h.scrollTop / max) * 100);
-      [25,50,75,100].forEach(function(mark){
-        if(p >= mark && !sent[mark]){ sent[mark] = 1; sessionStorage.setItem(KEY, JSON.stringify(sent)); abTrack('scroll_depth', String(mark)); }
-      });
-    }
-    window.addEventListener('scroll', onDepth, {passive:true});
-    onDepth();
-  }catch(_){}
-})();
-
 // Harga emas: fetch + fallback + waktu W.I.B
 const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
