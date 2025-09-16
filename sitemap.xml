@@ -4,7 +4,18 @@
     <loc>https://rodaemasindonesia.com/</loc>
     <priority>1.0</priority>
     <changefreq>daily</changefreq>
-    <lastmod>2025-01-01T00:00:00+00:00</lastmod>
+    <lastmod>2025-01-05T00:00:00+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://rodaemasindonesia.com/blog/</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+    <lastmod>2025-01-05T00:00:00+00:00</lastmod>
+  </url>
+  <url>
+    <loc>https://rodaemasindonesia.com/blog/keuntungan-jual-emas-cod/</loc>
+    <priority>0.8</priority>
+    <changefreq>monthly</changefreq>
+    <lastmod>2025-01-05T00:00:00+00:00</lastmod>
   </url>
 </urlset>
-
