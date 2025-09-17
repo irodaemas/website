@@ -261,6 +261,143 @@ function roundUpPrice(n, step){
   var s = step || 1000;
   return Math.ceil(n / s) * s;
 }
+function computeLmBaruPrice(basePrice){
+  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
+}
+function computeLmLamaPrice(basePrice){
+  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
+}
+function safeNumber(v){
+  var num = Number(v);
+  return Number.isFinite(num) ? num : null;
+}
+function resolveDate(value){
+  if(!value) return null;
+  var dateCandidate = null;
+  if(value instanceof Date){
+    dateCandidate = value;
+  } else if(typeof value === 'number'){ dateCandidate = new Date(value); }
+  else if(typeof value === 'string'){
+    var trimmed = value.trim();
+    if(!trimmed) return null;
+    if(/^\d+$/.test(trimmed)) dateCandidate = new Date(Number(trimmed));
+    else dateCandidate = new Date(trimmed);
+  }
+  return dateCandidate && !isNaN(dateCandidate.getTime()) ? dateCandidate : null;
+}
+function formatCurrencyIDR(value){
+  try{ return Number(value || 0).toLocaleString('id-ID'); }
+  catch(_){ return String(value || 0); }
+}
+function updateLmBaruHighlight(currentPrice, options){
+  options = options || {};
+  var valueEl = document.getElementById('lmBaruCurrent');
+  var badgeEl = document.getElementById('lmBaruTrendBadge');
+  var deltaWrap = document.getElementById('lmBaruDelta');
+  var deltaTextEl = document.getElementById('lmBaruDeltaText');
+  var iconEl = deltaWrap ? deltaWrap.querySelector('.delta-icon') : null;
+
+  if(valueEl){
+    if(typeof currentPrice === 'number' && isFinite(currentPrice)){
+      valueEl.textContent = 'Rp ' + formatCurrencyIDR(currentPrice);
+    } else {
+      valueEl.textContent = 'Rp —';
+    }
+    valueEl.classList.remove('value-flash');
+    requestAnimationFrame(function(){ valueEl.classList.add('value-flash'); });
+  }
+
+  if(!deltaWrap) return;
+
+  var badgeLabel = options.badgeLabel || 'Menunggu';
+  var badgeState = options.badgeState || 'price-neutral';
+  var deltaMessage = options.deltaText || 'Selisih menunggu data sebelumnya';
+  var hasCurrent = typeof currentPrice === 'number' && isFinite(currentPrice);
+  var prevPrice = typeof options.previousPrice === 'number' && isFinite(options.previousPrice) ? options.previousPrice : null;
+  var iconState = 'pending';
+
+  deltaWrap.classList.remove('trend-up','trend-down','trend-flat','trend-pending');
+
+  if(hasCurrent && prevPrice !== null){
+    var diff = Math.round(currentPrice - prevPrice);
+    var absDiff = Math.abs(diff);
+    if(diff > 0){
+      deltaWrap.classList.add('trend-up');
+      deltaMessage = options.deltaText || ('Naik Rp ' + formatCurrencyIDR(absDiff) + ' dibanding kemarin');
+      iconState = 'up';
+      badgeLabel = options.badgeLabel || 'Naik';
+      badgeState = options.badgeState || 'price-up';
+    } else if(diff < 0){
+      deltaWrap.classList.add('trend-down');
+      deltaMessage = options.deltaText || ('Turun Rp ' + formatCurrencyIDR(absDiff) + ' dibanding kemarin');
+      iconState = 'down';
+      badgeLabel = options.badgeLabel || 'Turun';
+      badgeState = options.badgeState || 'price-down';
+    } else {
+      deltaWrap.classList.add('trend-flat');
+      deltaMessage = options.deltaText || 'Tidak berubah dibanding kemarin';
+      iconState = 'flat';
+      badgeLabel = options.badgeLabel || 'Stabil';
+      badgeState = options.badgeState || 'price-neutral';
+    }
+  } else {
+    deltaWrap.classList.add('trend-pending');
+    iconState = 'pending';
+  }
+
+  if(deltaTextEl) deltaTextEl.textContent = deltaMessage;
+  if(iconEl){
+    iconEl.textContent = '';
+    iconEl.setAttribute('data-trend', iconState);
+  }
+  if(badgeEl){
+    badgeEl.classList.remove('price-up','price-down','price-neutral');
+    badgeEl.classList.add(badgeState);
+    badgeEl.textContent = badgeLabel;
+  }
+  deltaWrap.classList.remove('delta-flash');
+  requestAnimationFrame(function(){ deltaWrap.classList.add('delta-flash'); });
+  var highlightCard = document.getElementById('lmBaruHighlight');
+  if(highlightCard){
+    highlightCard.classList.remove('is-updated');
+    requestAnimationFrame(function(){ highlightCard.classList.add('is-updated'); });
+  }
+}
+function extractPreviousBase(data, currentBase){
+  if(!data) return null;
+  var entries = [];
+  var order = 0;
+  function pushEntry(entry, isCurrent){
+    if(!entry) return;
+    var val = safeNumber(entry.buy);
+    if(val === null) return;
+    entries.push({
+      value: val,
+      time: resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt),
+      order: order++,
+      isCurrent: !!isCurrent
+    });
+  }
+  pushEntry(data.current, true);
+  pushEntry(data.previous, false);
+  if(data.current && data.current.previous) pushEntry(data.current.previous, false);
+  if(Array.isArray(data.history)) data.history.forEach(function(item){ pushEntry(item, false); });
+  if(!entries.length) return null;
+  entries.sort(function(a,b){
+    if(a.time && b.time){ return b.time.getTime() - a.time.getTime(); }
+    if(a.time && !b.time) return -1;
+    if(!a.time && b.time) return 1;
+    return b.order - a.order;
+  });
+  var currentVal = safeNumber(currentBase);
+  var currentEntry = entries.find(function(entry){ return entry.isCurrent; }) || entries[0];
+  if(currentEntry && currentVal === null) currentVal = currentEntry.value;
+  return entries.find(function(entry){
+    if(currentEntry && entry === currentEntry) return false;
+    if(currentVal !== null && Math.abs(entry.value - currentVal) < 1) return false;
+    return true;
+  })?.value || null;
+}
 function buildPerhiasanPricesFromBase(basePrice){
   return GOLD_KARAT_SERIES.map(function(entry){
     var factor = entry.karat === 24 ? FACTOR_PERHIASAN_24K : FACTOR_PERHIASAN_SUB;
@@ -300,43 +437,111 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
   });
   renderPriceTable(rows);
 }
-function displayFromBasePrice(P){
-  var lmBaru = roundUpPrice(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
-  var lmLama = roundUpPrice(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
-  renderPriceTableFromNumbers(lmBaru, lmLama, buildPerhiasanPricesFromBase(P));
+function displayFromBasePrice(basePrice, options){
+  options = options || {};
+  var normalizedBase = Number(basePrice);
+  if(!Number.isFinite(normalizedBase)) return;
+  var lmBaru = computeLmBaruPrice(normalizedBase);
+  var lmLama = computeLmLamaPrice(normalizedBase);
+  renderPriceTableFromNumbers(lmBaru, lmLama, buildPerhiasanPricesFromBase(normalizedBase));
+
+  var prevPrice = null;
+  if(Number.isFinite(options.previousPrice)) prevPrice = Math.round(options.previousPrice);
+  else if(Number.isFinite(options.previousBase)) prevPrice = computeLmBaruPrice(options.previousBase);
+
+  updateLmBaruHighlight(lmBaru, {
+    previousPrice: prevPrice,
+    updatedAt: options.updatedAt,
+    deltaText: options.deltaText,
+    badgeLabel: options.badgeLabel,
+    badgeState: options.badgeState
+  });
+
+  var info = document.getElementById('lastUpdatedInfo');
+  if(info){
+    if(typeof options.infoText === 'string'){
+      info.textContent = options.infoText;
+    } else {
+      var infoDate = resolveDate(options.updatedAt) || new Date();
+      var infoText = 'Terakhir diperbarui: ' + formatDateTimeIndo(infoDate);
+      if(options.metaSuffix) infoText += options.metaSuffix;
+      info.textContent = infoText;
+    }
+  }
 }
 
 async function fetchGoldPrice() {
   try {
     const ctl = new AbortController();
     const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
-    const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=1', { signal: ctl.signal });
+    const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=2', { signal: ctl.signal });
     clearTimeout(t);
     const data = await response.json();
     /* istanbul ignore else */
     if (data && data.statusCode === 200 && data.data && data.data.current) {
-      const hargaEmas24Karat = Number(data.data.current.buy);
-      REI_LAST_BASE_P = hargaEmas24Karat; saveLastBasePrice(hargaEmas24Karat);
-      displayFromBasePrice(hargaEmas24Karat);
-      // Inform last updated
-      var info = document.getElementById('lastUpdatedInfo'); /* istanbul ignore next */ if(info){ info.textContent = 'Terakhir diperbarui: ' + formatDateTimeIndo(new Date()); }
+      const currentBase = safeNumber(data.data.current.buy);
+      if(currentBase !== null){
+        const previousBase = extractPreviousBase(data.data, currentBase);
+        const updatedAtRaw = resolveDate(data.data.current.priceDate || data.data.current.time || data.data.current.timestamp || data.data.current.updatedAt);
+        const updatedAt = updatedAtRaw || new Date();
+        REI_LAST_BASE_P = currentBase; saveLastBasePrice(currentBase);
+        displayFromBasePrice(currentBase, { previousBase: previousBase, updatedAt: updatedAt });
+        return;
+      }
     } else {
       const last = readLastBasePrice();
       /* istanbul ignore next */
-      if(last){ displayFromBasePrice(last.p); var info = document.getElementById('lastUpdatedInfo'); /* istanbul ignore next */ if(info){ info.textContent = 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)); } }
+      if(last){
+        REI_LAST_BASE_P = last.p;
+        displayFromBasePrice(last.p, {
+          updatedAt: last.t,
+          infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
+          badgeLabel: 'Cache',
+          badgeState: 'price-neutral'
+        });
+      }
       else { displayDefaultPrices(); }
+      return;
     }
+    const last = readLastBasePrice();
+    /* istanbul ignore next */
+    if(last){
+      REI_LAST_BASE_P = last.p;
+      displayFromBasePrice(last.p, {
+        updatedAt: last.t,
+        infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
+        badgeLabel: 'Cache',
+        badgeState: 'price-neutral'
+      });
+    }
+    else { displayDefaultPrices(); }
   } catch (err) {
     /* istanbul ignore next */
     console.warn('Harga gagal dimuat, pakai default:', err?.name || err);
     const last = readLastBasePrice();
     /* istanbul ignore next */
-    if(last){ displayFromBasePrice(last.p); var info = document.getElementById('lastUpdatedInfo'); /* istanbul ignore next */ if(info){ info.textContent = 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)); } }
+    if(last){
+      REI_LAST_BASE_P = last.p;
+      displayFromBasePrice(last.p, {
+        updatedAt: last.t,
+        infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
+        badgeLabel: 'Cache',
+        badgeState: 'price-neutral'
+      });
+    }
     else { displayDefaultPrices(); }
   }
 }
 function displayDefaultPrices() {
-  renderPriceTableFromNumbers(DEFAULT_PRICE_TABLE.lmBaru, DEFAULT_PRICE_TABLE.lmLama, DEFAULT_PRICE_TABLE.perhiasan);
+  var approxBase = (DEFAULT_PRICE_TABLE.lmBaru - PRICE_ADJUST_IDR) / FACTOR_LM_BARU;
+  REI_LAST_BASE_P = approxBase;
+  displayFromBasePrice(approxBase, {
+    previousPrice: null,
+    infoText: 'Terakhir diperbarui: menggunakan harga default',
+    deltaText: 'Gunakan data live untuk melihat perbandingan',
+    badgeLabel: 'Menunggu',
+    badgeState: 'price-neutral'
+  });
 }
 function formatDateTimeIndo(date) {
   const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];

@@ -158,6 +158,113 @@ tbody tr:hover{background:#fbf9ef}
 .kadar{font-weight:700;color:#012F2B}
 .table-card{max-width:800px;margin:0 auto}
 .date-badge{font-size:20px;font-weight:700;color:#013D39;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.45);padding:.2rem .5rem;border-radius:8px}
+.price-highlight{position:relative;overflow:hidden;background:linear-gradient(135deg,#022c29,#011f1d);color:#eafffa;padding:1.4rem;border:1px solid rgba(212,175,55,.2);border-radius:var(--radius);margin:0 auto;max-width:800px;display:flex;flex-direction:column;gap:.6rem;transition:transform .3s ease, box-shadow .3s ease}
+.price-highlight::after{content:"";position:absolute;inset:-40%;background:conic-gradient(from 120deg at 50% 50%,rgba(212,175,55,.12),rgba(1,61,57,0) 40%,rgba(212,175,55,.18) 60%,rgba(1,61,57,0) 85%);animation:priceHighlightShimmer 12s linear infinite;opacity:.6;pointer-events:none}
+.price-highlight > *{position:relative;z-index:1}
+.price-highlight.is-updated{animation:priceHighlightPop .7s cubic-bezier(.21,1.02,.73,1)}
+.price-highlight-head{display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+.price-highlight-label{margin:0;text-transform:uppercase;letter-spacing:.08em;font-weight:700;font-size:.82rem;color:#bfece4}
+.price-badge{display:inline-flex;align-items:center;justify-content:center;padding:.2rem .6rem;border-radius:999px;font-weight:700;font-size:.78rem;min-width:96px}
+.price-badge.price-up{background:rgba(14,156,90,.2);color:#58ffa9}
+.price-badge.price-down{background:rgba(212,80,64,.18);color:#ff9f94}
+.price-badge.price-neutral{background:rgba(255,255,255,.16);color:#f4fdfa}
+.price-highlight-main{display:flex;align-items:flex-end;gap:.4rem}
+.price-highlight-value{font-size:2.6rem;font-weight:700;color:var(--gold-2);transition:color .3s ease, transform .3s ease}
+.price-highlight-value.value-flash{animation:priceValueGlow .65s ease-out}
+.price-highlight-unit{font-size:1.1rem;font-weight:600;color:#e1faf6}
+.price-highlight-delta{display:flex;align-items:center;gap:.6rem;font-weight:600;font-size:.95rem;color:#f4fdfa;transition:transform .3s ease}
+.price-highlight-delta.delta-flash{animation:priceDeltaBounce .7s ease-out}
+.price-highlight-delta .delta-icon{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.16);color:#f4fdfa;position:relative;overflow:hidden;font-size:0}
+.price-highlight-delta .delta-icon::before,
+.price-highlight-delta .delta-icon::after{content:"";position:absolute;left:50%;transform:translateX(-50%);background:transparent}
+.price-highlight-delta.trend-up .delta-icon::before{top:6px;border-left:7px solid transparent;border-right:7px solid transparent;border-bottom:11px solid currentColor;animation:arrowLiftUpHead 1.4s ease-in-out infinite}
+.price-highlight-delta.trend-up .delta-icon::after{top:16px;width:4px;height:10px;background:currentColor;border-radius:999px;animation:arrowLiftUpTail 1.4s ease-in-out infinite}
+.price-highlight-delta.trend-down .delta-icon::before{bottom:6px;border-left:7px solid transparent;border-right:7px solid transparent;border-top:11px solid currentColor;animation:arrowLiftDownHead 1.4s ease-in-out infinite}
+.price-highlight-delta.trend-down .delta-icon::after{bottom:16px;width:4px;height:10px;background:currentColor;border-radius:999px;animation:arrowLiftDownTail 1.4s ease-in-out infinite}
+.price-highlight-delta.trend-flat .delta-icon::before{top:11px;width:14px;height:3px;border-radius:999px;background:currentColor;animation:arrowFlatPulse 1.6s ease-in-out infinite}
+.price-highlight-delta.trend-flat .delta-icon::after{top:17px;width:14px;height:3px;border-radius:999px;background:currentColor;animation:arrowFlatPulse 1.6s ease-in-out infinite .1s}
+.price-highlight-delta.trend-pending .delta-icon::before{top:12px;width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:-8px 0 0 currentColor,8px 0 0 currentColor;opacity:.65;animation:arrowPendingPulse 1.8s ease-in-out infinite}
+.price-highlight-delta.trend-pending .delta-icon::after{display:none}
+.price-highlight-delta.trend-up{color:#58ffa9}
+.price-highlight-delta.trend-up .delta-icon{background:rgba(14,156,90,.24);color:#58ffa9}
+.price-highlight-delta.trend-down{color:#ff9f94}
+.price-highlight-delta.trend-down .delta-icon{background:rgba(212,80,64,.26);color:#ff9f94}
+.price-highlight-delta.trend-flat{color:#fdfefe}
+.price-highlight-delta.trend-flat .delta-icon{background:rgba(255,255,255,.18);color:#fdfefe}
+@media (max-width:720px){
+  .price-highlight{padding:1.1rem;margin-bottom:1.1rem}
+  .price-highlight-value{font-size:2rem}
+  .price-highlight-unit{font-size:1rem}
+  .price-highlight-head{align-items:flex-start;flex-direction:column;gap:.4rem}
+  .price-badge{min-width:0}
+}
+.price-highlight::after{will-change:transform}
+.price-highlight.is-updated::after{opacity:.75}
+@media (prefers-reduced-motion: reduce){
+  .price-highlight::after{animation:none;opacity:.3}
+  .price-highlight.is-updated{animation:none}
+  .price-highlight-value.value-flash{animation:none}
+  .price-highlight-delta.delta-flash{animation:none}
+  .price-highlight-delta .delta-icon::before,
+  .price-highlight-delta .delta-icon::after{animation:none}
+}
+@keyframes priceHighlightShimmer{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+@keyframes priceHighlightPop{
+  0%{transform:scale(.97);box-shadow:0 0 0 rgba(212,175,55,0)}
+  60%{transform:scale(1.02);box-shadow:0 20px 45px rgba(1,61,57,.32)}
+  100%{transform:scale(1);box-shadow:0 12px 32px rgba(1,61,57,.24)}
+}
+@keyframes priceValueGlow{
+  0%{transform:translateY(6px) scale(.94);text-shadow:0 0 0 rgba(212,175,55,0)}
+  50%{transform:translateY(0) scale(1.04);text-shadow:0 8px 24px rgba(212,175,55,.6)}
+  100%{transform:translateY(0) scale(1);text-shadow:0 0 0 rgba(212,175,55,0)}
+}
+@keyframes priceDeltaBounce{
+  0%{transform:translateY(8px);opacity:.7}
+  40%{transform:translateY(-6px);opacity:1}
+  65%{transform:translateY(3px)}
+  100%{transform:translateY(0)}
+}
+@keyframes arrowLiftUpHead{
+  0%{transform:translate(-50%,4px);opacity:.65}
+  50%{transform:translate(-50%,-4px);opacity:1}
+  100%{transform:translate(-50%,4px);opacity:.65}
+}
+@keyframes arrowLiftUpTail{
+  0%{transform:translate(-50%,2px);opacity:.6}
+  50%{transform:translate(-50%,-4px);opacity:1}
+  100%{transform:translate(-50%,2px);opacity:.6}
+}
+@keyframes arrowLiftDownHead{
+  0%{transform:translate(-50%,-4px);opacity:.65}
+  50%{transform:translate(-50%,4px);opacity:1}
+  100%{transform:translate(-50%,-4px);opacity:.65}
+}
+@keyframes arrowLiftDownTail{
+  0%{transform:translate(-50%,-2px);opacity:.6}
+  50%{transform:translate(-50%,4px);opacity:1}
+  100%{transform:translate(-50%,-2px);opacity:.6}
+}
+@keyframes arrowFlatPulse{
+  0%{transform:translateX(-50%) scaleX(.9);opacity:.7}
+  50%{transform:translateX(-50%) scaleX(1.05);opacity:1}
+  100%{transform:translateX(-50%) scaleX(.9);opacity:.7}
+}
+@keyframes arrowPendingPulse{
+  0%,100%{transform:translateX(-50%) scale(.8);opacity:.55}
+  40%{transform:translateX(-50%) scale(1);opacity:1}
+  70%{transform:translateX(-50%) scale(.9);opacity:.75}
+}
+.lm-highlight-section{padding:clamp(2rem, 3vw + 1rem, 3.4rem) 0}
+.lm-highlight-header{display:flex;align-items:center;justify-content:space-between;gap:1.4rem;margin-bottom:1.2rem}
+.lm-highlight-header .btn{white-space:nowrap;box-shadow:0 12px 26px rgba(1,61,57,.18)}
+@media (max-width:720px){
+  .lm-highlight-header{flex-direction:column;align-items:flex-start}
+  .lm-highlight-header .btn{width:100%;justify-content:center}
+}
 /* ---------- gallery ---------- */
 .gallery{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
 .gallery img{width:100%;height:180px;object-fit:cover;border-radius:12px}
