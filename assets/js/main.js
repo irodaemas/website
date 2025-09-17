@@ -398,6 +398,17 @@ const GOLD_INFO_CONTENT = {
     ]
   }
 };
+const GOLD_UNIT_DEFS = [
+  { id: 'gram', label: 'Gram (g)', toGram: 1 },
+  { id: 'ameh', label: 'Ameh (2,5 g)', toGram: 2.5 },
+  { id: 'suku', label: 'Suku (3,75 g)', toGram: 3.75 },
+  { id: 'mayam', label: 'Mayam (±3,33 g)', toGram: 3.33 },
+  { id: 'tael', label: 'Tael (37,5 g)', toGram: 37.5 },
+  { id: 'troy', label: 'Troy Ounce (31,103 g)', toGram: 31.1034768 },
+  { id: 'tola', label: 'Tola (11,664 g)', toGram: 11.6638038 },
+  { id: 'baht', label: 'Baht (15,244 g)', toGram: 15.244 },
+  { id: 'kupang', label: 'Kupang (0,6 g)', toGram: 0.6 }
+];
 const DEFAULT_PRICE_TABLE = {
   lmBaru: 1916000,
   lmLama: 1886000,
@@ -622,14 +633,14 @@ function renderPriceTable(rows){
     var color = row.color || GOLD_ROW_PRIMARY;
     var infoAttr = row.infoKey ? ` data-info-key="${row.infoKey}" tabindex="0" role="button" aria-label="Detail ${row.label}"` : '';
     var iconTooltip = row.iconTooltip || row.label;
-    var iconTitleAttr = iconTooltip ? ` title="${escapeAttr(iconTooltip)}"` : '';
+    var tooltipAttr = iconTooltip ? ` data-tooltip="${escapeAttr(iconTooltip)}"` : '';
     var iconAriaAttr = iconTooltip ? ` role="img" aria-label="${escapeAttr(iconTooltip)}"` : ' aria-hidden="true"';
-    var iconHtml = row.icon ? `<span class="price-icon price-icon--${row.icon}"${iconTitleAttr}${iconAriaAttr}></span>` : '';
+    var iconHtml = row.icon ? `<span class="price-icon price-icon--${row.icon} tooltip"${tooltipAttr}${iconAriaAttr}></span>` : '';
     var addAttrs = '';
     if(row.addCat){ addAttrs += ` data-add-cat="${row.addCat}"`; }
     if(row.addKadar !== undefined && row.addKadar !== null){ addAttrs += ` data-add-kadar="${row.addKadar}"`; }
     var addTooltip = `Tambahkan ${row.label} ke kalkulator`;
-    var addBtn = row.addCat ? `<button type="button" class="price-add-btn"${addAttrs} aria-label="${escapeAttr(addTooltip)}" title="${escapeAttr(addTooltip)}"><span class="price-add-icon" aria-hidden="true">+</span></button>` : '';
+    var addBtn = row.addCat ? `<button type="button" class="price-add-btn tooltip"${addAttrs} aria-label="${escapeAttr(addTooltip)}" data-tooltip="${escapeAttr(addTooltip)}"><span class="price-add-icon" aria-hidden="true">+</span></button>` : '';
     var labelHtml = `<div class="price-label">${row.label}</div>`;
     var priceHtml = `<div class="price-amount" style="color:${color}">Rp <span class="num" data-to="${row.price}">0</span></div>`;
     var actionHtml = row.addCat ? addBtn : '';
@@ -1005,6 +1016,95 @@ fetchGoldPrice();
 
   window.REI_CALC = window.REI_CALC || {};
   window.REI_CALC.setSelection = setSelection;
+})();
+
+// Konverter satuan emas
+/* istanbul ignore next */
+(function(){
+  var fromValue = document.getElementById('conv-from-value');
+  var toValue = document.getElementById('conv-to-value');
+  var fromUnit = document.getElementById('conv-from-unit');
+  var toUnit = document.getElementById('conv-to-unit');
+  var swapBtn = document.getElementById('conv-swap');
+  if(!fromValue || !toValue || !fromUnit || !toUnit) return;
+
+  var updating = false;
+
+  function populate(select){
+    select.innerHTML = '';
+    GOLD_UNIT_DEFS.forEach(function(unit){
+      var opt = document.createElement('option');
+      opt.value = unit.id;
+      opt.textContent = unit.label;
+      select.appendChild(opt);
+    });
+  }
+
+  function unitById(id){
+    return GOLD_UNIT_DEFS.find(function(u){ return u.id === id; }) || GOLD_UNIT_DEFS[0];
+  }
+
+function sanitize(value){
+  var num = Number(value);
+  return Number.isFinite(num) ? num : 0;
+}
+
+function format(number){
+  if(!Number.isFinite(number)) return '0';
+  var abs = Math.abs(number);
+  var decimals = abs >= 100 ? 2 : abs >= 1 ? 3 : 5;
+  var fixed = number.toFixed(decimals);
+  var trimmedNum = Number(fixed);
+  if(Number.isFinite(trimmedNum)){
+    var str = trimmedNum.toString();
+    if(str.indexOf('e') >= 0) return fixed.replace(/\.?0+$/,'');
+    return str;
+  }
+  return fixed.replace(/(\.\d*?)0+$/,'$1').replace(/\.0+$/,'');
+}
+
+  function convertFrom(){
+    if(updating) return;
+    updating = true;
+    var amount = sanitize(fromValue.value);
+    var from = unitById(fromUnit.value);
+    var to = unitById(toUnit.value);
+    var grams = amount * from.toGram;
+    var converted = grams / to.toGram;
+    toValue.value = format(converted);
+    updating = false;
+  }
+
+  function convertTo(){
+    if(updating) return;
+    updating = true;
+    var amount = sanitize(toValue.value);
+    var from = unitById(fromUnit.value);
+    var to = unitById(toUnit.value);
+    var grams = amount * to.toGram;
+    var converted = grams / from.toGram;
+    fromValue.value = format(converted);
+    updating = false;
+  }
+
+  function swap(){
+    var fromId = fromUnit.value;
+    fromUnit.value = toUnit.value;
+    toUnit.value = fromId;
+    convertFrom();
+  }
+
+  populate(fromUnit);
+  populate(toUnit);
+  fromUnit.value = 'gram';
+  toUnit.value = 'ameh';
+  convertFrom();
+
+  fromValue.addEventListener('input', convertFrom);
+  fromUnit.addEventListener('change', convertFrom);
+  toUnit.addEventListener('change', convertFrom);
+  toValue.addEventListener('input', convertTo);
+  if(swapBtn){ swapBtn.addEventListener('click', function(){ swap(); }); }
 })();
 
 // Tahun pada footer + 404 helpers
