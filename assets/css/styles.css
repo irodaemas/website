@@ -78,6 +78,7 @@ header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(
 nav a{color:#d6fffb;text-decoration:none;font-weight:600;opacity:.9}
 nav a:hover{opacity:1}
 nav a, .foot a{display:inline-block; padding:.6rem .4rem; line-height:1.2}
+.foot li > span{display:inline-block; padding:.6rem .4rem; line-height:1.2; color:#dff7f4}
 /* Navbar sizing tweak */
 nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .nav a:focus-visible{outline:2px solid var(--focus-ring-strong);outline-offset:6px;border-radius:8px}
