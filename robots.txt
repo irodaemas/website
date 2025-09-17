@@ -1,5 +1,13 @@
+User-agent: bingbot
+Allow: /
+
+User-agent: BingPreview
+Allow: /
+
+User-agent: msnbot
+Allow: /
+
 User-agent: *
 Allow: /
 
 Sitemap: https://rodaemasindonesia.com/sitemap.xml
-
