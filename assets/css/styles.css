@@ -341,6 +341,26 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .cta-grid{grid-template-columns:1.1fr .9fr}
+
+/* ---------- value grid ---------- */
+.value-section{padding:clamp(2.6rem,3.8vw + 1rem,4.4rem) 0;background:#f8fbfb}
+.value-section .value-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,0.85fr);gap:2.6rem;margin-top:1.8rem;align-items:stretch}
+.value-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem}
+.value-card{background:#ffffff;border:1px solid rgba(1,61,57,.08);border-radius:18px;padding:1.4rem 1.5rem;box-shadow:0 18px 36px rgba(1,61,57,.12);display:flex;flex-direction:column;gap:.6rem;position:relative;overflow:hidden}
+.value-card::after{content:"";position:absolute;inset:auto -40px -60px -40px;height:140px;background:radial-gradient(circle,rgba(212,175,55,.18),transparent 70%);opacity:.9;pointer-events:none}
+.value-card h3{margin:0;font-size:1.12rem;color:#013D39}
+.value-card p{margin:0;color:#516460;line-height:1.6}
+.value-steps{background:#ffffff;border:1px solid rgba(1,61,57,.08);border-radius:18px;padding:1.6rem 1.8rem;box-shadow:0 22px 38px rgba(1,61,57,.12);display:flex;flex-direction:column;gap:1.1rem}
+.value-steps h3{margin:0;font-size:1.2rem;color:#013D39}
+.value-steps ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1.1rem}
+.value-steps li{display:flex;gap:1rem;border-bottom:1px solid rgba(1,61,57,.08);padding-bottom:1rem}
+.value-steps li:last-child{border-bottom:none;padding-bottom:0}
+.value-steps h4{margin:0 0 .3rem;font-size:1.05rem;color:#013D39}
+.value-steps p{margin:0;color:#516460;line-height:1.55}
+.step-chip{width:38px;height:38px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;background:rgba(212,175,55,.24);color:#013D39;font-weight:700}
+@media (max-width:980px){
+  .value-section .value-grid{grid-template-columns:1fr;gap:1.8rem}
+}
 .price-row[role="button"]{cursor:pointer;transition:background-color .18s ease, box-shadow .18s ease}
 .price-row[role="button"] td{transition:background-color .18s ease}
 .price-row[role="button"]:hover td{background:rgba(212,175,55,.18)}
