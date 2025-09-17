@@ -649,7 +649,7 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
     var iconType = 'jewelry';
     var iconTitle = 'Perhiasan emas';
     var iconTooltip = `Perhiasan ${entry.karat}K`;
-    if(entry.karat && Number(entry.karat) < 18){
+    if(entry.karat && Number(entry.karat) < 17){
       iconType = 'jewelry-low';
       iconTitle = 'Perhiasan kadar menengah';
     }
