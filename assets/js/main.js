@@ -196,6 +196,208 @@ const GOLD_KARAT_SERIES = [
   { karat: 6, purity: 0.25 },
   { karat: 5, purity: 0.2083 }
 ];
+const GOLD_INFO_CONTENT = {
+  'lm_baru': {
+    title: 'Logam Mulia (LM) Baru',
+    meta: 'Kemurnian 99,99% (24K) • Sertifikat resmi pabrik',
+    description: 'LM baru mencakup keping/gramasi produksi terbaru Antam, UBS, atau pabrikan resmi lain. Kondisi fisik mulus dan sertifikat utuh membantu menjaga nilai buyback maksimal.',
+    tips: [
+      'Sertakan sertifikat/packaging asli saat transaksi.',
+      'Pastikan nomor seri keping sesuai dengan yang tertera di sertifikat.',
+      'Hindari menyentuh permukaan emas secara langsung agar tidak meninggalkan noda.'
+    ]
+  },
+  'lm_lama': {
+    title: 'Logam Mulia (LM) Lama',
+    meta: 'Kemurnian 91%–99% • Cetakan lama / non-smartpackage',
+    description: 'LM lama mengacu pada cetakan sebelum kemasan terbaru atau produk yang telah keluar dari segel. Nilainya tetap tinggi selama berat dan kemurnian terjaga.',
+    tips: [
+      'Bawa bukti pembelian atau nota jika masih tersedia.',
+      'Simpan dalam plastik zip atau kapsul untuk menghindari gores.',
+      'Siapkan waktu pengecekan fisik lebih lama karena perlu ditimbang ulang.'
+    ]
+  },
+  'karat-24': {
+    title: 'Perhiasan 24K',
+    meta: 'Kemurnian ±99,9% • Sangat lunak dan kuning terang',
+    description: 'Perhiasan 24K identik dengan kadar emas tertinggi. Biasanya berbentuk gelang/cincin polos atau emas batangan kecil dengan ornamen minim.',
+    tips: [
+      'Tunjukkan cap kadar (999/24K) jika masih terbaca.',
+      'Gunakan kotak atau kain lembut karena material sangat mudah lecet.',
+      'Jika dibeli dari luar negeri, siapkan kwitansi untuk percepatan verifikasi.'
+    ]
+  },
+  'karat-23': {
+    title: 'Perhiasan 23K',
+    meta: 'Kemurnian ±95,8% • Favorit perhiasan tradisional',
+    description: 'Kadar 23K banyak dipakai untuk gelang dan cincin adat karena warnanya tetap kuning pekat namun lebih kokoh dari 24K.',
+    tips: [
+      'Cek stempel 950/23K di bagian dalam perhiasan.',
+      'Bersihkan ringan dengan kain kering, hindari chemical berlebihan.',
+      'Foto detail ukiran atau motif sebagai referensi saat konsultasi.'
+    ]
+  },
+  'karat-22': {
+    title: 'Perhiasan 22K',
+    meta: 'Kemurnian ±91,7% • Umum untuk perhiasan sehari-hari',
+    description: 'Kadar 22K menawarkan keseimbangan antara warna pekat dan ketahanan. Banyak ditemukan pada gelang rantai, kalung, dan cincin kawin.',
+    tips: [
+      'Perlihatkan cap 916/22K jika masih jelas.',
+      'Catat berat kotor bila terdapat batu/ornamen tambahan.',
+      'Hindari menyolder sendiri karena dapat mengubah komposisi campuran.'
+    ]
+  },
+  'karat-21': {
+    title: 'Perhiasan 21K',
+    meta: 'Kemurnian ±87,5% • Perhiasan campuran emas-perak',
+    description: 'Perhiasan 21K kerap memiliki warna sedikit lebih pucat. Komposisi tambahan logam membuatnya lebih kuat untuk penggunaan rutin.',
+    tips: [
+      'Sertakan informasi jika ada batu permata supaya penilaian lebih akurat.',
+      'Bersihkan debu pada sela-sela ornamen sebelum tim melakukan pengecekan.',
+      'Waspadai hasil solder ulang; informasikan jika pernah diperbaiki.'
+    ]
+  },
+  'karat-20': {
+    title: 'Perhiasan 20K',
+    meta: 'Kemurnian ±83,3% • Warna emas agak muda',
+    description: 'Kadar 20K sering ditemui pada perhiasan impor atau desain lama. Campuran logam tambahan memberi kekuatan namun mengurangi kilau kuning pekat.',
+    tips: [
+      'Lampirkan surat toko apabila masih ada untuk mengonfirmasi kadar.',
+      'Jika ada batu, sebutkan apakah ingin dijual beserta atau terpisah.',
+      'Simak proses uji asam yang mungkin dilakukan untuk memastikan kadar.'
+    ]
+  },
+  'karat-19': {
+    title: 'Perhiasan 19K',
+    meta: 'Kemurnian ±79,1% • Campuran logam tinggi',
+    description: 'Kadar 19K relatif jarang namun tetap beredar pada koleksi lawas. Warna emas cenderung pucat dengan sedikit kilau kehijauan.',
+    tips: [
+      'Beritahu jika perhiasan pernah dilapisi ulang untuk memperkuat warna.',
+      'Siapkan waktu pengecekan sedikit lebih lama karena kadar perlu diuji.',
+      'Gunakan pouch terpisah agar tidak bergesekan dengan perhiasan lain.'
+    ]
+  },
+  'karat-18': {
+    title: 'Perhiasan 18K',
+    meta: 'Kemurnian ±75% • Standar butik & brand global',
+    description: 'Perhiasan 18K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
+    tips: [
+      'Cantumkan merek/bukti pembelian bila berasal dari butik ternama.',
+      'Periksa baut atau clasp agar tidak longgar saat penimbangan.',
+      'Untuk cincin berlian, informasikan karat batu jika ingin dihitung terpisah.'
+    ]
+  },
+  'karat-17': {
+    title: 'Perhiasan 17K',
+    meta: 'Kemurnian ±70,8% • Banyak dijumpai pada perhiasan rumahan',
+    description: 'Campuran logam lebih tinggi membuat 17K cukup tahan banting dan berwarna kuning muda. Umum dipakai untuk kalung dan gelang harian.',
+    tips: [
+      'Jika ada bekas patri, sebutkan agar penaksir tahu bagian mana yang diperbaiki.',
+      'Bersihkan minyak atau lotion yang menempel sebelum pengecekan.',
+      'Simpan dalam kantong terpisah agar tidak tergores aksesoris lain.'
+    ]
+  },
+  'karat-16': {
+    title: 'Perhiasan 16K',
+    meta: 'Kemurnian ±66,7% • Warna keemasan lebih lembut',
+    description: 'Perhiasan 16K kerap dijadikan aksesori fashion dengan harga terjangkau namun tetap memuat kandungan emas signifikan.',
+    tips: [
+      'Ingatkan tim jika terdapat cat/lapisan tambahan di permukaan.',
+      'Foto perhiasan sebelum diserahkan untuk dokumentasi personal.',
+      'Siapkan waktu pengetesan karena kadar perlu dikonfirmasi ulang.'
+    ]
+  },
+  'karat-15': {
+    title: 'Perhiasan 15K',
+    meta: 'Kemurnian ±62,5% • Biasanya buatan lama atau impor',
+    description: 'Kadar 15K tidak lagi diproduksi massal namun masih ditemukan pada koleksi warisan. Warna condong kuning pucat dengan campuran perak tinggi.',
+    tips: [
+      'Sampaikan jika ingin menjual logam saja atau termasuk batu hias.',
+      'Jaga agar tidak terkena parfum/kimia sebelum penilaian.',
+      'Siapkan surat warisan atau bukti asal jika masih disimpan.'
+    ]
+  },
+  'karat-14': {
+    title: 'Perhiasan 14K',
+    meta: 'Kemurnian ±58,3% • Favorit cincin tunangan',
+    description: 'Kadar 14K populer karena kuat, tidak mudah berubah warna, dan aman untuk pemakaian sehari-hari. Sering dipakai brand internasional dengan batu berlian.',
+    tips: [
+      'Bawa kartu garansi/asli brand bila tersedia.',
+      'Informasikan kadar batu permata supaya appraisal dapat dipisahkan.',
+      'Pastikan screw/baut anting tidak hilang untuk menjaga nilai.'
+    ]
+  },
+  'karat-12': {
+    title: 'Perhiasan 12K',
+    meta: 'Kemurnian ±50% • Campuran logam hampir setengah',
+    description: 'Perhiasan 12K sering berupa fashion jewelry lama. Kandungan emasnya masih bernilai, namun uji kadar wajib dilakukan untuk kepastian.',
+    tips: [
+      'Beritahu jika warna sudah memudar atau pernah dilapis ulang.',
+      'Pisahkan rantai tipis agar tidak kusut ketika diukur.',
+      'Siapkan kesabaran karena proses uji kadar memerlukan beberapa menit.'
+    ]
+  },
+  'karat-10': {
+    title: 'Perhiasan 10K',
+    meta: 'Kemurnian ±41,6% • Umum di pasar Amerika',
+    description: 'Kadar 10K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
+    tips: [
+      'Bawa bukti pembelian luar negeri jika ada untuk mempercepat verifikasi.',
+      'Warna pucat adalah normal karena campuran tembaga/perak cukup tinggi.',
+      'Jika terdapat batu besar, siapkan assessment khusus untuk memperhitungkan nilainya.'
+    ]
+  },
+  'karat-9': {
+    title: 'Perhiasan 9K',
+    meta: 'Kemurnian ±37,5% • Kandungan emas rendah',
+    description: 'Perhiasan 9K termasuk kategori emas muda dengan kandungan emas di bawah 40%. Nilai buyback fokus pada berat bersih emas setelah dikurangi campuran.',
+    tips: [
+      'Harapkan proses uji kadar lebih intensif untuk memastikan kandungan emas.',
+      'Sampaikan bila terdapat bagian berlapis rhodium atau coating lain.',
+      'Kemas rapi agar detail ornamen tidak rusak saat transportasi.'
+    ]
+  },
+  'karat-8': {
+    title: 'Perhiasan 8K',
+    meta: 'Kemurnian ±33,3% • Lebih mirip logam campuran',
+    description: 'Dengan kandungan emas sepertiga, perhiasan 8K sering dijual sebagai fashion jewelry. Buyback menilai kandungan emas bersih melalui uji kadar.',
+    tips: [
+      'Beritahu jika produk awalnya dijual sebagai gold-filled atau gold-plated.',
+      'Siapkan waktu karena proses penimbangan akan dikombinasi dengan uji asam.',
+      'Jika hanya ingin menjual logam emasnya, sampaikan sejak awal.'
+    ]
+  },
+  'karat-6': {
+    title: 'Perhiasan 6K',
+    meta: 'Kemurnian ±25% • Biasanya warisan lama',
+    description: '6K memiliki kandungan emas seperempat. Banyak ditemukan pada koleksi antik yang telah melewati generasi.',
+    tips: [
+      'Sertakan cerita asal-usul jika ada; membantu menilai potensi nilai koleksi.',
+      'Harap maklum bila terdapat potongan untuk menguji kandungan.',
+      'Sediakan wadah aman karena struktur logam bisa rapuh.'
+    ]
+  },
+  'karat-5': {
+    title: 'Perhiasan 5K',
+    meta: 'Kemurnian ±20,8% • Konten emas sangat rendah',
+    description: 'Perhiasan 5K lebih banyak terdiri dari logam campuran. Nilai buyback fokus pada kandungan emas murni yang tersisa.',
+    tips: [
+      'Pahami bahwa estimasi harga akan jauh di bawah perhiasan kadar tinggi.',
+      'Jika ada nilai sentimental, pertimbangkan apakah ingin dijual seluruhnya.',
+      'Bersiap untuk uji asam lebih dari sekali guna memastikan kadar tepat.'
+    ]
+  },
+  'default': {
+    title: 'Detail Kadar Emas',
+    meta: 'Informasi umum kadar emas',
+    description: 'Silakan hubungi tim kami via WhatsApp untuk penjelasan lebih lanjut mengenai kadar atau jenis perhiasan yang Anda pilih.',
+    tips: [
+      'Cantumkan foto barang dari beberapa sudut.',
+      'Tulis berat perkiraan dan kondisi (ada retak, solder, atau batu).',
+      'Kami bantu cek lebih detail saat janji temu COD.'
+    ]
+  }
+};
 const DEFAULT_PRICE_TABLE = {
   lmBaru: 1916000,
   lmLama: 1886000,
@@ -402,7 +604,7 @@ function buildPerhiasanPricesFromBase(basePrice){
   return GOLD_KARAT_SERIES.map(function(entry){
     var factor = entry.karat === 24 ? FACTOR_PERHIASAN_24K : FACTOR_PERHIASAN_SUB;
     var harga = roundUpPrice(basePrice * entry.purity * factor + PRICE_ADJUST_IDR);
-    return { karat: entry.karat, price: harga };
+    return { karat: entry.karat, price: harga, infoKey: 'karat-' + entry.karat };
   });
 }
 function renderPriceTable(rows){
@@ -415,7 +617,8 @@ function renderPriceTable(rows){
   rows.forEach(function(row){
     if(!row || typeof row.price !== 'number' || !isFinite(row.price)) return;
     var color = row.color || GOLD_ROW_PRIMARY;
-    tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${row.label}</td><td style="text-align:right;font-weight:700;color:${color}">Rp <span class="num" data-to="${row.price}">0</span></td></tr>`);
+    var infoAttr = row.infoKey ? ` data-info-key="${row.infoKey}" tabindex="0" role="button" aria-label="Detail ${row.label}"` : '';
+    tbody.insertAdjacentHTML('beforeend', `<tr class="price-row" style="height:34px"${infoAttr}><td class="kadar">${row.label}</td><td style="text-align:right;font-weight:700;color:${color}">Rp <span class="num" data-to="${row.price}">0</span></td></tr>`);
     priceEntries.push({ name: row.schemaName || row.label, price: row.price });
   });
   tbody.setAttribute('aria-busy','false');
@@ -424,15 +627,16 @@ function renderPriceTable(rows){
 }
 function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
   var rows = [
-    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY },
-    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY }
+    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY, infoKey: 'lm_baru' },
+    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY, infoKey: 'lm_lama' }
   ];
   (perhiasanEntries || []).forEach(function(entry){
     rows.push({
       label: `${entry.karat}K`,
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
-      color: GOLD_ROW_PRIMARY
+      color: entry.color || GOLD_ROW_PRIMARY,
+      infoKey: entry.infoKey || ('karat-' + entry.karat)
     });
   });
   renderPriceTable(rows);
@@ -565,6 +769,130 @@ function displayDateTimeWIB() {
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
 fetchGoldPrice();
+
+// Modal detail kadar emas dari tabel harga
+/* istanbul ignore next */
+(function(){
+  var table = document.getElementById('goldPriceTable');
+  var modal = document.getElementById('goldInfoModal');
+  if(!table || !modal) return;
+
+  var titleEl = modal.querySelector('[data-modal-title]');
+  var metaEl = modal.querySelector('[data-modal-meta]');
+  var descEl = modal.querySelector('[data-modal-desc]');
+  var tipsEl = modal.querySelector('[data-modal-tips]');
+  var tipsWrap = modal.querySelector('[data-modal-tips-wrap]');
+  var closeBtn = modal.querySelector('[data-modal-close]');
+  var dialog = modal.querySelector('[data-modal-dialog]');
+  var lastFocusEl = null;
+
+  if(dialog && !dialog.hasAttribute('tabindex')){
+    dialog.setAttribute('tabindex', '-1');
+  }
+
+  function resolveInfo(key){
+    return GOLD_INFO_CONTENT[key] || GOLD_INFO_CONTENT[key?.toLowerCase?.()] || GOLD_INFO_CONTENT.default;
+  }
+
+  function renderContent(data){
+    if(!data) return;
+    if(titleEl) titleEl.textContent = data.title || 'Detail Kadar Emas';
+    if(metaEl){
+      metaEl.textContent = data.meta || '';
+      metaEl.style.display = data.meta ? '' : 'none';
+    }
+    if(descEl){
+      descEl.textContent = data.description || '';
+      descEl.style.display = data.description ? '' : 'none';
+    }
+    if(tipsEl){
+      tipsEl.innerHTML = '';
+      var tips = Array.isArray(data.tips) ? data.tips : [];
+      tips.forEach(function(tip){
+        var li = document.createElement('li');
+        li.textContent = tip;
+        tipsEl.appendChild(li);
+      });
+      if(tipsWrap){ tipsWrap.style.display = tips.length ? '' : 'none'; }
+    }
+  }
+
+  function getFocusable(){
+    return Array.prototype.slice.call(modal.querySelectorAll('button, [href], [tabindex]:not([tabindex="-1"])'));
+  }
+
+  function trapFocus(ev){
+    if(ev.key !== 'Tab') return;
+    var focusable = getFocusable();
+    if(!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if(ev.shiftKey && document.activeElement === first){
+      ev.preventDefault();
+      last.focus();
+    } else if(!ev.shiftKey && document.activeElement === last){
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+
+  function openModal(key, trigger){
+    var content = resolveInfo(key);
+    if(!content) return;
+    lastFocusEl = trigger || null;
+    renderContent(content);
+    modal.hidden = false;
+    modal.classList.add('is-visible');
+    document.body.classList.add('modal-open');
+    var focusTarget = closeBtn || dialog;
+    if(focusTarget && typeof focusTarget.focus === 'function'){
+      focusTarget.focus();
+    }
+  }
+
+  function closeModal(){
+    if(modal.classList.contains('is-visible')){
+      modal.classList.remove('is-visible');
+      modal.hidden = true;
+      document.body.classList.remove('modal-open');
+      if(lastFocusEl && typeof lastFocusEl.focus === 'function'){
+        requestAnimationFrame(function(){ lastFocusEl.focus(); });
+      }
+    }
+  }
+
+  table.addEventListener('click', function(ev){
+    var row = ev.target.closest('tr[data-info-key]');
+    if(!row) return;
+    ev.preventDefault();
+    openModal(row.getAttribute('data-info-key'), row);
+  });
+
+  table.addEventListener('keydown', function(ev){
+    if(ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') return;
+    var row = ev.target.closest('tr[data-info-key]');
+    if(!row) return;
+    ev.preventDefault();
+    openModal(row.getAttribute('data-info-key'), row);
+  });
+
+  if(closeBtn){
+    closeBtn.addEventListener('click', function(){ closeModal(); });
+  }
+
+  modal.addEventListener('click', function(ev){
+    if(ev.target === modal){ closeModal(); }
+  });
+
+  document.addEventListener('keydown', function(ev){
+    if(ev.key === 'Escape'){ closeModal(); }
+  });
+
+  modal.addEventListener('keydown', trapFocus);
+  if(dialog){
+    dialog.addEventListener('click', function(ev){ ev.stopPropagation(); });
+  }
+})();
 
 // Kalkulator Emas + WA Prefill
 /* istanbul ignore next */

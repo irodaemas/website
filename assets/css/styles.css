@@ -154,7 +154,10 @@ section{padding:clamp(2.5rem, 3.5vw + 1rem, 4rem) 0}
 table{width:100%;border-collapse:separate;border-spacing:0}
 th,td{padding:.7rem .9rem;border-bottom:1px solid #e9f0ee}
 thead th{position:static;background:#012F2B;color:var(--paper)}
-tbody tr:hover{background:#fbf9ef}
+.table-card tbody tr td{transition:background-color .2s ease}
+.table-card tbody tr:nth-child(odd) td{background:rgba(1,61,57,.04)}
+.table-card tbody tr:nth-child(even) td{background:rgba(1,61,57,.015)}
+tbody tr:hover td{background:rgba(212,175,55,.14)}
 .kadar{font-weight:700;color:#012F2B}
 .table-card{max-width:800px;margin:0 auto}
 .date-badge{font-size:20px;font-weight:700;color:#013D39;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.45);padding:.2rem .5rem;border-radius:8px}
@@ -294,6 +297,31 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .cta-grid{grid-template-columns:1.1fr .9fr}
+.price-row[role="button"]{cursor:pointer;transition:background-color .18s ease, box-shadow .18s ease}
+.price-row[role="button"] td{transition:background-color .18s ease}
+.price-row[role="button"]:hover td{background:rgba(212,175,55,.18)}
+.price-row[role="button"]:focus-visible td{background:rgba(212,175,55,.24)}
+.price-row[role="button"]:focus-visible{outline:2px solid var(--focus-ring);outline-offset:-2px}
+.modal-open{overflow:hidden}
+.modal-overlay{position:fixed;inset:0;background:rgba(5,21,21,.68);display:flex;align-items:center;justify-content:center;padding:2rem;z-index:160;opacity:0;pointer-events:none;transition:opacity .22s ease}
+.modal-overlay.is-visible{opacity:1;pointer-events:auto}
+.modal-card{background:var(--paper);color:var(--deep);border-radius:18px;max-width:min(640px,92vw);width:100%;padding:clamp(1.8rem,3vw + 1rem,2.6rem);box-shadow:0 28px 64px rgba(1,61,57,.28);position:relative;border:1px solid rgba(1,61,57,.12)}
+.modal-card:focus{outline:none}
+.modal-close{position:absolute;top:.75rem;right:.75rem;width:40px;height:40px;border-radius:50%;border:none;background:rgba(1,61,57,.08);color:var(--deep);font-size:1.8rem;line-height:1;display:grid;place-items:center;cursor:pointer;transition:background .2s ease}
+.modal-close:hover,.modal-close:focus-visible{background:rgba(1,61,57,.16)}
+.modal-meta{margin:0 0 .6rem;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:#5e6c6a}
+.modal-title{margin:0 2.4rem .8rem 0;font-size:clamp(1.4rem,2vw + 1rem,1.85rem);color:var(--deep)}
+.modal-desc{margin:0 0 1.2rem;line-height:1.65;color:#40514f}
+.modal-tips{border-top:1px solid rgba(1,61,57,.12);padding-top:1rem;margin-top:1rem}
+.modal-tips-label{margin:0 0 .6rem;font-weight:600;color:var(--deep)}
+.modal-tips-list{margin:0;padding-left:1.2rem;display:grid;gap:.45rem;color:#3e4f4c}
+.modal-foot{margin-top:1.6rem;display:flex;justify-content:flex-end}
+.modal-foot .btn{min-width:0}
+@media (max-width:600px){
+  .modal-card{padding:1.6rem}
+  .modal-foot{flex-direction:column;align-items:stretch;gap:.6rem}
+  .modal-foot .btn{width:100%}
+}
 /* --- Background utility for hostess image --- */
 .bg-hostess{ background: url('../img/wm.webp') center/cover no-repeat; border-color: rgba(255,255,255,.14) !important; min-height:300px; border-radius:12px; }
 /* ---------- blog layout ---------- */
