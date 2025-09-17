@@ -152,13 +152,40 @@ section{padding:clamp(2.5rem, 3.5vw + 1rem, 4rem) 0}
 .feature p, .feature .h3 { word-break: normal; overflow-wrap: break-word; hyphens: auto; }
 /* ---------- table ---------- */
 table{width:100%;border-collapse:separate;border-spacing:0}
-th,td{padding:.7rem .9rem;border-bottom:1px solid #e9f0ee}
+th,td{padding:.65rem .75rem;border-bottom:1px solid #e9f0ee;vertical-align:middle}
 thead th{position:static;background:#012F2B;color:var(--paper)}
 .table-card tbody tr td{transition:background-color .2s ease}
 .table-card tbody tr:nth-child(odd) td{background:rgba(1,61,57,.04)}
 .table-card tbody tr:nth-child(even) td{background:rgba(1,61,57,.015)}
 tbody tr:hover td{background:rgba(212,175,55,.14)}
-.kadar{font-weight:700;color:#012F2B}
+.kadar{font-weight:700;color:#012F2B;display:flex;align-items:center;gap:.6rem;line-height:1.35}
+.price-label{display:flex;flex-direction:column;gap:.05rem;color:#012F2B;overflow-wrap:anywhere}
+.price-cell{vertical-align:middle;text-align:right;font-weight:700}
+.price-amount{font-size:1.08rem;white-space:nowrap}
+.price-action{text-align:center;width:1%;white-space:nowrap}
+.price-add-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;background:rgba(1,61,57,.05);color:#013D39;border:1px solid rgba(1,61,57,.24);border-radius:50%;cursor:pointer;transition:background .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;padding:0}
+.price-add-btn:hover,.price-add-btn:focus-visible{background:rgba(212,175,55,.24);border-color:rgba(212,175,55,.5);color:#0c3b38}
+.price-add-btn:focus-visible{outline:2px solid var(--focus-ring);outline-offset:2px}
+.price-add-btn:active{transform:scale(.92)}
+.price-add-icon{font-size:1.4rem;line-height:1;font-weight:600}
+.price-icon{width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden;transition:transform .18s ease, box-shadow .18s ease}
+.price-icon::before,.price-icon::after{content:"";position:absolute}
+.price-icon:hover,.price-icon:focus-visible{transform:translateY(-1px);box-shadow:0 6px 14px rgba(1,61,57,.18)}
+.price-icon--lm{background:linear-gradient(135deg,rgba(212,175,55,.78),rgba(212,175,55,.42));border:1px solid rgba(212,175,55,.5);box-shadow:inset 0 -2px 4px rgba(1,61,57,.18)}
+.price-icon--lm::before{width:22px;height:8px;border-radius:999px;background:rgba(255,255,255,.85);bottom:9px;left:50%;transform:translateX(-50%);opacity:.7}
+.price-icon--lm::after{width:18px;height:6px;border-radius:999px;background:rgba(255,255,255,.55);bottom:4px;left:50%;transform:translateX(-50%);opacity:.55}
+.price-icon--jewelry,.price-icon--jewelry-low{border-radius:50%;border:1px solid rgba(212,175,55,.48);background:rgba(212,175,55,.18)}
+.price-icon--jewelry::before{width:18px;height:18px;border-radius:50%;border:3px solid rgba(212,175,55,.85);left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(255,255,255,.45) inset}
+.price-icon--jewelry::after{width:12px;height:12px;left:50%;top:2px;transform:translate(-50%,-20%);background:rgba(212,175,55,.9);clip-path:polygon(50% 0, 90% 60%, 50% 100%, 10% 60%);opacity:.9}
+.price-icon--jewelry-low{border-color:rgba(1,61,57,.26);background:rgba(1,61,57,.1)}
+.price-icon--jewelry-low::before{width:18px;height:18px;border-radius:50%;border:3px solid rgba(137,182,177,.85);left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 2px rgba(255,255,255,.4) inset}
+.price-icon--jewelry-low::after{width:12px;height:12px;left:50%;top:2px;transform:translate(-50%,-20%);background:rgba(137,182,177,.85);clip-path:polygon(50% 0, 90% 60%, 50% 100%, 10% 60%);opacity:.85}
+.price-icon--jewelry-low::after,.price-icon--jewelry::after{will-change:transform}
+@media (max-width:640px){
+  .price-cell{text-align:left}
+  .price-action{text-align:right;width:auto}
+  .price-add-btn{width:30px;height:30px}
+}
 .table-card{max-width:800px;margin:0 auto}
 .date-badge{font-size:20px;font-weight:700;color:#013D39;background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.45);padding:.2rem .5rem;border-radius:8px}
 .price-highlight{position:relative;overflow:hidden;background:linear-gradient(135deg,#022c29,#011f1d);color:#eafffa;padding:1.4rem;border:1px solid rgba(212,175,55,.2);border-radius:var(--radius);margin:0 auto;max-width:800px;display:flex;flex-direction:column;gap:.6rem;transition:transform .3s ease, box-shadow .3s ease}
@@ -450,8 +477,9 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .hero .bling img{ width:100%; height:420px; object-fit:cover; border-radius:12px; border:1px solid rgba(255,255,255,.18) }
 
 /* Harga table header alignment */
-.table-card th:first-child{ text-align:left; width:44% }
-.table-card th:last-child{ text-align:right; width:56% }
+.table-card th:first-child{ text-align:left }
+.table-card th:nth-child(2){ text-align:right }
+.table-card th:nth-child(3){ text-align:center }
 
 /* Kalkulator helpers */
 #cal-total.h2{ margin:0 }

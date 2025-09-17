@@ -491,6 +491,9 @@ function formatCurrencyIDR(value){
   try{ return Number(value || 0).toLocaleString('id-ID'); }
   catch(_){ return String(value || 0); }
 }
+function escapeAttr(value){
+  return String(value == null ? '' : value).replace(/"/g, '&quot;');
+}
 function updateLmBaruHighlight(currentPrice, options){
   options = options || {};
   var valueEl = document.getElementById('lmBaruCurrent');
@@ -618,7 +621,19 @@ function renderPriceTable(rows){
     if(!row || typeof row.price !== 'number' || !isFinite(row.price)) return;
     var color = row.color || GOLD_ROW_PRIMARY;
     var infoAttr = row.infoKey ? ` data-info-key="${row.infoKey}" tabindex="0" role="button" aria-label="Detail ${row.label}"` : '';
-    tbody.insertAdjacentHTML('beforeend', `<tr class="price-row" style="height:34px"${infoAttr}><td class="kadar">${row.label}</td><td style="text-align:right;font-weight:700;color:${color}">Rp <span class="num" data-to="${row.price}">0</span></td></tr>`);
+    var iconTooltip = row.iconTooltip || row.label;
+    var iconTitleAttr = iconTooltip ? ` title="${escapeAttr(iconTooltip)}"` : '';
+    var iconAriaAttr = iconTooltip ? ` role="img" aria-label="${escapeAttr(iconTooltip)}"` : ' aria-hidden="true"';
+    var iconHtml = row.icon ? `<span class="price-icon price-icon--${row.icon}"${iconTitleAttr}${iconAriaAttr}></span>` : '';
+    var addAttrs = '';
+    if(row.addCat){ addAttrs += ` data-add-cat="${row.addCat}"`; }
+    if(row.addKadar !== undefined && row.addKadar !== null){ addAttrs += ` data-add-kadar="${row.addKadar}"`; }
+    var addTooltip = `Tambahkan ${row.label} ke kalkulator`;
+    var addBtn = row.addCat ? `<button type="button" class="price-add-btn"${addAttrs} aria-label="${escapeAttr(addTooltip)}" title="${escapeAttr(addTooltip)}"><span class="price-add-icon" aria-hidden="true">+</span></button>` : '';
+    var labelHtml = `<div class="price-label">${row.label}</div>`;
+    var priceHtml = `<div class="price-amount" style="color:${color}">Rp <span class="num" data-to="${row.price}">0</span></div>`;
+    var actionHtml = row.addCat ? addBtn : '';
+    tbody.insertAdjacentHTML('beforeend', `<tr class="price-row" style="height:34px"${infoAttr}><td class="kadar">${iconHtml}${labelHtml}</td><td class="price-cell">${priceHtml}</td><td class="price-action">${actionHtml}</td></tr>`);
     priceEntries.push({ name: row.schemaName || row.label, price: row.price });
   });
   tbody.setAttribute('aria-busy','false');
@@ -627,16 +642,29 @@ function renderPriceTable(rows){
 }
 function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
   var rows = [
-    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY, infoKey: 'lm_baru' },
-    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY, infoKey: 'lm_lama' }
+    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY, infoKey: 'lm_baru', icon: 'lm', iconTitle: 'Keping logam mulia', iconTooltip: 'Logam Mulia (LM) Baru', addCat: 'lm_baru', addKadar: '24' },
+    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY, infoKey: 'lm_lama', icon: 'lm', iconTitle: 'Keping logam mulia', iconTooltip: 'Logam Mulia (LM) Lama', addCat: 'lm_lama', addKadar: '24' }
   ];
   (perhiasanEntries || []).forEach(function(entry){
+    var iconType = 'jewelry';
+    var iconTitle = 'Perhiasan emas';
+    var iconTooltip = `Perhiasan ${entry.karat}K`;
+    if(entry.karat && Number(entry.karat) < 18){
+      iconType = 'jewelry-low';
+      iconTitle = 'Perhiasan kadar menengah';
+    }
+    var catValue = entry.karat === 24 ? 'perhiasan_24' : 'perhiasan_sub';
     rows.push({
       label: `${entry.karat}K`,
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
       color: entry.color || GOLD_ROW_PRIMARY,
-      infoKey: entry.infoKey || ('karat-' + entry.karat)
+      infoKey: entry.infoKey || ('karat-' + entry.karat),
+      icon: entry.icon || iconType,
+      iconTitle: entry.iconTitle || iconTitle,
+      iconTooltip: entry.iconTooltip || iconTooltip,
+      addCat: entry.addCat || catValue,
+      addKadar: entry.addKadar || String(entry.karat)
     });
   });
   renderPriceTable(rows);
@@ -862,6 +890,20 @@ fetchGoldPrice();
   }
 
   table.addEventListener('click', function(ev){
+    var addBtn = ev.target.closest('button[data-add-cat]');
+    if(addBtn){
+      ev.preventDefault();
+      ev.stopPropagation();
+      var options = {};
+      var catAttr = addBtn.getAttribute('data-add-cat');
+      var kadarAttr = addBtn.getAttribute('data-add-kadar');
+      if(catAttr) options.cat = catAttr;
+      if(kadarAttr !== null) options.kadar = kadarAttr;
+      if(window.REI_CALC && typeof window.REI_CALC.setSelection === 'function'){
+        window.REI_CALC.setSelection(options);
+      }
+      return;
+    }
     var row = ev.target.closest('tr[data-info-key]');
     if(!row) return;
     ev.preventDefault();
@@ -870,6 +912,7 @@ fetchGoldPrice();
 
   table.addEventListener('keydown', function(ev){
     if(ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') return;
+    if(ev.target.closest('button')) return;
     var row = ev.target.closest('tr[data-info-key]');
     if(!row) return;
     ev.preventDefault();
@@ -936,6 +979,32 @@ fetchGoldPrice();
   cat.addEventListener('change', function(){ toggleKadar(); compute(); });
   document.addEventListener('prices:updated', compute);
   toggleKadar(); compute();
+
+  function setSelection(options){
+    if(!options) return;
+    if(options.cat){
+      var desired = String(options.cat);
+      var hasOption = Array.prototype.some.call(cat.options, function(opt){ return opt.value === desired; });
+      if(hasOption) cat.value = desired;
+      toggleKadar();
+    }
+    if(options.kadar !== undefined && options.kadar !== null){
+      var val = String(options.kadar);
+      var hasKadarOption = Array.prototype.some.call(kadar.options, function(opt){ return opt.value === val; });
+      if(hasKadarOption || kadar.disabled){
+        kadar.value = val;
+      }
+    }
+    if(options.berat !== undefined && options.berat !== null){
+      berat.value = String(options.berat);
+    }
+    compute();
+    var section = document.getElementById('kalkulator');
+    if(section){ section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+
+  window.REI_CALC = window.REI_CALC || {};
+  window.REI_CALC.setSelection = setSelection;
 })();
 
 // Tahun pada footer + 404 helpers

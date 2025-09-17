@@ -136,31 +136,6 @@
         </div>
       </section>
 
-      <!-- ===================== HARGA BUYBACK ===================== -->
-      <section id="harga">
-        <div class="container">
-          <div class="accent-title">Harga Buyback</div>
-          <h2 class="h2">
-            Tabel Perhiasan & Logam Mulia (LM) Hari Ini:
-            <br>
-            <span id="currentDateTime" class="date-badge">—</span>
-          </h2>
-          <div class="card table-wrap table-card">
-            <table aria-label="Tabel harga buyback perhiasan">
-              <thead>
-              <tr>
-                <th>Kadar</th>
-                <th>Harga (Rp)</th>
-              </tr>
-              </thead>
-              <tbody id="goldPriceTable" aria-live="polite" aria-busy="true"></tbody>
-            </table>
-          </div>
-          <p id="lastUpdatedInfo" class="text-note mt-10" role="status" aria-live="polite">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
-          <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
-        </div>
-      </section>
-
       <!-- ===================== LM HIGHLIGHT ===================== -->
       <section id="lm-highlight" aria-labelledby="lmHighlightTitle" class="lm-highlight-section">
         <div class="container">
@@ -187,6 +162,32 @@
         </div>
       </section>
 
+      <!-- ===================== HARGA BUYBACK ===================== -->
+      <section id="harga">
+        <div class="container">
+          <div class="accent-title">Harga Buyback</div>
+          <h2 class="h2">
+            Tabel Perhiasan & Logam Mulia (LM) Hari Ini:
+            <br>
+            <span id="currentDateTime" class="date-badge">—</span>
+          </h2>
+          <div class="card table-wrap table-card">
+            <table aria-label="Tabel harga buyback perhiasan">
+              <thead>
+              <tr>
+                <th>Kadar</th>
+                <th>Harga (Rp)</th>
+                <th>+</th>
+              </tr>
+              </thead>
+              <tbody id="goldPriceTable" aria-live="polite" aria-busy="true"></tbody>
+            </table>
+          </div>
+          <p id="lastUpdatedInfo" class="text-note mt-10" role="status" aria-live="polite">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
+          <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
+        </div>
+      </section>
+
       <!-- ===================== KALKULATOR ===================== -->
       <section id="kalkulator">
         <div class="container">
@@ -206,6 +207,7 @@
               <div>
                 <label for="cal-kadar" class="h3">Kadar</label>
                 <select id="cal-kadar" class="form-control">
+                  <option value="24">24K</option>
                   <option value="23">23K</option>
                   <option value="22">22K</option>
                   <option value="21">21K</option>
