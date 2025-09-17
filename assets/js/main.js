@@ -171,6 +171,54 @@ const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
+const FACTOR_LM_BARU = 0.932;
+const FACTOR_LM_LAMA = 0.917;
+const FACTOR_PERHIASAN_24K = 0.862;
+const FACTOR_PERHIASAN_SUB = 0.786;
+const GOLD_ROW_PRIMARY = '#0E4D47';
+const GOLD_ROW_SECONDARY = '#335e5a';
+const GOLD_KARAT_SERIES = [
+  { karat: 24, purity: 1 },
+  { karat: 23, purity: 0.9583 },
+  { karat: 22, purity: 0.9167 },
+  { karat: 21, purity: 0.875 },
+  { karat: 20, purity: 0.8333 },
+  { karat: 19, purity: 0.7917 },
+  { karat: 18, purity: 0.75 },
+  { karat: 17, purity: 0.7083 },
+  { karat: 16, purity: 0.6667 },
+  { karat: 15, purity: 0.625 },
+  { karat: 14, purity: 0.5833 },
+  { karat: 12, purity: 0.5 },
+  { karat: 10, purity: 0.4167 },
+  { karat: 9, purity: 0.375 },
+  { karat: 8, purity: 0.3333 },
+  { karat: 6, purity: 0.25 },
+  { karat: 5, purity: 0.2083 }
+];
+const DEFAULT_PRICE_TABLE = {
+  lmBaru: 1916000,
+  lmLama: 1886000,
+  perhiasan: [
+    { karat: 24, price: 1776000 },
+    { karat: 23, price: 1558000 },
+    { karat: 22, price: 1493000 },
+    { karat: 21, price: 1427000 },
+    { karat: 20, price: 1361000 },
+    { karat: 19, price: 1296000 },
+    { karat: 18, price: 1230000 },
+    { karat: 17, price: 1165000 },
+    { karat: 16, price: 1099000 },
+    { karat: 15, price: 1034000 },
+    { karat: 14, price: 968000 },
+    { karat: 12, price: 837000 },
+    { karat: 10, price: 706000 },
+    { karat: 9, price: 640000 },
+    { karat: 8, price: 575000 },
+    { karat: 6, price: 444000 },
+    { karat: 5, price: 378000 }
+  ]
+};
 function saveLastBasePrice(p){ try{ localStorage.setItem(LAST_PRICE_KEY, JSON.stringify({ p, t: Date.now() })); }catch(_){} }
 function readLastBasePrice(){ try{ const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY)||''); /* istanbul ignore next */ if(o && typeof o.p==='number') return o; }catch(_){} return null; }
 function updatePriceSchema(items){
@@ -209,33 +257,53 @@ function updatePriceSchema(items){
     el.textContent = JSON.stringify(data);
   }catch(_){ }
 }
-function displayFromBasePrice(P){
-  const PRICE_ADJUST_IDR = +50000;
-  const FACTOR_LM_BARU = 0.932; const FACTOR_LM_LAMA = 0.917; const FACTOR_24K_PERHIASAN = 0.862; const FACTOR_SUB_24K_PERHIASAN = 0.786;
-  const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
-  const tbody = document.getElementById('goldPriceTable'); /* istanbul ignore next */ if(!tbody) return;
+function roundUpPrice(n, step){
+  var s = step || 1000;
+  return Math.ceil(n / s) * s;
+}
+function buildPerhiasanPricesFromBase(basePrice){
+  return GOLD_KARAT_SERIES.map(function(entry){
+    var factor = entry.karat === 24 ? FACTOR_PERHIASAN_24K : FACTOR_PERHIASAN_SUB;
+    var harga = roundUpPrice(basePrice * entry.purity * factor + PRICE_ADJUST_IDR);
+    return { karat: entry.karat, price: harga };
+  });
+}
+function renderPriceTable(rows){
+  var tbody = document.getElementById('goldPriceTable');
+  /* istanbul ignore next */
+  if(!tbody) return;
   tbody.setAttribute('aria-busy','true');
   tbody.innerHTML = '';
-  const priceEntries = [];
-  const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
-  const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
-  priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: lmBaru });
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
-  priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: lmLama });
-  const karatList = [
-    {karat:24,purity:1},{karat:23,purity:0.9583},{karat:22,purity:0.9167},{karat:21,purity:0.875},{karat:20,purity:0.8333},{karat:19,purity:0.7917},{karat:18,purity:0.75},{karat:17,purity:0.7083},{karat:16,purity:0.6667},{karat:15,purity:0.625},{karat:14,purity:0.5833}
-  ];
-  karatList.forEach(({ karat, purity }) => {
-    const factor = (karat === 24) ? FACTOR_24K_PERHIASAN : FACTOR_SUB_24K_PERHIASAN;
-    const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
-    const label = karat === 24 ? '24K' : `${karat}K`;
-    tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
-    priceEntries.push({ name: `Perhiasan ${label}`, price: harga });
+  var priceEntries = [];
+  rows.forEach(function(row){
+    if(!row || typeof row.price !== 'number' || !isFinite(row.price)) return;
+    var color = row.color || GOLD_ROW_PRIMARY;
+    tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${row.label}</td><td style="text-align:right;font-weight:700;color:${color}">Rp <span class="num" data-to="${row.price}">0</span></td></tr>`);
+    priceEntries.push({ name: row.schemaName || row.label, price: row.price });
   });
   tbody.setAttribute('aria-busy','false');
   updatePriceSchema(priceEntries);
   document.dispatchEvent(new CustomEvent('prices:updated'));
+}
+function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
+  var rows = [
+    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY },
+    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY }
+  ];
+  (perhiasanEntries || []).forEach(function(entry){
+    rows.push({
+      label: `${entry.karat}K`,
+      schemaName: `Perhiasan ${entry.karat}K`,
+      price: entry.price,
+      color: GOLD_ROW_PRIMARY
+    });
+  });
+  renderPriceTable(rows);
+}
+function displayFromBasePrice(P){
+  var lmBaru = roundUpPrice(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
+  var lmLama = roundUpPrice(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
+  renderPriceTableFromNumbers(lmBaru, lmLama, buildPerhiasanPricesFromBase(P));
 }
 
 async function fetchGoldPrice() {
@@ -249,37 +317,7 @@ async function fetchGoldPrice() {
     if (data && data.statusCode === 200 && data.data && data.data.current) {
       const hargaEmas24Karat = Number(data.data.current.buy);
       REI_LAST_BASE_P = hargaEmas24Karat; saveLastBasePrice(hargaEmas24Karat);
-      const FACTOR_LM_BARU = 0.932;
-      const FACTOR_LM_LAMA = 0.917;
-      const FACTOR_24K_PERHIASAN = 0.862;
-      const FACTOR_SUB_24K_PERHIASAN = 0.786;
-      const ceilStep = (n, step = 1000) => Math.ceil(n / step) * step;
-      const P = hargaEmas24Karat;
-      const tbody = document.getElementById('goldPriceTable');
-      /* istanbul ignore next */
-      if(!tbody) return;
-      tbody.setAttribute('aria-busy','true');
-      tbody.innerHTML = '';
-      const lmBaru = ceilStep(P * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
-      const lmLama = ceilStep(P * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
-      const priceEntries = [];
-      tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${lmBaru}">0</span></td></tr>`);
-      priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: lmBaru });
-      tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${lmLama}">0</span></td></tr>`);
-      priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: lmLama });
-      const karatList = [
-        {karat:24,purity:1},{karat:23,purity:0.9583},{karat:22,purity:0.9167},{karat:21,purity:0.875},{karat:20,purity:0.8333},{karat:19,purity:0.7917},{karat:18,purity:0.75},{karat:17,purity:0.7083},{karat:16,purity:0.6667},{karat:15,purity:0.625},{karat:14,purity:0.5833},{karat:12,purity:0.5},{karat:10,purity:0.4167},{karat:9,purity:0.375},{karat:8,purity:0.3333},{karat:6,purity:0.25},{karat:5,purity:0.2083}
-      ];
-      karatList.forEach(({ karat, purity }) => {
-        const factor = (karat === 24) ? FACTOR_24K_PERHIASAN : FACTOR_SUB_24K_PERHIASAN;
-        const harga = ceilStep(P * purity * factor + PRICE_ADJUST_IDR);
-        const label = karat === 24 ? '24K' : `${karat}K`;
-        tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">${label}</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${harga}">0</span></td></tr>`);
-        priceEntries.push({ name: `Perhiasan ${label}`, price: harga });
-      });
-      tbody.setAttribute('aria-busy','false');
-      updatePriceSchema(priceEntries);
-      document.dispatchEvent(new CustomEvent('prices:updated'));
+      displayFromBasePrice(hargaEmas24Karat);
       // Inform last updated
       var info = document.getElementById('lastUpdatedInfo'); /* istanbul ignore next */ if(info){ info.textContent = 'Terakhir diperbarui: ' + formatDateTimeIndo(new Date()); }
     } else {
@@ -298,47 +336,7 @@ async function fetchGoldPrice() {
   }
 }
 function displayDefaultPrices() {
-  // Fixed default prices (IDR)
-  const LM_BARU_DEFAULT = 1916000;
-  const LM_LAMA_DEFAULT = 1886000;
-  const defaults = [
-    { karat: 24, baru: 1776000 },
-    { karat: 23, baru: 1558000 },
-    { karat: 22, baru: 1493000 },
-    { karat: 21, baru: 1427000 },
-    { karat: 20, baru: 1361000 },
-    { karat: 19, baru: 1296000 },
-    { karat: 18, baru: 1230000 },
-    { karat: 17, baru: 1165000 },
-    { karat: 16, baru: 1099000 },
-    { karat: 15, baru: 1034000 },
-    { karat: 14, baru: 968000 },
-    { karat: 12, baru: 837000 },
-    { karat: 10, baru: 706000 },
-    { karat: 9,  baru: 640000 },
-    { karat: 8,  baru: 575000 },
-    { karat: 6,  baru: 444000 },
-    { karat: 5,  baru: 378000 }
-  ];
-  const tbody = document.getElementById('goldPriceTable');
-  /* istanbul ignore next */
-  if(!tbody) return;
-  tbody.setAttribute('aria-busy','true');
-  tbody.innerHTML = '';
-  // Exact LM rows (no adjustment)
-  const priceEntries = [];
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Baru</td><td style="text-align:right;font-weight:700;color:#0E4D47">Rp <span class="num" data-to="${LM_BARU_DEFAULT}">0</span></td></tr>`);
-  priceEntries.push({ name: 'Logam Mulia (LM) Baru', price: LM_BARU_DEFAULT });
-  tbody.insertAdjacentHTML('beforeend', `<tr style="height:34px"><td class="kadar">Logam Mulia (LM) Lama</td><td style="text-align:right;font-weight:700;color:#335e5a">Rp <span class="num" data-to="${LM_LAMA_DEFAULT}">0</span></td></tr>`);
-  priceEntries.push({ name: 'Logam Mulia (LM) Lama', price: LM_LAMA_DEFAULT });
-  // Per-karat rows (no adjustment)
-  defaults.forEach(({karat, baru}) => {
-    tbody.insertAdjacentHTML('beforeend', `<tr style=\"height:34px\"><td class=\"kadar\">${karat}K</td><td style=\"text-align:right;font-weight:700;color:#0E4D47\">Rp <span class=\"num\" data-to=\"${baru}\">0</span></td></tr>`);
-    priceEntries.push({ name: `Perhiasan ${karat}K`, price: baru });
-  });
-  tbody.setAttribute('aria-busy','false');
-  updatePriceSchema(priceEntries);
-  document.dispatchEvent(new CustomEvent('prices:updated'));
+  renderPriceTableFromNumbers(DEFAULT_PRICE_TABLE.lmBaru, DEFAULT_PRICE_TABLE.lmLama, DEFAULT_PRICE_TABLE.perhiasan);
 }
 function formatDateTimeIndo(date) {
   const days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];

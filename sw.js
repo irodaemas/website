@@ -2,9 +2,6 @@
 const CACHE_NAME = 'rodaemas-v6';
 const FONT_CACHE = 'rodaemas-fonts-v1';
 
-// Base URL (scope) – agar aman saat di subfolder
-const BASE = self.registration.scope; // e.g. http://localhost:63342/Roda%20Emas%20Indonesia/
-
 // Core assets gunakan path relatif terhadap scope
 const CORE_ASSETS = [
     './',
@@ -19,6 +16,8 @@ const CORE_ASSETS = [
     './assets/img/logo.webp?v=1',
     './assets/img/asset1.webp',
     './assets/img/wm.webp',
+    './harga/',
+    './harga/index.html',
     './blog/',
     './blog/index.html',
     './blog/keuntungan-jual-emas-cod/',
