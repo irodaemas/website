@@ -1,6 +1,6 @@
-/* Roda Emas Indonesia – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'rodaemas-v6';
-const FONT_CACHE = 'rodaemas-fonts-v1';
+/* Sentral Emas – Service Worker (subfolder-friendly) */
+const CACHE_NAME = 'sentralemas-v6';
+const FONT_CACHE = 'sentralemas-fonts-v1';
 
 // Core assets gunakan path relatif terhadap scope
 const CORE_ASSETS = [

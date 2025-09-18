@@ -8,7 +8,7 @@
     <html lang="id">
       <head>
         <meta charset="utf-8"/>
-        <title>Peta Situs – Roda Emas Indonesia</title>
+        <title>Peta Situs – Sentral Emas</title>
         <style>
           body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:#f7f9fa;color:#1a2833;margin:0;padding:40px}
           h1{font-size:28px;margin-bottom:8px}
@@ -23,7 +23,7 @@
         </style>
       </head>
       <body>
-        <h1>Peta Situs Roda Emas Indonesia</h1>
+        <h1>Peta Situs Sentral Emas</h1>
         <p>Daftar URL yang disediakan untuk mesin pencari. Total <strong><xsl:value-of select="count(//sitemap:url)"/></strong> halaman.</p>
         <table>
           <thead>

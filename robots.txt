@@ -10,4 +10,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://rodaemasindonesia.com/sitemap.xml
+Sitemap: https://sentralemas.com/sitemap.xml

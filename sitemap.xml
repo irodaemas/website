@@ -2,31 +2,31 @@
 <?xml-stylesheet type="text/xsl" href="/assets/sitemap.xsl"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://rodaemasindonesia.com/</loc>
+    <loc>https://sentralemas.com/</loc>
     <priority>1.0</priority>
     <changefreq>daily</changefreq>
     <lastmod>2025-01-05T00:00:00+00:00</lastmod>
   </url>
   <url>
-    <loc>https://rodaemasindonesia.com/harga/</loc>
+    <loc>https://sentralemas.com/harga/</loc>
     <priority>0.9</priority>
     <changefreq>daily</changefreq>
     <lastmod>2025-09-17T07:01:08+00:00</lastmod>
   </url>
   <url>
-    <loc>https://rodaemasindonesia.com/blog/</loc>
+    <loc>https://sentralemas.com/blog/</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
     <lastmod>2025-01-05T00:00:00+00:00</lastmod>
   </url>
   <url>
-    <loc>https://rodaemasindonesia.com/blog/keuntungan-jual-emas-cod/</loc>
+    <loc>https://sentralemas.com/blog/keuntungan-jual-emas-cod/</loc>
     <priority>0.8</priority>
     <changefreq>monthly</changefreq>
     <lastmod>2025-09-05T00:00:00+00:00</lastmod>
   </url>
   <url>
-    <loc>https://rodaemasindonesia.com/blog/panduan-menilai-keaslian-emas-sebelum-cod/</loc>
+    <loc>https://sentralemas.com/blog/panduan-menilai-keaslian-emas-sebelum-cod/</loc>
     <priority>0.75</priority>
     <changefreq>monthly</changefreq>
     <lastmod>2025-09-12T00:00:00+00:00</lastmod>

@@ -111,7 +111,7 @@
         </linearGradient>\
       </defs>\
       <rect width="800" height="480" fill="url(#g)"/>\
-      <text x="50%" y="52%" font-family="Inter,Arial" font-size="28" fill="white" text-anchor="middle">Roda Emas Indonesia</text>\
+      <text x="50%" y="52%" font-family="Inter,Arial" font-size="28" fill="white" text-anchor="middle">Sentral Emas</text>\
     </svg>'
   );
   // Seed placeholder for LQIP images
@@ -442,7 +442,7 @@ function updatePriceSchema(items){
     var data = {
       "@context": "https://schema.org",
       "@type": "ItemList",
-      "@id": "https://rodaemasindonesia.com/#price-list",
+      "@id": "https://sentralemas.com/#price-list",
       "name": "Referensi Harga Buyback Emas & Perhiasan",
       "itemListElement": items.map(function(item, idx){
         return {
@@ -455,7 +455,7 @@ function updatePriceSchema(items){
             "price": item.price,
             "priceCurrency": "IDR",
             "availability": "https://schema.org/InStock",
-            "itemOffered": {"@id": "https://rodaemasindonesia.com/#service"}
+            "itemOffered": {"@id": "https://sentralemas.com/#service"}
           }
         };
       })
@@ -973,7 +973,7 @@ fetchGoldPrice();
     else { perGram = ceilStep(P*FACTOR_SUB*purityFromK(k) + ADJ); }
     var est = ceilStep(perGram * g, 1000);
     total.textContent = 'Rp ' + formatIDR(est);
-    var msg = `Halo Roda Emas Indonesia,%0A%0ASaya ingin konsultasi buyback:%0A- Kategori: ${labelCat(c)}%0A- Kadar: ${k}K%0A- Berat: ${g} gram%0A- Estimasi: Rp ${formatIDR(est)}%0A%0AMohon info lebih lanjut, terima kasih.`;
+    var msg = `Halo Sentral Emas,%0A%0ASaya ingin konsultasi buyback:%0A- Kategori: ${labelCat(c)}%0A- Kadar: ${k}K%0A- Berat: ${g} gram%0A- Estimasi: Rp ${formatIDR(est)}%0A%0AMohon info lebih lanjut, terima kasih.`;
     wa.href = 'https://wa.me/6285591088503?text=' + msg;
   }
   function labelCat(c){

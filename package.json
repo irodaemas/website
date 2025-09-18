@@ -1,5 +1,5 @@
 {
-  "name": "roda-emas-indonesia",
+  "name": "sentral-emas-indonesia",
   "version": "1.0.0",
   "description": "",
   "main": "sw.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/irodaemas/website.git"
+    "url": "git+https://github.com/isentralemas/website.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/irodaemas/website/issues"
+    "url": "https://github.com/isentralemas/website/issues"
   },
-  "homepage": "https://github.com/irodaemas/website#readme",
+  "homepage": "https://github.com/isentralemas/website#readme",
   "devDependencies": {
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0"
