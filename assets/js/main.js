@@ -1192,6 +1192,53 @@ if ('serviceWorker' in navigator) {
   apply();
 })();
 
+// PWA Install Prompt
+/* istanbul ignore next */
+(function(){
+  let deferredPrompt;
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const prompt = document.getElementById('pwaPrompt');
+    if (prompt) {
+      prompt.hidden = false;
+      prompt.setAttribute('data-state', 'install');
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    const prompt = document.getElementById('pwaPrompt');
+    if (prompt) {
+      prompt.hidden = true;
+    }
+    deferredPrompt = null;
+  });
+
+  document.addEventListener('click', (e) => {
+    const action = e.target.closest('[data-action]');
+    if (!action) return;
+    const act = action.getAttribute('data-action');
+    const prompt = document.getElementById('pwaPrompt');
+    if (act === 'install' && deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+        deferredPrompt = null;
+        if (prompt) prompt.hidden = true;
+      });
+    } else if (act === 'close') {
+      if (prompt) prompt.hidden = true;
+    } else if (act === 'open') {
+      if (prompt) prompt.hidden = true;
+    }
+  });
+})();
+
 // Expose selected helpers for testing under Node/Jest without affecting browser usage
 /* istanbul ignore else */
 if (typeof module !== 'undefined' && module.exports) {
