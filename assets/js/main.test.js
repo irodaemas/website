@@ -44,6 +44,26 @@ describe('main.js behaviours', () => {
       <div id="currentDateTime"></div>
       <div id="typer"></div>
       <table><tbody id="goldPriceTable"></tbody></table>
+      <div id="lmBaruHighlight" class="price-highlight">
+        <div class="price-highlight-head">
+          <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
+          <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+        </div>
+        <div class="price-highlight-main">
+          <span id="lmBaruCurrent" class="price-highlight-value">Rp —</span>
+          <span class="price-highlight-unit">/gram</span>
+        </div>
+        <div id="lmBaruDelta" class="price-highlight-delta">
+          <span class="delta-icon" data-trend="pending"></span>
+          <span id="lmBaruDeltaText">Selisih menunggu data</span>
+        </div>
+        <div class="price-highlight-actions">
+          <button id="highlight-add" type="button" class="price-highlight-add" data-add-cat="lm_baru" data-add-kadar="24">
+            <span class="price-add-icon" aria-hidden="true">+</span>
+            <span>Masukkan ke Kalkulator</span>
+          </button>
+        </div>
+      </div>
       <div id="lastUpdatedInfo"></div>
       <select id="cal-cat">
         <option value="lm_baru">LM Baru</option>
@@ -51,7 +71,10 @@ describe('main.js behaviours', () => {
         <option value="perhiasan_24">Perhiasan 24K</option>
         <option value="perhiasan_sub" selected>Perhiasan &lt;24K</option>
       </select>
-      <input id="cal-kadar" value="18" />
+      <select id="cal-kadar">
+        <option value="24">24K</option>
+        <option value="18" selected>18K</option>
+      </select>
       <input id="cal-berat" value="3" />
       <div id="cal-total"></div>
       <a id="wa-prefill"></a>
@@ -314,12 +337,113 @@ describe('main.js behaviours', () => {
     main.displayFromBasePrice(1000000);
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
+    const firstRow = tbody.querySelector('.price-row');
+    expect(firstRow).not.toBeNull();
+    expect(firstRow.getAttribute('data-info-key')).toBe('lm_lama');
+    const addBtn = firstRow.querySelector('.price-add-btn');
+    expect(addBtn).not.toBeNull();
+    expect(addBtn.getAttribute('data-add-cat')).toBe('lm_lama');
+    expect(addBtn.getAttribute('data-add-kadar')).toBe('24');
+    const icon = firstRow.querySelector('.price-icon');
+    expect(icon).not.toBeNull();
+    expect(icon.getAttribute('data-tooltip')).toContain('Logam Mulia');
+    const highlightBtn = document.getElementById('highlight-add');
+    expect(highlightBtn.getAttribute('data-add-cat')).toBe('lm_baru');
     expect(listener).toHaveBeenCalled();
     const script = document.getElementById('priceItemList');
     expect(script).not.toBeNull();
     const json = JSON.parse(script.textContent);
     expect(json.itemListElement.length).toBeGreaterThan(0);
     document.removeEventListener('prices:updated', listener);
+  });
+
+  test('displayFromBasePrice updates highlight states and info text', async () => {
+    await loadMain();
+    const badge = document.getElementById('lmBaruTrendBadge');
+    const deltaWrap = document.getElementById('lmBaruDelta');
+    const current = document.getElementById('lmBaruCurrent');
+    const icon = deltaWrap.querySelector('.delta-icon');
+    const highlight = document.getElementById('lmBaruHighlight');
+    const calcSpy = jest.spyOn(window.REI_CALC, 'setSelection');
+
+    main.displayFromBasePrice(1000000, {
+      previousPrice: 900000,
+      updatedAt: '1714608000000',
+      metaSuffix: ' • Uji'
+    });
+    await flush(20);
+    expect(current.textContent).toBe('Rp 982.000');
+    expect(badge.textContent).toBe('Naik');
+    expect(badge.classList.contains('price-up')).toBe(true);
+    expect(deltaWrap.classList.contains('trend-up')).toBe(true);
+    expect(deltaWrap.classList.contains('delta-flash')).toBe(true);
+    expect(icon.getAttribute('data-trend')).toBe('up');
+    expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Naik Rp 82.000');
+    expect(current.classList.contains('value-flash')).toBe(true);
+    expect(highlight.classList.contains('is-updated')).toBe(true);
+    const infoText = document.getElementById('lastUpdatedInfo').textContent;
+    expect(infoText).toContain('Terakhir diperbarui:');
+    expect(infoText).toContain('2024');
+    expect(infoText).toContain('• Uji');
+
+    main.displayFromBasePrice(900000, {
+      previousBase: 1000000,
+      updatedAt: 1714694400000
+    });
+    await flush(20);
+    expect(badge.textContent).toBe('Turun');
+    expect(badge.classList.contains('price-down')).toBe(true);
+    expect(deltaWrap.classList.contains('trend-down')).toBe(true);
+    expect(icon.getAttribute('data-trend')).toBe('down');
+    expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Turun Rp');
+
+    main.displayFromBasePrice(850000, {
+      previousPrice: 0
+    });
+    await flush(20);
+    expect(deltaWrap.classList.contains('trend-up')).toBe(true);
+
+    const latestPrice = current.textContent.replace(/[^0-9]/g, '');
+    const samePrice = Number(latestPrice);
+    main.displayFromBasePrice(850000, {
+      previousPrice: samePrice
+    });
+    await flush(20);
+    expect(deltaWrap.classList.contains('trend-flat')).toBe(true);
+    expect(icon.getAttribute('data-trend')).toBe('flat');
+
+    main.displayFromBasePrice(850000, {});
+    await flush(20);
+    expect(deltaWrap.classList.contains('trend-pending')).toBe(true);
+    expect(icon.getAttribute('data-trend')).toBe('pending');
+
+    const highlightAdd = document.getElementById('highlight-add');
+    highlightAdd.click();
+    expect(calcSpy).toHaveBeenCalledWith(expect.objectContaining({ cat: 'lm_baru', kadar: '24' }));
+    calcSpy.mockRestore();
+  });
+
+  test('displayFromBasePrice survives toLocaleString failures', async () => {
+    await loadMain();
+    const originalToLocaleString = Number.prototype.toLocaleString;
+    const originalDispatch = document.dispatchEvent;
+    let didThrow = false;
+    Number.prototype.toLocaleString = jest.fn(function (...args) {
+      if (!didThrow) {
+        didThrow = true;
+        throw new Error('fail');
+      }
+      return originalToLocaleString.apply(this, args);
+    });
+    document.dispatchEvent = jest.fn(() => true);
+    try {
+      main.displayFromBasePrice(1000000);
+      await flush(20);
+      expect(document.getElementById('lmBaruCurrent').textContent).toBe('Rp 982000');
+    } finally {
+      Number.prototype.toLocaleString = originalToLocaleString;
+      document.dispatchEvent = originalDispatch;
+    }
   });
 
   test('displayDefaultPrices falls back correctly', async () => {
@@ -368,15 +492,34 @@ describe('main.js behaviours', () => {
     const response = {
       json: () => Promise.resolve({
         statusCode: 200,
-        data: { current: { buy: 1000000 } },
+        data: {
+          current: {
+            buy: 1000000,
+            priceDate: '2024-05-10T00:00:00Z',
+            previous: { buy: 1000000, time: '2024-05-09T00:00:00Z' },
+          },
+          previous: { buy: 1020000, timestamp: 1714953600000 },
+          history: [
+            { buy: 1000000, priceDate: '2024-05-08T00:00:00Z' },
+            { buy: 970000 },
+          ],
+        },
       }),
     };
     global.fetch = jest.fn(() => Promise.resolve(response));
     await main.fetchGoldPrice();
+    await flush(20);
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
     const info = document.getElementById('lastUpdatedInfo');
     expect(info.textContent).toContain('Terakhir diperbarui');
+    expect(info.textContent).toContain('2024');
+    const deltaWrap = document.getElementById('lmBaruDelta');
+    const badge = document.getElementById('lmBaruTrendBadge');
+    expect(deltaWrap.classList.contains('trend-down')).toBe(true);
+    expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Turun Rp 19.000');
+    expect(badge.textContent).toBe('Turun');
+    expect(badge.classList.contains('price-down')).toBe(true);
     expect(localStorage.getItem('rei_last_base_price_v1')).toBeTruthy();
   });
 
