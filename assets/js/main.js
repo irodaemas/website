@@ -1176,6 +1176,18 @@ if ('serviceWorker' in navigator) {
   var btn = document.getElementById('backToTop');
   if(!btn) return;
   btn.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // Toggle visibility based on scroll position
+  var scrollThreshold = 200; // Show after scrolling 200px
+  function toggleBackToTop() {
+    if (window.scrollY > scrollThreshold) {
+      btn.classList.add('visible');
+    } else {
+      btn.classList.remove('visible');
+    }
+  }
+  window.addEventListener('scroll', toggleBackToTop, { passive: true });
+  toggleBackToTop(); // Check initial state
 })();
 
 // Nav aria-current
