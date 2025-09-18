@@ -80,6 +80,32 @@
         </div>
       </section>
 
+      <!-- ===================== LM HIGHLIGHT ===================== -->
+      <section id="lm-highlight" aria-labelledby="lmHighlightTitle" class="lm-highlight-section">
+        <div class="container">
+          <div class="lm-highlight-header">
+            <div>
+              <div class="accent-title">Update LM Baru</div>
+              <h2 id="lmHighlightTitle" class="h2">Pergerakan Harga Buyback Harian</h2>
+            </div>
+          </div>
+          <div id="lmBaruHighlight" class="card price-highlight" role="status" aria-live="polite">
+            <div class="price-highlight-head">
+              <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
+              <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+            </div>
+            <div class="price-highlight-main">
+              <span id="lmBaruCurrent" class="price-highlight-value">Rp —</span>
+              <span class="price-highlight-unit">/gram</span>
+            </div>
+            <div class="price-highlight-delta" id="lmBaruDelta">
+              <span class="delta-icon" aria-hidden="true">-</span>
+              <span id="lmBaruDeltaText">Selisih menunggu data</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="harga">
         <div class="container">
           <div class="accent-title">Harga Buyback</div>
@@ -92,8 +118,9 @@
             <table aria-label="Tabel harga buyback perhiasan">
               <thead>
                 <tr>
-                  <th>Kadar</th>
-                  <th>Harga (Rp)</th>
+                  <th scope="col">Kadar</th>
+                  <th scope="col">Harga (Rp)</th>
+                  <th scope="col" aria-label="Tambah ke kalkulator">&plus;</th>
                 </tr>
               </thead>
               <tbody id="goldPriceTable" aria-live="polite" aria-busy="true"></tbody>
@@ -124,6 +151,7 @@
               <div>
                 <label for="cal-kadar" class="h3">Kadar</label>
                 <select id="cal-kadar" class="form-control">
+                  <option value="24">24K</option>
                   <option value="23">23K</option>
                   <option value="22">22K</option>
                   <option value="21">21K</option>
@@ -176,6 +204,24 @@
           <div class="card bg-hostess pad-1" role="img" aria-label="Ilustrasi customer service"></div>
         </div>
       </section>
+
+      <div id="goldInfoModal" class="modal-overlay" hidden>
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="goldInfoTitle" data-modal-dialog>
+          <button type="button" class="modal-close" data-modal-close aria-label="Tutup detail kadar">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <p class="modal-meta" data-modal-meta></p>
+          <h3 id="goldInfoTitle" class="modal-title" data-modal-title>Detail Kadar Emas</h3>
+          <p class="modal-desc" data-modal-desc></p>
+          <div class="modal-tips" data-modal-tips-wrap>
+            <p class="modal-tips-label">Tips buyback:</p>
+            <ul class="modal-tips-list" data-modal-tips></ul>
+          </div>
+          <div class="modal-foot">
+            <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga-detail">Diskusikan via WhatsApp</a>
+          </div>
+        </div>
+      </div>
     </main>
 
     <footer>

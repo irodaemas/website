@@ -535,9 +535,10 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 }
 
 /* CTA section styling moved from inline */
-#kontak{ background:linear-gradient(180deg,#013D39,#012E2B); color:var(--paper) }
-#kontak .accent-title, #kontak .h2{ color:var(--paper) }
-#kontak .cta-actions{ margin-top:var(--space-md) }
+#kontak, #cta-harga{ background:linear-gradient(180deg,#013D39,#012E2B); color:var(--paper) }
+#kontak .accent-title, #kontak .h2, #cta-harga .accent-title, #cta-harga .h2{ color:var(--paper) }
+#kontak .lead, #cta-harga .lead{ color:rgba(255,255,255,.83) }
+#kontak .cta-actions, #cta-harga .cta-actions{ margin-top:var(--space-md) }
 
 /* Footer cleanup */
 .foot strong{ color:var(--paper) }
