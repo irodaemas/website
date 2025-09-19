@@ -36,3 +36,9 @@ out/
 
 # Misc
 *.local
+
+# Config files to not expose
+jest.config.js
+jest.setup.js
+package.json
+package-lock.json
