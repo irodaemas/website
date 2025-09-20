@@ -76,8 +76,30 @@ describe('main.js behaviours', () => {
         <option value="18" selected>18K</option>
       </select>
       <input id="cal-berat" value="3" />
-      <div id="cal-total"></div>
-      <a id="wa-prefill"></a>
+      <div class="calc-box">
+        <div class="calc-actions">
+          <div class="calc-current">
+            <div id="cal-current"></div>
+          </div>
+          <button id="cal-add" type="button">Tambah</button>
+        </div>
+        <div class="calc-items">
+          <div id="cal-empty">Belum ada item</div>
+          <div id="cal-table-wrap" hidden>
+            <table class="calc-table">
+              <tbody id="cal-items-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="calc-summary">
+          <div class="calc-info">
+            <div id="cal-count"></div>
+            <div id="cal-total"></div>
+            <div id="cal-note"></div>
+          </div>
+          <a id="wa-prefill"></a>
+        </div>
+      </div>
       <div id="yr"></div>
       <div id="y"></div>
       <div id="path"></div>
@@ -611,6 +633,30 @@ describe('main.js behaviours', () => {
     cat.value = 'perhiasan_sub';
     cat.dispatchEvent(new Event('change'));
     expect(kadar.disabled).toBe(false);
+    expect(decodeHref()).toContain('Perhiasan <24K');
+  });
+
+  test('calculator list handles add, setSelection, and removal', async () => {
+    await loadMain();
+    const berat = document.getElementById('cal-berat');
+    const addBtn = document.getElementById('cal-add');
+    const itemsBody = document.getElementById('cal-items-body');
+    const decodeHref = () => decodeURIComponent(document.getElementById('wa-prefill').href);
+
+    berat.value = '2';
+    addBtn.click();
+    expect(itemsBody.children.length).toBe(1);
+    expect(decodeHref()).toContain('1.');
+
+    window.REI_CALC.setSelection({ cat: 'lm_baru', kadar: '24', berat: '1.5', skipScroll: true });
+    expect(itemsBody.children.length).toBe(2);
+    expect(decodeHref()).toContain('2.');
+
+    const removeButtons = () => itemsBody.querySelectorAll('button[data-remove-id]');
+    removeButtons()[0].click();
+    expect(itemsBody.children.length).toBe(1);
+    removeButtons()[0].click();
+    expect(itemsBody.children.length).toBe(0);
     expect(decodeHref()).toContain('Perhiasan <24K');
   });
 
