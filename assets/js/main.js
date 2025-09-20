@@ -175,8 +175,8 @@ const FACTOR_LM_BARU = 0.932;
 const FACTOR_LM_LAMA = 0.917;
 const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
-const GOLD_ROW_PRIMARY = '#0E4D47';
-const GOLD_ROW_SECONDARY = '#335e5a';
+const GOLD_ROW_PRIMARY = 'var(--accent-green)';
+const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 const GOLD_KARAT_SERIES = [
   { karat: 24, purity: 1 },
   { karat: 23, purity: 0.9583 },
@@ -1260,6 +1260,62 @@ if ('serviceWorker' in navigator) {
       if (prompt) prompt.hidden = true;
     }
   });
+})();
+
+// Dark Mode Toggle
+/* istanbul ignore next */
+(function(){
+  const THEME_KEY = 'sentral_emas_theme';
+  const toggle = document.getElementById('darkModeToggle');
+  
+  if (!toggle) return;
+
+  function applyTheme(theme) {
+    let isDark;
+    if (theme === 'auto') {
+      isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    } else {
+      isDark = theme === 'dark';
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    }
+  }
+
+  function updateToggleIcon(theme) {
+    toggle.setAttribute('data-theme-mode', theme);
+  }
+
+  function cycleTheme() {
+    const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
+    let newTheme;
+    if (currentTheme === 'light') {
+      newTheme = 'dark';
+    } else if (currentTheme === 'dark') {
+      newTheme = 'auto';
+    } else {
+      newTheme = 'light';
+    }
+    localStorage.setItem(THEME_KEY, newTheme);
+    applyTheme(newTheme);
+    updateToggleIcon(newTheme);
+  }
+
+  // Initialize
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'auto';
+  applyTheme(savedTheme);
+  updateToggleIcon(savedTheme);
+
+  // Event listeners
+  toggle.addEventListener('click', cycleTheme);
+
+  if (window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+      const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
+      if (currentTheme === 'auto') {
+        applyTheme('auto');
+      }
+    });
+  }
 })();
 
 // Expose selected helpers for testing under Node/Jest without affecting browser usage
