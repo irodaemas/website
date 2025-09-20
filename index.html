@@ -85,7 +85,7 @@
     <header>
       <div class="container nav">
         <a class="brand" href="#home">
-          <img src="assets/img/logo.webp?v=1" alt="" width="32" height="32" decoding="async"/>
+          <img src="assets/img/logo.webp?v=1" alt="Logo Sentral Emas" width="32" height="32" decoding="async"/>
           <strong>Sentral Emas</strong>
         </a>
         <nav class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">
@@ -125,7 +125,7 @@
           </div>
           <div>
             <div class="card bling">
-              <img alt="Perhiasan emas – ilustrasi" src="assets/img/asset1.webp" decoding="async" fetchpriority="high" loading="eager" width="1200" height="420"/>
+              <img alt="Ilustrasi perhiasan emas dan berlian yang diterima untuk buyback" src="assets/img/asset1.webp" decoding="async" fetchpriority="high" loading="eager" width="1200" height="420"/>
               <i class="shine" aria-hidden="true"></i>
               <i class="sparkle s1" aria-hidden="true"></i>
               <i class="sparkle s2" aria-hidden="true"></i>
@@ -145,7 +145,15 @@
               <h2 id="lmHighlightTitle" class="h2">Pergerakan Harga Buyback Harian</h2>
             </div>
           </div>
-          <div id="lmBaruHighlight" class="card price-highlight" role="status" aria-live="polite">
+          <div id="lmBaruHighlight" class="card price-highlight" role="status" aria-live="polite" aria-busy="true">
+            <div class="skeleton-content" aria-hidden="true">
+              <div class="flex-split">
+                <div class="skeleton skeleton-line" style="width: 150px; height: 1.1rem;"></div>
+                <div class="skeleton skeleton-badge"></div>
+              </div>
+              <div class="skeleton skeleton-price" style="height: 2.4rem; width: 200px; margin-top: .2rem;"></div>
+              <div class="skeleton skeleton-delta" style="width: 240px;"></div>
+            </div>
             <div class="price-highlight-head">
               <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
               <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
@@ -177,10 +185,42 @@
               <tr>
                 <th>Kadar</th>
                 <th>Harga (Rp)</th>
-                <th>+</th>
+                <th width="1%">+</th>
+                <th class="price-indicator-cell" aria-hidden="true"></th>
               </tr>
               </thead>
-              <tbody id="goldPriceTable" aria-live="polite" aria-busy="true"></tbody>
+              <tbody id="goldPriceTable" aria-live="polite" aria-busy="true">
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td><div class="skeleton skeleton-box" style="margin-right: .6rem; display: inline-block; vertical-align: middle;"></div><div class="skeleton skeleton-line" style="width: 60px;"></div></td>
+                  <td align="right"><div class="skeleton skeleton-price"></div></td>
+                  <td align="center"><div class="skeleton skeleton-box" style="border-radius: 50%;"></div></td>
+                  <td></td>
+                </tr>
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td><div class="skeleton skeleton-box" style="margin-right: .6rem; display: inline-block; vertical-align: middle;"></div><div class="skeleton skeleton-line" style="width: 60px;"></div></td>
+                  <td align="right"><div class="skeleton skeleton-price"></div></td>
+                  <td align="center"><div class="skeleton skeleton-box" style="border-radius: 50%;"></div></td>
+                  <td></td>
+                </tr>
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td><div class="skeleton skeleton-box" style="margin-right: .6rem; display: inline-block; vertical-align: middle;"></div><div class="skeleton skeleton-line" style="width: 60px;"></div></td>
+                  <td align="right"><div class="skeleton skeleton-price"></div></td>
+                  <td align="center"><div class="skeleton skeleton-box" style="border-radius: 50%;"></div></td>
+                  <td></td>
+                </tr>
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td><div class="skeleton skeleton-box" style="margin-right: .6rem; display: inline-block; vertical-align: middle;"></div><div class="skeleton skeleton-line" style="width: 60px;"></div></td>
+                  <td align="right"><div class="skeleton skeleton-price"></div></td>
+                  <td align="center"><div class="skeleton skeleton-box" style="border-radius: 50%;"></div></td>
+                  <td></td>
+                </tr>
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td><div class="skeleton skeleton-box" style="margin-right: .6rem; display: inline-block; vertical-align: middle;"></div><div class="skeleton skeleton-line" style="width: 60px;"></div></td>
+                  <td align="right"><div class="skeleton skeleton-price"></div></td>
+                  <td align="center"><div class="skeleton skeleton-box" style="border-radius: 50%;"></div></td>
+                  <td></td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <p id="lastUpdatedInfo" class="text-note mt-10" role="status" aria-live="polite">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
@@ -347,13 +387,13 @@
           <div class="accent-title">Dokumentasi</div>
           <h2 class="h2">Galeri</h2>
           <div class="grid gallery">
-            <img alt="Barang yang pernah dibeli #1" data-src="assets/img/asset2.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #2" data-src="assets/img/asset3.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #3" data-src="assets/img/asset4.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #4" data-src="assets/img/asset5.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #5" data-src="assets/img/asset6.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #6" data-src="assets/img/asset8.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
-            <img alt="Barang yang pernah dibeli #7" data-src="assets/img/asset12.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #1" data-src="assets/img/asset2.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #2" data-src="assets/img/asset3.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #3" data-src="assets/img/asset4.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #4" data-src="assets/img/asset5.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #5" data-src="assets/img/asset6.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #6" data-src="assets/img/asset8.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #7" data-src="assets/img/asset12.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip"/>
             <video src="assets/video/asset15.mp4" muted loop playsinline preload="none" loading="lazy">
               <track kind="captions" src="assets/video/asset15.vtt" srclang="id" label="Bahasa Indonesia">
             </video>
@@ -471,7 +511,7 @@
       <div class="container foot">
         <div>
           <div class="brand mb-06">
-            <img src="assets/img/logo.webp?v=1" alt="" loading="lazy" decoding="async" width="28" height="28"/>
+            <img src="assets/img/logo.webp?v=1" alt="Logo Sentral Emas" loading="lazy" decoding="async" width="28" height="28"/>
             <strong>Sentral Emas</strong>
           </div>
           <p class="my-02">Buyback aman via COD se‑Jabodetabek, mengikuti harga pasar hari transaksi. Transparan, cepat, dan terpercaya.</p>
