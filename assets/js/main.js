@@ -170,6 +170,16 @@
 const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
 const LM_HISTORY_DAYS_LIMIT = 7;
+const ENTRY_TIME_FIELDS = [
+  'priceDate',
+  'time',
+  'timestamp',
+  'date',
+  'updatedAt',
+  'updated_at',
+  'lastUpdatedAt',
+  'last_updated_at'
+];
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
@@ -543,6 +553,17 @@ function resolveDate(value){
   }
   return dateCandidate && !isNaN(dateCandidate.getTime()) ? dateCandidate : null;
 }
+function resolveEntryTime(entry){
+  if(!entry || typeof entry !== 'object') return null;
+  for(var i = 0; i < ENTRY_TIME_FIELDS.length; i++){
+    var key = ENTRY_TIME_FIELDS[i];
+    var candidate = entry[key];
+    if(candidate === undefined || candidate === null || candidate === '') continue;
+    var resolved = resolveDate(candidate);
+    if(resolved) return resolved;
+  }
+  return null;
+}
 function formatCurrencyIDR(value){
   try{ return Number(value || 0).toLocaleString('id-ID'); }
   catch(_){ return String(value || 0); }
@@ -634,7 +655,7 @@ function prepareLmBaruHistorySeries(source, currentBase, limit){
     if(baseValue === null) return;
     entries.push({
       base: baseValue,
-      time: resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt),
+      time: resolveEntryTime(entry),
       order: order++,
       role: role || null
     });
@@ -1037,10 +1058,11 @@ function extractPreviousBase(data, currentBase){
     if(!entry) return;
     var val = safeNumber(entry.buy);
     if(val === null) return;
-    var timeValue = resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt);
+    var timeDate = resolveEntryTime(entry);
+    var timeValue = timeDate instanceof Date && !isNaN(timeDate.getTime()) ? timeDate.getTime() : null;
     candidates.push({
       value: val,
-      time: timeValue instanceof Date && !isNaN(timeValue.getTime()) ? timeValue.getTime() : null,
+      time: timeValue,
       priority: priority || 0,
       order: order++
     });
@@ -1210,8 +1232,7 @@ async function fetchGoldPrice() {
       const currentBase = safeNumber(data.data.current.buy);
       if(currentBase !== null){
         let previousBase = extractPreviousBase(data.data, currentBase);
-        const updatedAtRaw = resolveDate(data.data.current.priceDate || data.data.current.time || data.data.current.timestamp || data.data.current.updatedAt);
-        const updatedAt = updatedAtRaw || new Date();
+        const updatedAt = resolveEntryTime(data.data.current) || new Date();
         const historySeries = prepareLmBaruHistorySeries(data.data, currentBase, LM_HISTORY_DAYS_LIMIT);
         const pair = findLmBaruSeriesPair(historySeries, currentBase);
         let previousPrice = null;
