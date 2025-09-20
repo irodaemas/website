@@ -65,23 +65,29 @@ describe('main.js behaviours', () => {
         </div>
       </div>
       <div id="lastUpdatedInfo"></div>
-      <select id="cal-cat">
-        <option value="lm_baru">LM Baru</option>
-        <option value="lm_lama">LM Lama</option>
-        <option value="perhiasan_24">Perhiasan 24K</option>
-        <option value="perhiasan_sub" selected>Perhiasan &lt;24K</option>
-      </select>
-      <select id="cal-kadar">
-        <option value="24">24K</option>
-        <option value="18" selected>18K</option>
-      </select>
-      <input id="cal-berat" value="3" />
+      <div class="calc-grid">
+        <div class="calc-field">
+          <select id="cal-cat">
+            <option value="lm_baru">LM Baru</option>
+            <option value="lm_lama">LM Lama</option>
+            <option value="perhiasan_24">Perhiasan 24K</option>
+            <option value="perhiasan_sub" selected>Perhiasan &lt;24K</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <select id="cal-kadar">
+            <option value="24">24K</option>
+            <option value="18" selected>18K</option>
+          </select>
+        </div>
+        <div class="calc-field calc-field--weight">
+          <input id="cal-berat" value="3" />
+          <button id="cal-add" type="button" class="btn calc-add-btn">Tambah</button>
+        </div>
+      </div>
       <div class="calc-box">
-        <div class="calc-actions">
-          <div class="calc-current">
-            <div id="cal-current"></div>
-          </div>
-          <button id="cal-add" type="button">Tambah</button>
+        <div class="calc-current">
+          <div id="cal-current"></div>
         </div>
         <div class="calc-items">
           <div id="cal-empty">Belum ada item</div>
