@@ -781,6 +781,8 @@ function updateSparklineMarker(point, rect){
     marker.setAttribute('aria-hidden','true');
     marker.style.left = '';
     marker.style.top = '';
+    delete marker.dataset.x;
+    delete marker.dataset.y;
     return;
   }
   var container = marker.parentElement;
@@ -788,18 +790,34 @@ function updateSparklineMarker(point, rect){
   var height = rect && rect.height ? rect.height : (container ? container.clientHeight : 0);
   var x = point.x;
   var y = point.y;
+  var markerHalfWidth = (marker.offsetWidth || marker.clientWidth || 12) / 2;
+  var markerHalfHeight = (marker.offsetHeight || marker.clientHeight || 12) / 2;
   if(width > 0){
-    if(x < 0) x = 0;
-    else if(x > width) x = width;
+    var minX = markerHalfWidth;
+    var maxX = width - markerHalfWidth;
+    if(minX > maxX){
+      x = width / 2;
+    } else {
+      if(x < minX) x = minX;
+      else if(x > maxX) x = maxX;
+    }
   }
   if(height > 0){
-    if(y < 0) y = 0;
-    else if(y > height) y = height;
+    var minY = markerHalfHeight;
+    var maxY = height - markerHalfHeight;
+    if(minY > maxY){
+      y = height / 2;
+    } else {
+      if(y < minY) y = minY;
+      else if(y > maxY) y = maxY;
+    }
   }
   marker.style.left = x + 'px';
   marker.style.top = y + 'px';
   marker.setAttribute('aria-hidden','false');
   marker.classList.add('is-visible');
+  marker.dataset.x = String(x);
+  marker.dataset.y = String(y);
 }
 function hideSparklineTooltip(options){
   var tooltip = document.getElementById('lmBaruSparklineTooltip');
@@ -809,6 +827,8 @@ function hideSparklineTooltip(options){
     tooltip.style.left = '';
     tooltip.style.top = '';
     tooltip.textContent = '';
+    tooltip.style.removeProperty('--sparkline-arrow-position');
+    delete tooltip.dataset.index;
   }
   updateSparklineMarker(null);
   if(!options || options.clearSummary !== false){ updateSparklinePointSummary(''); }
@@ -819,28 +839,75 @@ function showSparklineTooltip(point, index, rect){
   if(!point) return;
   var tooltip = document.getElementById('lmBaruSparklineTooltip');
   if(!tooltip) return;
-  var width = rect && rect.width ? rect.width : 0;
-  var height = rect && rect.height ? rect.height : 0;
-  var x = typeof point.x === 'number' ? point.x : 0;
-  var y = typeof point.y === 'number' ? point.y : 0;
+  var container = tooltip.parentElement;
+  var width = rect && rect.width ? rect.width : (container ? container.clientWidth : 0);
+  var height = rect && rect.height ? rect.height : (container ? container.clientHeight : 0);
+  var x = typeof point.x === 'number' ? point.x : (width > 0 ? width / 2 : 0);
+  var y = typeof point.y === 'number' ? point.y : (height > 0 ? height / 2 : 0);
   if(typeof point.x === 'number' && typeof point.y === 'number'){
     updateSparklineMarker({ x: point.x, y: point.y }, rect);
+    var marker = document.getElementById('lmBaruSparklineMarker');
+    if(marker){
+      var dataX = Number(marker.dataset.x);
+      if(isFinite(dataX)) x = dataX;
+      var dataY = Number(marker.dataset.y);
+      if(isFinite(dataY)) y = dataY;
+    }
   } else {
     updateSparklineMarker(null);
   }
-  if(width > 0){
-    x = Math.min(width - 10, Math.max(10, x));
-  }
+  var verticalMargin = 12;
   if(height > 0){
-    y = Math.min(height - 10, Math.max(10, y));
+    var minY = verticalMargin;
+    var maxY = height - verticalMargin;
+    if(minY > maxY){
+      y = height / 2;
+    } else {
+      if(y < minY) y = minY;
+      else if(y > maxY) y = maxY;
+    }
   }
-  var shouldFlip = y < 32;
   tooltip.classList.remove('is-visible');
-  tooltip.classList.toggle('is-flip', shouldFlip);
-  tooltip.style.left = x + 'px';
-  tooltip.style.top = y + 'px';
-  tooltip.textContent = formatSparklinePointTooltip(point);
+  tooltip.classList.toggle('is-flip', y < 32);
   tooltip.setAttribute('aria-hidden','false');
+  tooltip.textContent = formatSparklinePointTooltip(point);
+  tooltip.style.top = y + 'px';
+  tooltip.style.left = x + 'px';
+  tooltip.style.removeProperty('--sparkline-arrow-position');
+  var tooltipWidth = tooltip.offsetWidth || 0;
+  var containerWidth = width > 0 ? width : (container ? container.clientWidth : 0);
+  var adjustedX = x;
+  var arrowPosition = null;
+  if(containerWidth > 0 && tooltipWidth > 0){
+    var halfWidth = tooltipWidth / 2;
+    var margin = 12;
+    var minX = halfWidth + margin;
+    var maxX = containerWidth - halfWidth - margin;
+    if(minX > maxX){
+      adjustedX = containerWidth / 2;
+    } else {
+      if(adjustedX < minX) adjustedX = minX;
+      else if(adjustedX > maxX) adjustedX = maxX;
+    }
+    var anchorOffset = x - adjustedX + halfWidth;
+    if(!isFinite(anchorOffset)) anchorOffset = halfWidth;
+    var arrowPadding = Math.min(14, Math.max(8, Math.round(tooltipWidth * 0.08)));
+    var minArrow = arrowPadding;
+    var maxArrow = tooltipWidth - arrowPadding;
+    if(minArrow > maxArrow){
+      arrowPosition = halfWidth;
+    } else {
+      if(anchorOffset < minArrow) anchorOffset = minArrow;
+      else if(anchorOffset > maxArrow) anchorOffset = maxArrow;
+      arrowPosition = anchorOffset;
+    }
+  }
+  tooltip.style.left = adjustedX + 'px';
+  if(arrowPosition !== null && isFinite(arrowPosition)){
+    tooltip.style.setProperty('--sparkline-arrow-position', arrowPosition + 'px');
+  }
+  if(typeof index === 'number') tooltip.dataset.index = String(index);
+  else delete tooltip.dataset.index;
   requestAnimationFrame(function(){ tooltip.classList.add('is-visible'); });
   updateSparklinePointSummary(formatSparklinePointAnnouncement(point));
   LM_BARU_SPARKLINE_ACTIVE_INDEX = typeof index === 'number' ? index : -1;
