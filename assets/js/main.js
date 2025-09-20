@@ -832,38 +832,57 @@ function applySparklineFromCache(summarySuffix, fallbackText){
 }
 function extractPreviousBase(data, currentBase){
   if(!data) return null;
-  var entries = [];
+  var currentVal = safeNumber(currentBase);
+  if(currentVal === null && data.current){
+    var derived = safeNumber(data.current.buy);
+    if(derived !== null) currentVal = derived;
+  }
+  var candidates = [];
   var order = 0;
-  function pushEntry(entry, isCurrent){
+  function pushCandidate(entry, priority){
     if(!entry) return;
     var val = safeNumber(entry.buy);
     if(val === null) return;
-    entries.push({
+    var timeValue = resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt);
+    candidates.push({
       value: val,
-      time: resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt),
-      order: order++,
-      isCurrent: !!isCurrent
+      time: timeValue instanceof Date && !isNaN(timeValue.getTime()) ? timeValue.getTime() : null,
+      priority: priority || 0,
+      order: order++
     });
   }
-  pushEntry(data.current, true);
-  pushEntry(data.previous, false);
-  if(data.current && data.current.previous) pushEntry(data.current.previous, false);
-  if(Array.isArray(data.history)) data.history.forEach(function(item){ pushEntry(item, false); });
-  if(!entries.length) return null;
-  entries.sort(function(a,b){
-    if(a.time && b.time){ return b.time.getTime() - a.time.getTime(); }
-    if(a.time && !b.time) return -1;
-    if(!a.time && b.time) return 1;
+  if(data.current){
+    pushCandidate(data.current.previous, 3);
+  }
+  pushCandidate(data.previous, 1);
+  if(Array.isArray(data.history)){
+    data.history.forEach(function(item){ pushCandidate(item, 1); });
+  }
+  if(!candidates.length) return null;
+  candidates.sort(function(a, b){
+    if(a.priority !== b.priority) return b.priority - a.priority;
+    if(a.time !== null && b.time !== null && a.time !== b.time) return b.time - a.time;
+    if(a.time !== null && b.time === null) return -1;
+    if(a.time === null && b.time !== null) return 1;
     return b.order - a.order;
   });
-  var currentVal = safeNumber(currentBase);
-  var currentEntry = entries.find(function(entry){ return entry.isCurrent; }) || entries[0];
-  if(currentEntry && currentVal === null) currentVal = currentEntry.value;
-  return entries.find(function(entry){
-    if(currentEntry && entry === currentEntry) return false;
-    if(currentVal !== null && Math.abs(entry.value - currentVal) < 1) return false;
-    return true;
-  })?.value || null;
+  var seenValues = new Set();
+  for(var i = 0; i < candidates.length; i++){
+    var candidate = candidates[i];
+    if(!candidate) continue;
+    var value = candidate.value;
+    if(currentVal !== null && Math.abs(value - currentVal) < 1){
+      if(candidate.priority >= 3){
+        return value;
+      }
+      continue;
+    }
+    var key = String(value);
+    if(seenValues.has(key)) continue;
+    seenValues.add(key);
+    return value;
+  }
+  return null;
 }
 function buildPerhiasanPricesFromBase(basePrice){
   return GOLD_KARAT_SERIES.map(function(entry){
