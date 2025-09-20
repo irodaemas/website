@@ -710,8 +710,8 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 #kontak .cta-actions, #cta-harga .cta-actions{ margin-top:var(--space-md) }
 
 /* Footer cleanup */
-.foot strong{ color:var(--text-primary) }
-.foot .h3{ color:var(--text-primary) }
+.foot strong{ color:#fff !important; }
+.foot .h3{ color:#fff !important; }
 .foot p{ color:#cbe8e5 }
 .foot ul{ color:#dff7f4; list-style:none; padding:0; margin:.3rem 0 }
 .foot .brand img{ width:28px; height:28px; object-fit:contain; border-radius:6px }
