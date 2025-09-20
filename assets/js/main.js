@@ -753,7 +753,7 @@ function formatSparklinePointTooltip(point){
   var priceText = isFinite(priceValue) ? 'Rp ' + formatCurrencyIDR(Math.round(priceValue)) : 'Rp —';
   var dateText = '';
   if(point.time instanceof Date && !isNaN(point.time.getTime())){
-    dateText = formatDateTimeIndo(point.time);
+    dateText = formatDateOnlyIndo(point.time);
   }
   return dateText ? dateText + ' • ' + priceText : priceText;
 }
@@ -762,13 +762,44 @@ function formatSparklinePointAnnouncement(point){
   var priceValue = Number(point.price);
   var priceText = isFinite(priceValue) ? 'Rp ' + formatCurrencyIDR(Math.round(priceValue)) : 'harga tidak tersedia';
   if(point.time instanceof Date && !isNaN(point.time.getTime())){
-    return 'Harga ' + priceText + ' pada ' + formatDateTimeIndo(point.time) + '.';
+    var dateOnly = formatDateOnlyIndo(point.time);
+    if(dateOnly){
+      return 'Harga ' + priceText + ' pada ' + dateOnly + '.';
+    }
   }
   return 'Harga ' + priceText + '.';
 }
 function updateSparklinePointSummary(message){
   var summaryEl = document.getElementById('lmBaruSparklinePointSummary');
   if(summaryEl){ summaryEl.textContent = message || ''; }
+}
+function updateSparklineMarker(point, rect){
+  var marker = document.getElementById('lmBaruSparklineMarker');
+  if(!marker) return;
+  if(!point || typeof point.x !== 'number' || typeof point.y !== 'number'){
+    marker.classList.remove('is-visible');
+    marker.setAttribute('aria-hidden','true');
+    marker.style.left = '';
+    marker.style.top = '';
+    return;
+  }
+  var container = marker.parentElement;
+  var width = rect && rect.width ? rect.width : (container ? container.clientWidth : 0);
+  var height = rect && rect.height ? rect.height : (container ? container.clientHeight : 0);
+  var x = point.x;
+  var y = point.y;
+  if(width > 0){
+    if(x < 0) x = 0;
+    else if(x > width) x = width;
+  }
+  if(height > 0){
+    if(y < 0) y = 0;
+    else if(y > height) y = height;
+  }
+  marker.style.left = x + 'px';
+  marker.style.top = y + 'px';
+  marker.setAttribute('aria-hidden','false');
+  marker.classList.add('is-visible');
 }
 function hideSparklineTooltip(options){
   var tooltip = document.getElementById('lmBaruSparklineTooltip');
@@ -779,6 +810,7 @@ function hideSparklineTooltip(options){
     tooltip.style.top = '';
     tooltip.textContent = '';
   }
+  updateSparklineMarker(null);
   if(!options || options.clearSummary !== false){ updateSparklinePointSummary(''); }
   if(!options || options.unlock !== false){ LM_BARU_SPARKLINE_TOOLTIP_LOCKED = false; }
   LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
@@ -791,6 +823,11 @@ function showSparklineTooltip(point, index, rect){
   var height = rect && rect.height ? rect.height : 0;
   var x = typeof point.x === 'number' ? point.x : 0;
   var y = typeof point.y === 'number' ? point.y : 0;
+  if(typeof point.x === 'number' && typeof point.y === 'number'){
+    updateSparklineMarker({ x: point.x, y: point.y }, rect);
+  } else {
+    updateSparklineMarker(null);
+  }
   if(width > 0){
     x = Math.min(width - 10, Math.max(10, x));
   }
@@ -1005,13 +1042,16 @@ function updateLmBaruSparkline(series, options){
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      var lastPoint = points.length ? points[points.length - 1] : null;
-      if(lastPoint){
+      ctx.lineWidth = 1.1;
+      points.forEach(function(plotPoint, idx){
+        if(!plotPoint) return;
         ctx.beginPath();
-        ctx.arc(lastPoint.x, lastPoint.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(88, 255, 169, 1)';
+        ctx.arc(plotPoint.x, plotPoint.y, idx === points.length - 1 ? 3.4 : 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = idx === points.length - 1 ? 'rgba(88, 255, 169, 1)' : 'rgba(88, 255, 169, 0.62)';
+        ctx.strokeStyle = idx === points.length - 1 ? 'rgba(1, 33, 30, 0.72)' : 'rgba(1, 33, 30, 0.4)';
         ctx.fill();
-      }
+        ctx.stroke();
+      });
 
       canvas.classList.add('sparkline-visible');
       LM_BARU_SPARKLINE_POINTS = points;
@@ -1300,6 +1340,12 @@ function formatDateTimeIndo(date) {
   const hours = String(date.getHours()).padStart(2,'0');
   const minutes = String(date.getMinutes()).padStart(2,'0');
   return `${day}, ${dateNum} ${month} ${year} ${hours}:${minutes} WIB`;
+}
+function formatDateOnlyIndo(date){
+  if(!(date instanceof Date) || isNaN(date.getTime())) return '';
+  var full = formatDateTimeIndo(date);
+  if(typeof full !== 'string') return '';
+  return full.replace(/\s\d{2}:\d{2}\sWIB$/, '');
 }
 function displayDateTimeWIB() {
   const now = new Date();
