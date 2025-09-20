@@ -67,37 +67,87 @@ async function handleNavigate(request) {
             return fresh;
         }
         // Cache halaman yang valid untuk navigasi cepat berikutnya
-        const cache = await caches.open(CACHE_NAME);
-        cache.put(request, fresh.clone());
+        if (fresh && fresh.ok) {
+            const cache = await caches.open(CACHE_NAME);
+            cache.put(request, fresh.clone());
+        }
         return fresh;
     } catch (e) {
         const cache = await caches.open(CACHE_NAME);
-        const cached = await cache.match('./index.html');
+        const cachedPage = await cache.match(request);
+        if (cachedPage) {
+            return cachedPage;
+        }
         const offline = await cache.match('./offline.html');
-        return offline || cached || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
+        if (offline) {
+            return offline;
+        }
+        const fallback = await cache.match('./index.html');
+        return fallback || new Response('<h1>Offline</h1>', { headers: { 'Content-Type': 'text/html' } });
     }
 }
 
-async function handleAsset(request) {
+async function handleAsset(event) {
+    const { request } = event;
     // Stale-while-revalidate untuk aset same-origin
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);
-    const fetchPromise = fetch(request).then((netRes) => {
-        cache.put(request, netRes.clone());
-        return netRes;
-    }).catch(() => null);
-    return cached || fetchPromise;
+    const networkPromise = fetch(request)
+        .then((netRes) => {
+            if (netRes && netRes.ok) {
+                cache.put(request, netRes.clone());
+            }
+            return netRes;
+        })
+        .catch(() => null);
+
+    if (cached) {
+        // Kembalikan versi cache segera, update berjalan di background
+        event.waitUntil(networkPromise);
+        return cached;
+    }
+
+    const fresh = await networkPromise;
+    if (fresh) {
+        return fresh;
+    }
+
+    return new Response('Offline', {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
 }
 
-async function handleFonts(request) {
+async function handleFonts(event) {
+    const { request } = event;
     // Runtime cache untuk Google Fonts
     const cache = await caches.open(FONT_CACHE);
     const cached = await cache.match(request);
-    const fetchPromise = fetch(request, { mode: 'cors' }).then((res) => {
-        cache.put(request, res.clone());
-        return res;
-    }).catch(() => null);
-    return cached || fetchPromise;
+    const networkPromise = fetch(request, { mode: 'cors' })
+        .then((res) => {
+            if (res && res.ok) {
+                cache.put(request, res.clone());
+            }
+            return res;
+        })
+        .catch(() => null);
+
+    if (cached) {
+        event.waitUntil(networkPromise);
+        return cached;
+    }
+
+    const fresh = await networkPromise;
+    if (fresh) {
+        return fresh;
+    }
+
+    return new Response('Offline', {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
 }
 
 // ===== Fetch
@@ -109,7 +159,7 @@ self.addEventListener('fetch', (event) => {
 
     // Fonts: googleapis/gstatic
     if (/fonts\.g(oogleapis|static)\.com$/.test(url.hostname)) {
-        event.respondWith(handleFonts(req));
+        event.respondWith(handleFonts(event));
         return;
     }
 
@@ -119,7 +169,7 @@ self.addEventListener('fetch', (event) => {
             event.respondWith(handleNavigate(req));
             return;
         }
-        event.respondWith(handleAsset(req));
+        event.respondWith(handleAsset(event));
     }
 });
 
