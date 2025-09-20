@@ -82,7 +82,7 @@ describe('main.js behaviours', () => {
         </div>
         <div class="calc-field calc-field--weight">
           <input id="cal-berat" value="3" />
-          <button id="cal-add" type="button" class="calc-add-btn">Tambah</button>
+          <button id="cal-add" type="button" class="btn calc-add-btn">Tambah</button>
         </div>
       </div>
       <div class="calc-box">
