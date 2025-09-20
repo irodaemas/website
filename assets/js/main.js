@@ -1587,28 +1587,35 @@ window.addEventListener('resize', function(){
   var cat = document.getElementById('cal-cat');
   var kadar = document.getElementById('cal-kadar');
   var berat = document.getElementById('cal-berat');
+  var current = document.getElementById('cal-current');
   var total = document.getElementById('cal-total');
+  var count = document.getElementById('cal-count');
+  var addBtn = document.getElementById('cal-add');
+  var itemsBody = document.getElementById('cal-items-body');
+  var emptyState = document.getElementById('cal-empty');
+  var tableWrap = document.getElementById('cal-table-wrap');
   var wa = document.getElementById('wa-prefill');
   if(!cat || !kadar || !berat || !total || !wa) return;
+
+  var items = [];
+  var lastPreview = null;
+  var idCounter = 1;
+
   function ceilStep(n, step){ step = step||1000; return Math.ceil(n/step)*step; }
   function formatIDR(n){ try{ return n.toLocaleString('id-ID'); }catch(_){ return String(n); } }
-  function purityFromK(k){ return Math.max(0, Math.min(1, Number(k||24)/24)); }
-  function compute(){
-    var P = REI_LAST_BASE_P || (readLastBasePrice()?.p) || 1200000; // fallback base
-    var c = cat.value;
-    var k = Number(kadar.value||24);
-    var g = Math.max(0, Number(berat.value||0));
-    var FACTOR_LM_BARU = 0.932, FACTOR_LM_LAMA=0.917, FACTOR_24K=0.862, FACTOR_SUB=0.786, ADJ=50000;
-    var perGram;
-    if(c==='lm_baru'){ perGram = ceilStep(P*FACTOR_LM_BARU + ADJ); k=24; }
-    else if(c==='lm_lama'){ perGram = ceilStep(P*FACTOR_LM_LAMA + ADJ); k=24; }
-    else if(c==='perhiasan_24'){ perGram = ceilStep(P*FACTOR_24K + ADJ); k=24; }
-    else { perGram = ceilStep(P*FACTOR_SUB*purityFromK(k) + ADJ); }
-    var est = ceilStep(perGram * g, 1000);
-    total.textContent = 'Rp ' + formatIDR(est);
-    var msg = `Halo Sentral Emas,%0A%0ASaya ingin konsultasi buyback:%0A- Kategori: ${labelCat(c)}%0A- Kadar: ${k}K%0A- Berat: ${g} gram%0A- Estimasi: Rp ${formatIDR(est)}%0A%0AMohon info lebih lanjut, terima kasih.`;
-    wa.href = 'https://wa.me/6285591088503?text=' + msg;
+  function formatWeight(value){
+    var num = Number(value);
+    if(!Number.isFinite(num)) return '0';
+    try{ return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }catch(_){ return String(num); }
   }
+  function formatWeightInput(value){
+    var num = Number(value);
+    if(!Number.isFinite(num)) return '0';
+    var clamped = Math.max(0, num);
+    var rounded = Math.round(clamped * 100) / 100;
+    return String(rounded);
+  }
+  function purityFromK(k){ return Math.max(0, Math.min(1, Number(k||24)/24)); }
   function labelCat(c){
     switch(c){
       case 'lm_baru': return 'Logam Mulia (LM) Baru';
@@ -1617,32 +1624,288 @@ window.addEventListener('resize', function(){
       default: return 'Perhiasan <24K';
     }
   }
-  ['input','change'].forEach(function(ev){ cat.addEventListener(ev, compute); kadar.addEventListener(ev, compute); berat.addEventListener(ev, compute); });
-  // Disable kadar when not needed
-  function toggleKadar(){ var disable = (cat.value==='lm_baru'||cat.value==='lm_lama'||cat.value==='perhiasan_24'); kadar.disabled = disable; }
-  cat.addEventListener('change', function(){ toggleKadar(); compute(); });
-  document.addEventListener('prices:updated', compute);
-  toggleKadar(); compute();
+
+  function calculateValues(catValue, kadarValue, beratValue){
+    var base = REI_LAST_BASE_P || (readLastBasePrice()?.p) || 1200000;
+    var c = catValue || 'perhiasan_sub';
+    var k = Number(kadarValue||24);
+    var g = Math.max(0, Number(beratValue||0));
+    g = Math.round(g * 100) / 100;
+    var FACTOR_LM_BARU = 0.932;
+    var FACTOR_LM_LAMA = 0.917;
+    var FACTOR_24K = 0.862;
+    var FACTOR_SUB = 0.786;
+    var ADJ = 50000;
+    var perGram;
+    if(c==='lm_baru'){ perGram = ceilStep(base*FACTOR_LM_BARU + ADJ); k = 24; }
+    else if(c==='lm_lama'){ perGram = ceilStep(base*FACTOR_LM_LAMA + ADJ); k = 24; }
+    else if(c==='perhiasan_24'){ perGram = ceilStep(base*FACTOR_24K + ADJ); k = 24; }
+    else { perGram = ceilStep(base*FACTOR_SUB*purityFromK(k) + ADJ); }
+    var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
+    return { cat: c, kadar: k, berat: g, estimasi: est };
+  }
+
+  function updateWaLink(){
+    if(!wa) return;
+    var baseUrl = 'https://wa.me/6285591088503?text=';
+    var message;
+    if(items.length){
+      var totalValue = items.reduce(function(sum, item){ return sum + (item.estimasi || 0); }, 0);
+      var lines = items.map(function(item, index){
+        return (index + 1) + '. ' + labelCat(item.cat) + ' • ' + item.kadar + 'K • ' + formatWeight(item.berat) + ' gram • Estimasi: Rp ' + formatIDR(item.estimasi || 0);
+      });
+      var parts = ['Halo Sentral Emas,', '', 'Saya ingin konsultasi buyback. Berikut daftar barang:']
+        .concat(lines, ['', 'Total estimasi: Rp ' + formatIDR(totalValue), '', 'Mohon info lebih lanjut, terima kasih.']);
+      message = parts.join('\n');
+    } else if(lastPreview){
+      message = [
+        'Halo Sentral Emas,',
+        '',
+        'Saya ingin konsultasi buyback:',
+        '- Kategori: ' + labelCat(lastPreview.cat),
+        '- Kadar: ' + lastPreview.kadar + 'K',
+        '- Berat: ' + formatWeight(lastPreview.berat) + ' gram',
+        '- Estimasi: Rp ' + formatIDR(lastPreview.estimasi),
+        '',
+        'Mohon info lebih lanjut, terima kasih.'
+      ].join('\n');
+    } else {
+      message = [
+        'Halo Sentral Emas,',
+        '',
+        'Saya ingin konsultasi buyback. Mohon info lebih lanjut, terima kasih.'
+      ].join('\n');
+    }
+    wa.href = baseUrl + encodeURIComponent(message);
+  }
+
+  function refreshList(){
+    var totalValue = 0;
+    if(itemsBody){
+      itemsBody.innerHTML = '';
+    }
+    items.forEach(function(item){
+      var computed = calculateValues(item.cat, item.kadar, item.berat);
+      item.kadar = computed.kadar;
+      item.berat = computed.berat;
+      item.estimasi = computed.estimasi;
+      totalValue += item.estimasi;
+      if(!itemsBody) return;
+      var row = document.createElement('tr');
+      row.setAttribute('data-item-id', String(item.id));
+
+      var mainCell = document.createElement('td');
+      var name = document.createElement('div');
+      name.className = 'calc-item-name';
+      name.textContent = labelCat(item.cat);
+      var meta = document.createElement('div');
+      meta.className = 'calc-item-meta';
+      meta.textContent = 'Kadar ' + item.kadar + 'K';
+      mainCell.appendChild(name);
+      mainCell.appendChild(meta);
+
+      var weightCell = document.createElement('td');
+      var weightField = document.createElement('div');
+      weightField.className = 'calc-weight-field';
+      var weightInput = document.createElement('input');
+      weightInput.type = 'number';
+      weightInput.min = '0';
+      weightInput.step = '0.01';
+      weightInput.inputMode = 'decimal';
+      weightInput.value = formatWeightInput(item.berat);
+      weightInput.setAttribute('data-edit-id', String(item.id));
+      weightInput.setAttribute('aria-label', 'Ubah berat ' + labelCat(item.cat) + ' dalam gram');
+      var weightSuffix = document.createElement('span');
+      weightSuffix.className = 'calc-weight-suffix';
+      weightSuffix.textContent = 'g';
+      weightField.appendChild(weightInput);
+      weightField.appendChild(weightSuffix);
+      weightCell.appendChild(weightField);
+
+      var estimateCell = document.createElement('td');
+      estimateCell.textContent = 'Rp ' + formatIDR(item.estimasi);
+
+      var actionCell = document.createElement('td');
+      var removeBtn = document.createElement('button');
+      removeBtn.type = 'button';
+      removeBtn.className = 'calc-remove';
+      removeBtn.setAttribute('data-remove-id', String(item.id));
+      removeBtn.setAttribute('aria-label', 'Hapus ' + labelCat(item.cat));
+      removeBtn.textContent = 'Hapus';
+      actionCell.appendChild(removeBtn);
+
+      row.appendChild(mainCell);
+      row.appendChild(weightCell);
+      row.appendChild(estimateCell);
+      row.appendChild(actionCell);
+
+      itemsBody.appendChild(row);
+    });
+    if(emptyState){ emptyState.hidden = items.length > 0; }
+    if(tableWrap){ tableWrap.hidden = items.length === 0; }
+    if(total){ total.textContent = 'Rp ' + formatIDR(totalValue); }
+    if(count){ count.textContent = items.length ? items.length + ' barang' : '0 barang'; }
+    updateWaLink();
+  }
+
+  function updatePreview(){
+    var computed = calculateValues(cat.value, kadar.value, berat.value);
+    if(current){ current.textContent = 'Rp ' + formatIDR(computed.estimasi); }
+    if(computed.berat > 0 && computed.estimasi > 0){
+      lastPreview = { cat: cat.value, kadar: computed.kadar, berat: computed.berat, estimasi: computed.estimasi };
+    } else {
+      lastPreview = null;
+    }
+    if(!items.length){
+      updateWaLink();
+    }
+  }
+
+  function addItem(catValue, kadarValue, beratValue){
+    var computed = calculateValues(catValue, kadarValue, beratValue);
+    if(computed.berat <= 0 || computed.estimasi <= 0){
+      return false;
+    }
+    items.push({ id: idCounter++, cat: computed.cat, kadar: computed.kadar, berat: computed.berat, estimasi: computed.estimasi });
+    refreshList();
+    return true;
+  }
+
+  function removeItem(id){
+    var index = items.findIndex(function(item){ return item.id === id; });
+    if(index === -1) return;
+    items.splice(index, 1);
+    refreshList();
+    if(!items.length){ updatePreview(); }
+  }
+
+  function updateItemWeight(id, nextWeight, options){
+    var item = items.find(function(entry){ return entry.id === id; });
+    if(!item) return;
+    var numeric = Number(nextWeight);
+    if(!Number.isFinite(numeric)) return;
+    var sanitized = Math.max(0, numeric);
+    sanitized = Math.round(sanitized * 100) / 100;
+    var changed = item.berat !== sanitized;
+    item.berat = sanitized;
+    var restoreFocus = options && options.restoreFocus;
+    var selectionStart = null;
+    var selectionEnd = null;
+    if(restoreFocus && options && options.source && typeof options.source.selectionStart === 'number'){
+      selectionStart = options.source.selectionStart;
+      selectionEnd = options.source.selectionEnd;
+    }
+    if(!changed && !restoreFocus && !(options && options.forceRefresh)){
+      updateWaLink();
+      return;
+    }
+    refreshList();
+    if(restoreFocus){
+      var focusInput = itemsBody && itemsBody.querySelector('input[data-edit-id="' + id + '"]');
+      if(focusInput){
+        focusInput.focus();
+        var len = focusInput.value.length;
+        if(selectionStart !== null && selectionEnd !== null){
+          var safeStart = Math.min(selectionStart, len);
+          var safeEnd = Math.min(selectionEnd, len);
+          try{ focusInput.setSelectionRange(safeStart, safeEnd); }
+          catch(_){ try{ focusInput.setSelectionRange(len, len); }catch(__){} }
+        } else {
+          try{ focusInput.setSelectionRange(len, len); }catch(_){ }
+        }
+      }
+    }
+  }
+
+  function toggleKadar(){
+    var disable = (cat.value==='lm_baru'||cat.value==='lm_lama'||cat.value==='perhiasan_24');
+    kadar.disabled = disable;
+    if(disable){ kadar.value = '24'; }
+  }
+
+  ['input','change'].forEach(function(ev){ berat.addEventListener(ev, updatePreview); kadar.addEventListener(ev, updatePreview); });
+  cat.addEventListener('change', function(){ toggleKadar(); updatePreview(); });
+  cat.addEventListener('input', function(){ toggleKadar(); updatePreview(); });
+
+  if(addBtn){
+    addBtn.addEventListener('click', function(){
+      if(!addItem(cat.value, kadar.value, berat.value) && berat){
+        berat.focus();
+      }
+      updatePreview();
+    });
+  }
+
+  if(itemsBody){
+    itemsBody.addEventListener('click', function(ev){
+      var btn = ev.target.closest('button[data-remove-id]');
+      if(!btn) return;
+      var id = Number(btn.getAttribute('data-remove-id'));
+      removeItem(id);
+    });
+    itemsBody.addEventListener('input', function(ev){
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      var raw = field.value;
+      if(raw === '' || raw === '-' || raw.endsWith('.')) return;
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      updateItemWeight(id, raw, { restoreFocus: true, source: field });
+    });
+    itemsBody.addEventListener('change', function(ev){
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      var raw = field.value === '' ? '0' : field.value;
+      updateItemWeight(id, raw, { forceRefresh: true });
+    });
+    itemsBody.addEventListener('keydown', function(ev){
+      if(ev.key !== 'Enter') return;
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      ev.preventDefault();
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      var raw = field.value === '' ? '0' : field.value;
+      updateItemWeight(id, raw, { forceRefresh: true });
+      field.blur();
+    });
+  }
+
+  document.addEventListener('prices:updated', function(){
+    refreshList();
+    if(!items.length){ updatePreview(); }
+  });
+
+  toggleKadar();
+  refreshList();
+  updatePreview();
 
   function setSelection(options){
     if(!options) return;
     if(options.cat){
       var desired = String(options.cat);
       var hasOption = Array.prototype.some.call(cat.options, function(opt){ return opt.value === desired; });
-      if(hasOption) cat.value = desired;
+      if(hasOption){ cat.value = desired; }
       toggleKadar();
     }
     if(options.kadar !== undefined && options.kadar !== null){
       var val = String(options.kadar);
-      var hasKadarOption = Array.prototype.some.call(kadar.options, function(opt){ return opt.value === val; });
-      if(hasKadarOption || kadar.disabled){
+      var hasKadar = Array.prototype.some.call(kadar.options, function(opt){ return opt.value === val; });
+      if(hasKadar || kadar.disabled){
         kadar.value = val;
       }
     }
     if(options.berat !== undefined && options.berat !== null){
       berat.value = String(options.berat);
     }
-    compute();
+    updatePreview();
+    if(options.addToList !== false){
+      var weightValue = (options.berat !== undefined && options.berat !== null) ? options.berat : berat.value;
+      addItem(cat.value, kadar.value, weightValue);
+    }
+    if(options.skipScroll) return;
     var section = document.getElementById('kalkulator');
     if(section){ section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   }

@@ -65,19 +65,47 @@ describe('main.js behaviours', () => {
         </div>
       </div>
       <div id="lastUpdatedInfo"></div>
-      <select id="cal-cat">
-        <option value="lm_baru">LM Baru</option>
-        <option value="lm_lama">LM Lama</option>
-        <option value="perhiasan_24">Perhiasan 24K</option>
-        <option value="perhiasan_sub" selected>Perhiasan &lt;24K</option>
-      </select>
-      <select id="cal-kadar">
-        <option value="24">24K</option>
-        <option value="18" selected>18K</option>
-      </select>
-      <input id="cal-berat" value="3" />
-      <div id="cal-total"></div>
-      <a id="wa-prefill"></a>
+      <div class="calc-grid">
+        <div class="calc-field">
+          <select id="cal-cat">
+            <option value="lm_baru">LM Baru</option>
+            <option value="lm_lama">LM Lama</option>
+            <option value="perhiasan_24">Perhiasan 24K</option>
+            <option value="perhiasan_sub" selected>Perhiasan &lt;24K</option>
+          </select>
+        </div>
+        <div class="calc-field">
+          <select id="cal-kadar">
+            <option value="24">24K</option>
+            <option value="18" selected>18K</option>
+          </select>
+        </div>
+        <div class="calc-field calc-field--weight">
+          <input id="cal-berat" value="3" />
+          <button id="cal-add" type="button" class="calc-add-btn">Tambah</button>
+        </div>
+      </div>
+      <div class="calc-box">
+        <div class="calc-current">
+          <div id="cal-current"></div>
+        </div>
+        <div class="calc-items">
+          <div id="cal-empty">Belum ada item</div>
+          <div id="cal-table-wrap" hidden>
+            <table class="calc-table">
+              <tbody id="cal-items-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="calc-summary">
+          <div class="calc-info">
+            <div id="cal-count"></div>
+            <div id="cal-total"></div>
+            <div id="cal-note"></div>
+          </div>
+          <a id="wa-prefill"></a>
+        </div>
+      </div>
       <div id="yr"></div>
       <div id="y"></div>
       <div id="path"></div>
@@ -612,6 +640,55 @@ describe('main.js behaviours', () => {
     cat.dispatchEvent(new Event('change'));
     expect(kadar.disabled).toBe(false);
     expect(decodeHref()).toContain('Perhiasan <24K');
+  });
+
+  test('calculator list handles add, setSelection, and removal', async () => {
+    await loadMain();
+    const berat = document.getElementById('cal-berat');
+    const addBtn = document.getElementById('cal-add');
+    const itemsBody = document.getElementById('cal-items-body');
+    const decodeHref = () => decodeURIComponent(document.getElementById('wa-prefill').href);
+
+    berat.value = '2';
+    addBtn.click();
+    expect(itemsBody.children.length).toBe(1);
+    expect(decodeHref()).toContain('1.');
+
+    window.REI_CALC.setSelection({ cat: 'lm_baru', kadar: '24', berat: '1.5', skipScroll: true });
+    expect(itemsBody.children.length).toBe(2);
+    expect(decodeHref()).toContain('2.');
+
+    const removeButtons = () => itemsBody.querySelectorAll('button[data-remove-id]');
+    removeButtons()[0].click();
+    expect(itemsBody.children.length).toBe(1);
+    removeButtons()[0].click();
+    expect(itemsBody.children.length).toBe(0);
+    expect(decodeHref()).toContain('Perhiasan <24K');
+  });
+
+  test('calculator list allows editing weight values', async () => {
+    await loadMain();
+    const berat = document.getElementById('cal-berat');
+    const addBtn = document.getElementById('cal-add');
+    const itemsBody = document.getElementById('cal-items-body');
+    const total = document.getElementById('cal-total');
+    const decodeHref = () => decodeURIComponent(document.getElementById('wa-prefill').href);
+
+    berat.value = '1';
+    addBtn.click();
+    const initialTotal = total.textContent;
+
+    const weightInput = itemsBody.querySelector('input[data-edit-id]');
+    expect(weightInput).toBeTruthy();
+
+    weightInput.value = '5';
+    weightInput.dispatchEvent(new Event('input', { bubbles: true }));
+    await Promise.resolve();
+
+    const updatedInput = itemsBody.querySelector('input[data-edit-id]');
+    expect(updatedInput.value).toBe('5');
+    expect(total.textContent).not.toBe(initialTotal);
+    expect(decodeHref()).toContain('5 gram');
   });
 
   test('footer, back to top, and nav enhancements apply', async () => {

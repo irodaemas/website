@@ -261,8 +261,8 @@
           <div class="accent-title">Kalkulator Emas</div>
           <h2 class="h2">Estimasi Buyback Hari Ini</h2>
           <div class="card pad-1">
-            <div class="grid grid-3 gap-1">
-              <div>
+            <div class="calc-grid">
+              <div class="calc-field">
                 <label for="cal-cat" class="h3">Kategori</label>
                 <select id="cal-cat" class="form-control converter-select">
                   <option value="lm_baru">Logam Mulia (LM) Baru</option>
@@ -271,7 +271,7 @@
                   <option value="perhiasan_sub">Perhiasan &lt;24K</option>
                 </select>
               </div>
-              <div>
+              <div class="calc-field">
                 <label for="cal-kadar" class="h3">Kadar</label>
                 <select id="cal-kadar" class="form-control converter-select">
                   <option value="24">24K</option>
@@ -296,18 +296,43 @@
                   <option value="5">5K</option>
                 </select>
               </div>
-              <div>
+              <div class="calc-field calc-field--weight">
                 <label for="cal-berat" class="h3">Berat (gram)</label>
                 <input id="cal-berat" type="number" min="0" step="0.01" value="1" class="form-control converter-input" />
+                <button id="cal-add" type="button" class="btn btn-ghost calc-add-btn">Tambah ke Daftar</button>
               </div>
             </div>
             <div class="calc-box mt-10">
-              <div class="calc-info">
-                <div class="calc-label">Perkiraan total</div>
-                <div id="cal-total" class="calc-amount" role="status" aria-live="polite" aria-atomic="true" aria-describedby="cal-note">Rp 0</div>
-                <div id="cal-note" class="calc-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
+              <div class="calc-current">
+                <div class="calc-label">Estimasi item ini</div>
+                <div id="cal-current" class="calc-amount" role="status" aria-live="polite" aria-atomic="true">Rp 0</div>
+                <div class="calc-note calc-note--sub">Atur kategori, kadar, dan berat lalu ketuk tombol tambah. Berat bisa disesuaikan langsung di daftar.</div>
               </div>
-              <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
+              <div class="calc-items" aria-live="polite" aria-atomic="false">
+                <div id="cal-empty" class="calc-empty">Belum ada item dalam daftar. Gunakan tombol tambah di formulir atau ikon plus pada tabel harga.</div>
+                <div id="cal-table-wrap" class="calc-table-wrap" hidden>
+                  <table class="calc-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Barang</th>
+                        <th scope="col">Berat (gram)</th>
+                        <th scope="col">Estimasi</th>
+                        <th scope="col"><span class="sr-only">Aksi</span></th>
+                      </tr>
+                    </thead>
+                    <tbody id="cal-items-body"></tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="calc-summary">
+                <div class="calc-info">
+                  <div class="calc-label">Perkiraan total</div>
+                  <div id="cal-count" class="calc-count">0 barang</div>
+                  <div id="cal-total" class="calc-amount" role="status" aria-live="polite" aria-atomic="true" aria-describedby="cal-note">Rp 0</div>
+                  <div id="cal-note" class="calc-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
+                </div>
+                <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
+              </div>
             </div>
           </div>
         </div>
