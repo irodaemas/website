@@ -1608,6 +1608,13 @@ window.addEventListener('resize', function(){
     if(!Number.isFinite(num)) return '0';
     try{ return num.toLocaleString('id-ID', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); }catch(_){ return String(num); }
   }
+  function formatWeightInput(value){
+    var num = Number(value);
+    if(!Number.isFinite(num)) return '0';
+    var clamped = Math.max(0, num);
+    var rounded = Math.round(clamped * 100) / 100;
+    return String(rounded);
+  }
   function purityFromK(k){ return Math.max(0, Math.min(1, Number(k||24)/24)); }
   function labelCat(c){
     switch(c){
@@ -1623,6 +1630,7 @@ window.addEventListener('resize', function(){
     var c = catValue || 'perhiasan_sub';
     var k = Number(kadarValue||24);
     var g = Math.max(0, Number(beratValue||0));
+    g = Math.round(g * 100) / 100;
     var FACTOR_LM_BARU = 0.932;
     var FACTOR_LM_LAMA = 0.917;
     var FACTOR_24K = 0.862;
@@ -1697,7 +1705,22 @@ window.addEventListener('resize', function(){
       mainCell.appendChild(meta);
 
       var weightCell = document.createElement('td');
-      weightCell.textContent = formatWeight(item.berat) + ' g';
+      var weightField = document.createElement('div');
+      weightField.className = 'calc-weight-field';
+      var weightInput = document.createElement('input');
+      weightInput.type = 'number';
+      weightInput.min = '0';
+      weightInput.step = '0.01';
+      weightInput.inputMode = 'decimal';
+      weightInput.value = formatWeightInput(item.berat);
+      weightInput.setAttribute('data-edit-id', String(item.id));
+      weightInput.setAttribute('aria-label', 'Ubah berat ' + labelCat(item.cat) + ' dalam gram');
+      var weightSuffix = document.createElement('span');
+      weightSuffix.className = 'calc-weight-suffix';
+      weightSuffix.textContent = 'g';
+      weightField.appendChild(weightInput);
+      weightField.appendChild(weightSuffix);
+      weightCell.appendChild(weightField);
 
       var estimateCell = document.createElement('td');
       estimateCell.textContent = 'Rp ' + formatIDR(item.estimasi);
@@ -1756,6 +1779,44 @@ window.addEventListener('resize', function(){
     if(!items.length){ updatePreview(); }
   }
 
+  function updateItemWeight(id, nextWeight, options){
+    var item = items.find(function(entry){ return entry.id === id; });
+    if(!item) return;
+    var numeric = Number(nextWeight);
+    if(!Number.isFinite(numeric)) return;
+    var sanitized = Math.max(0, numeric);
+    sanitized = Math.round(sanitized * 100) / 100;
+    var changed = item.berat !== sanitized;
+    item.berat = sanitized;
+    var restoreFocus = options && options.restoreFocus;
+    var selectionStart = null;
+    var selectionEnd = null;
+    if(restoreFocus && options && options.source && typeof options.source.selectionStart === 'number'){
+      selectionStart = options.source.selectionStart;
+      selectionEnd = options.source.selectionEnd;
+    }
+    if(!changed && !restoreFocus && !(options && options.forceRefresh)){
+      updateWaLink();
+      return;
+    }
+    refreshList();
+    if(restoreFocus){
+      var focusInput = itemsBody && itemsBody.querySelector('input[data-edit-id="' + id + '"]');
+      if(focusInput){
+        focusInput.focus();
+        var len = focusInput.value.length;
+        if(selectionStart !== null && selectionEnd !== null){
+          var safeStart = Math.min(selectionStart, len);
+          var safeEnd = Math.min(selectionEnd, len);
+          try{ focusInput.setSelectionRange(safeStart, safeEnd); }
+          catch(_){ try{ focusInput.setSelectionRange(len, len); }catch(__){} }
+        } else {
+          try{ focusInput.setSelectionRange(len, len); }catch(_){ }
+        }
+      }
+    }
+  }
+
   function toggleKadar(){
     var disable = (cat.value==='lm_baru'||cat.value==='lm_lama'||cat.value==='perhiasan_24');
     kadar.disabled = disable;
@@ -1781,6 +1842,34 @@ window.addEventListener('resize', function(){
       if(!btn) return;
       var id = Number(btn.getAttribute('data-remove-id'));
       removeItem(id);
+    });
+    itemsBody.addEventListener('input', function(ev){
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      var raw = field.value;
+      if(raw === '' || raw === '-' || raw.endsWith('.')) return;
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      updateItemWeight(id, raw, { restoreFocus: true, source: field });
+    });
+    itemsBody.addEventListener('change', function(ev){
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      var raw = field.value === '' ? '0' : field.value;
+      updateItemWeight(id, raw, { forceRefresh: true });
+    });
+    itemsBody.addEventListener('keydown', function(ev){
+      if(ev.key !== 'Enter') return;
+      var field = ev.target.closest('input[data-edit-id]');
+      if(!field) return;
+      ev.preventDefault();
+      var id = Number(field.getAttribute('data-edit-id'));
+      if(!Number.isFinite(id)) return;
+      var raw = field.value === '' ? '0' : field.value;
+      updateItemWeight(id, raw, { forceRefresh: true });
+      field.blur();
     });
   }
 

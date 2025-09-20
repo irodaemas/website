@@ -660,6 +660,31 @@ describe('main.js behaviours', () => {
     expect(decodeHref()).toContain('Perhiasan <24K');
   });
 
+  test('calculator list allows editing weight values', async () => {
+    await loadMain();
+    const berat = document.getElementById('cal-berat');
+    const addBtn = document.getElementById('cal-add');
+    const itemsBody = document.getElementById('cal-items-body');
+    const total = document.getElementById('cal-total');
+    const decodeHref = () => decodeURIComponent(document.getElementById('wa-prefill').href);
+
+    berat.value = '1';
+    addBtn.click();
+    const initialTotal = total.textContent;
+
+    const weightInput = itemsBody.querySelector('input[data-edit-id]');
+    expect(weightInput).toBeTruthy();
+
+    weightInput.value = '5';
+    weightInput.dispatchEvent(new Event('input', { bubbles: true }));
+    await Promise.resolve();
+
+    const updatedInput = itemsBody.querySelector('input[data-edit-id]');
+    expect(updatedInput.value).toBe('5');
+    expect(total.textContent).not.toBe(initialTotal);
+    expect(decodeHref()).toContain('5 gram');
+  });
+
   test('footer, back to top, and nav enhancements apply', async () => {
     await loadMain();
     const year = new Date().getFullYear().toString();

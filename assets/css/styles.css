@@ -649,6 +649,10 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .calc-table tbody tr:last-child td{ border-bottom:none }
 .calc-item-name{ font-weight:600; color:var(--text-primary) }
 .calc-item-meta{ color:var(--text-muted); font-size:.85rem; margin-top:.15rem }
+.calc-weight-field{ display:flex; align-items:center; justify-content:flex-end; gap:.35rem }
+.calc-weight-field input{ width:5.75rem; padding:.45rem .6rem; border-radius:8px; border:1px solid var(--border-subtle); background:var(--paper); color:var(--text-primary); font-size:.95rem; text-align:right; font-family:inherit }
+.calc-weight-field input:focus-visible{ outline:2px solid var(--accent-green); outline-offset:2px; border-color:var(--accent-green) }
+.calc-weight-suffix{ color:var(--text-muted); font-size:.85rem }
 .calc-remove{ border:0; background:none; color:var(--text-muted); font-size:.9rem; font-weight:600; cursor:pointer; padding:.2rem .4rem; border-radius:8px }
 .calc-remove:hover, .calc-remove:focus-visible{ color:var(--accent-green); background:rgba(1,61,57,.08) }
 .calc-remove:focus-visible{ outline:2px solid var(--accent-green); outline-offset:2px }
