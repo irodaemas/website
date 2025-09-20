@@ -475,6 +475,10 @@ let LM_BARU_PRICE_SERIES = readLastSparklineSeries();
 const DEFAULT_SPARKLINE_PERIOD = `${LM_HISTORY_DAYS_LIMIT} hari terakhir`;
 let LM_BARU_SPARKLINE_META = { periodLabel: DEFAULT_SPARKLINE_PERIOD, hasSeries: false };
 let LM_BARU_SPARKLINE_RESIZE_FRAME = null;
+let LM_BARU_SPARKLINE_POINTS = [];
+let LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
+let LM_BARU_SPARKLINE_TOOLTIP_LOCKED = false;
+let LM_BARU_SPARKLINE_EVENTS_BOUND = false;
 function updatePriceSchema(items){
   try{
     var el = document.getElementById('priceItemList');
@@ -624,25 +628,26 @@ function prepareLmBaruHistorySeries(source, currentBase, limit){
   var limitValue = typeof limit === 'number' && limit > 0 ? limit : LM_HISTORY_DAYS_LIMIT;
   var entries = [];
   var order = 0;
-  function pushEntry(entry){
+  function pushEntry(entry, role){
     if(!entry) return;
     var baseValue = safeNumber(entry.buy);
     if(baseValue === null) return;
     entries.push({
       base: baseValue,
       time: resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt),
-      order: order++
+      order: order++,
+      role: role || null
     });
   }
   if(source){
-    if(Array.isArray(source.history)) source.history.forEach(pushEntry);
-    pushEntry(source.previous);
-    if(source.current && source.current.previous) pushEntry(source.current.previous);
-    pushEntry(source.current);
+    if(Array.isArray(source.history)) source.history.forEach(function(item){ pushEntry(item, 'history'); });
+    pushEntry(source.previous, 'previous');
+    if(source.current && source.current.previous) pushEntry(source.current.previous, 'current-previous');
+    pushEntry(source.current, 'current');
   }
   if(typeof currentBase === 'number' && isFinite(currentBase)){
     var alreadyIncluded = entries.some(function(entry){ return Math.abs(entry.base - currentBase) < 0.5; });
-    if(!alreadyIncluded){ entries.push({ base: currentBase, time: null, order: order++ }); }
+    if(!alreadyIncluded){ entries.push({ base: currentBase, time: null, order: order++, role: 'current-fallback' }); }
   }
   if(!entries.length) return [];
   entries.sort(function(a, b){
@@ -652,18 +657,55 @@ function prepareLmBaruHistorySeries(source, currentBase, limit){
     return a.order - b.order;
   });
   var seenTimes = new Set();
-  var normalized = [];
-  entries.forEach(function(entry){
+  var reversed = [];
+  for(var idx = entries.length - 1; idx >= 0; idx--){
+    var entry = entries[idx];
+    if(!entry) continue;
     var timeKey = entry.time ? entry.time.getTime() : null;
-    if(timeKey !== null){ if(seenTimes.has(timeKey)) return; seenTimes.add(timeKey); }
-    normalized.push({
+    if(timeKey !== null){
+      if(seenTimes.has(timeKey)) continue;
+      seenTimes.add(timeKey);
+    }
+    reversed.push({
       base: entry.base,
       price: computeLmBaruPrice(entry.base),
-      time: entry.time
+      time: entry.time,
+      role: entry.role || null
     });
-  });
-  if(normalized.length > limitValue){ normalized = normalized.slice(normalized.length - limitValue); }
-  return normalized;
+  }
+  if(!reversed.length) return [];
+  reversed.reverse();
+  if(reversed.length > limitValue){ reversed = reversed.slice(reversed.length - limitValue); }
+  return reversed;
+}
+function findLmBaruSeriesPair(series, currentBase){
+  var result = { current: null, previous: null };
+  if(!Array.isArray(series) || !series.length){
+    if(typeof currentBase === 'number' && isFinite(currentBase)){
+      result.current = { base: currentBase, price: computeLmBaruPrice(currentBase), time: null };
+    }
+    return result;
+  }
+  var points = series.filter(function(point){ return point && typeof point.base === 'number' && isFinite(point.base); });
+  for(var i = points.length - 1; i >= 0; i--){
+    var point = points[i];
+    if(!point) continue;
+    if(!result.current){
+      result.current = point;
+      continue;
+    }
+    result.previous = point;
+    break;
+  }
+  if(typeof currentBase === 'number' && isFinite(currentBase)){
+    if(!result.current || Math.abs(result.current.base - currentBase) > 0.5){
+      result.current = { base: currentBase, price: computeLmBaruPrice(currentBase), time: result.current ? result.current.time : null };
+    }
+  }
+  if(result.previous && typeof result.previous.price !== 'number'){
+    result.previous = Object.assign({}, result.previous, { price: computeLmBaruPrice(result.previous.base) });
+  }
+  return result;
 }
 function describeSparklineSeries(series, periodLabel){
   if(!Array.isArray(series) || series.length < 2) return 'Riwayat harga tidak tersedia.';
@@ -683,6 +725,140 @@ function describeSparklineSeries(series, periodLabel){
     return 'Harga turun Rp ' + formatCurrencyIDR(absDiff) + ' selama ' + label + ', dari Rp ' + formatCurrencyIDR(firstPrice) + ' menjadi Rp ' + formatCurrencyIDR(lastPrice) + '.';
   }
   return 'Harga relatif stabil selama ' + label + ' di sekitar Rp ' + formatCurrencyIDR(lastPrice) + '.';
+}
+function formatSparklinePointTooltip(point){
+  if(!point) return '';
+  var priceValue = Number(point.price);
+  var priceText = isFinite(priceValue) ? 'Rp ' + formatCurrencyIDR(Math.round(priceValue)) : 'Rp —';
+  var dateText = '';
+  if(point.time instanceof Date && !isNaN(point.time.getTime())){
+    dateText = formatDateTimeIndo(point.time);
+  }
+  return dateText ? dateText + ' • ' + priceText : priceText;
+}
+function formatSparklinePointAnnouncement(point){
+  if(!point) return '';
+  var priceValue = Number(point.price);
+  var priceText = isFinite(priceValue) ? 'Rp ' + formatCurrencyIDR(Math.round(priceValue)) : 'harga tidak tersedia';
+  if(point.time instanceof Date && !isNaN(point.time.getTime())){
+    return 'Harga ' + priceText + ' pada ' + formatDateTimeIndo(point.time) + '.';
+  }
+  return 'Harga ' + priceText + '.';
+}
+function updateSparklinePointSummary(message){
+  var summaryEl = document.getElementById('lmBaruSparklinePointSummary');
+  if(summaryEl){ summaryEl.textContent = message || ''; }
+}
+function hideSparklineTooltip(options){
+  var tooltip = document.getElementById('lmBaruSparklineTooltip');
+  if(tooltip){
+    tooltip.classList.remove('is-visible','is-flip');
+    tooltip.setAttribute('aria-hidden','true');
+    tooltip.style.left = '';
+    tooltip.style.top = '';
+    tooltip.textContent = '';
+  }
+  if(!options || options.clearSummary !== false){ updateSparklinePointSummary(''); }
+  if(!options || options.unlock !== false){ LM_BARU_SPARKLINE_TOOLTIP_LOCKED = false; }
+  LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
+}
+function showSparklineTooltip(point, index, rect){
+  if(!point) return;
+  var tooltip = document.getElementById('lmBaruSparklineTooltip');
+  if(!tooltip) return;
+  var width = rect && rect.width ? rect.width : 0;
+  var height = rect && rect.height ? rect.height : 0;
+  var x = typeof point.x === 'number' ? point.x : 0;
+  var y = typeof point.y === 'number' ? point.y : 0;
+  if(width > 0){
+    x = Math.min(width - 10, Math.max(10, x));
+  }
+  if(height > 0){
+    y = Math.min(height - 10, Math.max(10, y));
+  }
+  var shouldFlip = y < 32;
+  tooltip.classList.remove('is-visible');
+  tooltip.classList.toggle('is-flip', shouldFlip);
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+  tooltip.textContent = formatSparklinePointTooltip(point);
+  tooltip.setAttribute('aria-hidden','false');
+  requestAnimationFrame(function(){ tooltip.classList.add('is-visible'); });
+  updateSparklinePointSummary(formatSparklinePointAnnouncement(point));
+  LM_BARU_SPARKLINE_ACTIVE_INDEX = typeof index === 'number' ? index : -1;
+}
+function showSparklinePointAtIndex(index, canvas, lockSelection){
+  if(!Array.isArray(LM_BARU_SPARKLINE_POINTS)) return;
+  var total = LM_BARU_SPARKLINE_POINTS.length;
+  if(total <= 0) return;
+  var targetIndex = typeof index === 'number' ? index : total - 1;
+  if(targetIndex < 0) targetIndex = 0;
+  if(targetIndex >= total) targetIndex = total - 1;
+  var point = LM_BARU_SPARKLINE_POINTS[targetIndex];
+  if(!point) return;
+  var targetCanvas = canvas || document.getElementById('lmBaruSparkline');
+  if(!targetCanvas) return;
+  var rect = targetCanvas.getBoundingClientRect();
+  showSparklineTooltip(point, targetIndex, rect);
+  if(lockSelection){ LM_BARU_SPARKLINE_TOOLTIP_LOCKED = true; }
+}
+function handleSparklinePointerEvent(ev, lockSelection){
+  if(!Array.isArray(LM_BARU_SPARKLINE_POINTS) || !LM_BARU_SPARKLINE_POINTS.length) return;
+  var canvas = ev && ev.currentTarget ? ev.currentTarget : document.getElementById('lmBaruSparkline');
+  if(!canvas) return;
+  var rect = canvas.getBoundingClientRect();
+  var clientX = typeof ev.clientX === 'number' ? ev.clientX : (rect.left + rect.width);
+  var localX = clientX - rect.left;
+  if(!isFinite(localX)) return;
+  var nearestIndex = 0;
+  var nearestDistance = Infinity;
+  for(var i = 0; i < LM_BARU_SPARKLINE_POINTS.length; i++){
+    var point = LM_BARU_SPARKLINE_POINTS[i];
+    if(!point) continue;
+    var distance = Math.abs(localX - point.x);
+    if(distance < nearestDistance){
+      nearestDistance = distance;
+      nearestIndex = i;
+    }
+  }
+  showSparklinePointAtIndex(nearestIndex, canvas, lockSelection);
+}
+function handleSparklineKeyNavigation(ev){
+  if(!Array.isArray(LM_BARU_SPARKLINE_POINTS) || !LM_BARU_SPARKLINE_POINTS.length) return;
+  var canvas = ev.currentTarget || document.getElementById('lmBaruSparkline');
+  if(!canvas) return;
+  var handled = false;
+  var targetIndex = LM_BARU_SPARKLINE_ACTIVE_INDEX;
+  if(ev.key === 'ArrowRight'){ handled = true; targetIndex = targetIndex < 0 ? 0 : targetIndex + 1; }
+  else if(ev.key === 'ArrowLeft'){ handled = true; targetIndex = targetIndex < 0 ? LM_BARU_SPARKLINE_POINTS.length - 1 : targetIndex - 1; }
+  else if(ev.key === 'Home'){ handled = true; targetIndex = 0; }
+  else if(ev.key === 'End'){ handled = true; targetIndex = LM_BARU_SPARKLINE_POINTS.length - 1; }
+  else if(ev.key === 'Escape'){ handled = true; hideSparklineTooltip({ unlock: true }); }
+  if(handled){
+    ev.preventDefault();
+    if(ev.key !== 'Escape'){ showSparklinePointAtIndex(targetIndex, canvas, true); }
+  }
+}
+function attachSparklineInteractions(){
+  if(LM_BARU_SPARKLINE_EVENTS_BOUND) return;
+  var canvas = document.getElementById('lmBaruSparkline');
+  if(!canvas) return;
+  LM_BARU_SPARKLINE_EVENTS_BOUND = true;
+  canvas.addEventListener('pointerenter', function(ev){ if(LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return; handleSparklinePointerEvent(ev, false); });
+  canvas.addEventListener('pointermove', function(ev){ if(ev.pointerType === 'touch' && !LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return; handleSparklinePointerEvent(ev, false); });
+  canvas.addEventListener('pointerdown', function(ev){ handleSparklinePointerEvent(ev, true); });
+  canvas.addEventListener('click', function(ev){ handleSparklinePointerEvent(ev, true); });
+  canvas.addEventListener('pointerleave', function(){ if(LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return; hideSparklineTooltip({ unlock: false }); });
+  canvas.addEventListener('focus', function(){ showSparklinePointAtIndex(LM_BARU_SPARKLINE_POINTS.length - 1, canvas, true); });
+  canvas.addEventListener('blur', function(){ hideSparklineTooltip({ unlock: true }); });
+  canvas.addEventListener('keydown', handleSparklineKeyNavigation);
+  document.addEventListener('pointerdown', function(ev){
+    if(!LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return;
+    if(canvas.contains(ev.target)) return;
+    var tooltip = document.getElementById('lmBaruSparklineTooltip');
+    if(tooltip && tooltip.contains(ev.target)) return;
+    hideSparklineTooltip({ unlock: true });
+  }, true);
 }
 function getSparklineReuseOptions(){
   if(!LM_BARU_SPARKLINE_META) return { periodLabel: DEFAULT_SPARKLINE_PERIOD };
@@ -709,6 +885,9 @@ function updateLmBaruSparkline(series, options){
   var hasSeries = Array.isArray(series) && series.length >= 2 && series.every(function(point){ return point && typeof point.price === 'number' && isFinite(point.price); });
 
   if(!hasSeries){
+    LM_BARU_SPARKLINE_POINTS = [];
+    LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
+    hideSparklineTooltip({ unlock: true });
     if(canvas){
       try{
         var ctxClear = canvas.getContext && canvas.getContext('2d');
@@ -732,6 +911,7 @@ function updateLmBaruSparkline(series, options){
     return;
   }
 
+  hideSparklineTooltip({ unlock: true });
   if(highlightCard) highlightCard.setAttribute('data-sparkline-state','ready');
   if(fallbackEl){
     fallbackEl.textContent = '';
@@ -764,11 +944,22 @@ function updateLmBaruSparkline(series, options){
       ctx.lineJoin = 'round';
       ctx.lineCap = 'round';
 
+      var points = [];
       ctx.beginPath();
       prices.forEach(function(price, idx){
         var x = idx * step;
         var norm = (price - min) / range;
         var y = height - verticalPadding - norm * usableHeight;
+        var basePoint = series[idx] || {};
+        var baseValue = typeof basePoint.base === 'number' ? basePoint.base : null;
+        var timeValue = basePoint.time instanceof Date && !isNaN(basePoint.time.getTime()) ? basePoint.time : (basePoint.time ? resolveDate(basePoint.time) : null);
+        points.push({
+          x: x,
+          y: y,
+          price: price,
+          base: baseValue,
+          time: timeValue
+        });
         if(idx === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
       });
@@ -793,16 +984,19 @@ function updateLmBaruSparkline(series, options){
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      var lastIndex = prices.length - 1;
-      var lastX = lastIndex * step;
-      var lastNorm = (prices[lastIndex] - min) / range;
-      var lastY = height - verticalPadding - lastNorm * usableHeight;
-      ctx.beginPath();
-      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(88, 255, 169, 1)';
-      ctx.fill();
+      var lastPoint = points.length ? points[points.length - 1] : null;
+      if(lastPoint){
+        ctx.beginPath();
+        ctx.arc(lastPoint.x, lastPoint.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(88, 255, 169, 1)';
+        ctx.fill();
+      }
 
       canvas.classList.add('sparkline-visible');
+      LM_BARU_SPARKLINE_POINTS = points;
+      LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
+      LM_BARU_SPARKLINE_TOOLTIP_LOCKED = false;
+      attachSparklineInteractions();
     }
   }
   if(summaryEl){
@@ -966,9 +1160,6 @@ function displayFromBasePrice(basePrice, options){
   var highlightCard = document.getElementById('lmBaruHighlight');
   if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
 
-    var highlightCard = document.getElementById('lmBaruHighlight');
-  if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
-
   updateLmBaruHighlight(lmBaru, {
     previousPrice: prevPrice,
     updatedAt: options.updatedAt,
@@ -1018,10 +1209,18 @@ async function fetchGoldPrice() {
     if (data && data.statusCode === 200 && data.data && data.data.current) {
       const currentBase = safeNumber(data.data.current.buy);
       if(currentBase !== null){
-        const previousBase = extractPreviousBase(data.data, currentBase);
+        let previousBase = extractPreviousBase(data.data, currentBase);
         const updatedAtRaw = resolveDate(data.data.current.priceDate || data.data.current.time || data.data.current.timestamp || data.data.current.updatedAt);
         const updatedAt = updatedAtRaw || new Date();
         const historySeries = prepareLmBaruHistorySeries(data.data, currentBase, LM_HISTORY_DAYS_LIMIT);
+        const pair = findLmBaruSeriesPair(historySeries, currentBase);
+        let previousPrice = null;
+        if(pair.previous && typeof pair.previous.base === 'number'){
+          previousBase = pair.previous.base;
+          previousPrice = pair.previous.price;
+        } else if(Number.isFinite(previousBase)){
+          previousPrice = computeLmBaruPrice(previousBase);
+        }
         REI_LAST_BASE_P = currentBase;
         saveLastBasePrice(currentBase);
         if(Array.isArray(historySeries)){
@@ -1030,7 +1229,12 @@ async function fetchGoldPrice() {
         } else {
           LM_BARU_PRICE_SERIES = [];
         }
-        displayFromBasePrice(currentBase, { previousBase: previousBase, updatedAt: updatedAt });
+        const displayOptions = {
+          updatedAt: updatedAt
+        };
+        if(Number.isFinite(previousBase)) displayOptions.previousBase = previousBase;
+        if(Number.isFinite(previousPrice)) displayOptions.previousPrice = Math.round(previousPrice);
+        displayFromBasePrice(currentBase, displayOptions);
         updateLmBaruSparkline(historySeries, {
           periodLabel: DEFAULT_SPARKLINE_PERIOD,
           fallbackText: 'Riwayat harga belum tersedia dari penyedia data.'
@@ -1051,8 +1255,6 @@ function displayDefaultPrices() {
   var approxBase = (DEFAULT_PRICE_TABLE.lmBaru - PRICE_ADJUST_IDR) / FACTOR_LM_BARU;
   REI_LAST_BASE_P = approxBase;
   var highlightCard = document.getElementById('lmBaruHighlight');
-  if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
-    var highlightCard = document.getElementById('lmBaruHighlight');
   if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
   LM_BARU_PRICE_SERIES = [];
   displayFromBasePrice(approxBase, {
