@@ -758,9 +758,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 [data-theme="dark"] .price-highlight-label,
 [data-theme="dark"] .price-badge.price-neutral,
 [data-theme="dark"] .price-highlight-unit,
-[data-theme="dark"] .price-highlight-delta,
-[data-theme="dark"] .price-highlight-delta.trend-flat,
-[data-theme="dark"] .price-highlight-delta .delta-icon {
+[data-theme="dark"] .price-highlight-delta.trend-flat {
     color: var(--ink) !important;
 }
 
