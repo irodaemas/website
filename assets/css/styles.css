@@ -634,7 +634,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 #cal-total.h2{ margin:0 }
 
 /* Kalkulator result box */
-.calc-grid{ display:grid; gap:var(--space-md); grid-template-columns:repeat(3,minmax(0,1fr)); align-items:end }
+.calc-grid{ display:grid; gap:var(--space-md); grid-template-columns:repeat(3,minmax(0,1fr)); align-items:flex-start }
 .calc-field{ display:flex; flex-direction:column; gap:.55rem }
 .calc-field--weight{ gap:.7rem }
 .calc-field--weight .calc-add-btn{ margin-top:.2rem }
