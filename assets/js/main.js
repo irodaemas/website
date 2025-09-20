@@ -755,7 +755,7 @@ function formatSparklinePointTooltip(point){
   if(point.time instanceof Date && !isNaN(point.time.getTime())){
     dateText = formatDateOnlyIndo(point.time);
   }
-  return dateText ? dateText + ' • ' + priceText : priceText;
+  return dateText ? dateText + '\n' + priceText : priceText;
 }
 function formatSparklinePointAnnouncement(point){
   if(!point) return '';
