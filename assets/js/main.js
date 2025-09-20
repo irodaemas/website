@@ -829,8 +829,6 @@ function hideSparklineTooltip(options){
     tooltip.textContent = '';
     tooltip.style.removeProperty('--sparkline-arrow-position');
     delete tooltip.dataset.index;
-    var container = tooltip.parentElement;
-    if(container && container.classList){ container.classList.remove('sparkline-tooltip-flip'); }
   }
   updateSparklineMarker(null);
   if(!options || options.clearSummary !== false){ updateSparklinePointSummary(''); }
@@ -872,7 +870,6 @@ function showSparklineTooltip(point, index, rect){
   tooltip.classList.remove('is-visible');
   var shouldFlip = y < 32;
   tooltip.classList.toggle('is-flip', shouldFlip);
-  if(container && container.classList){ container.classList.toggle('sparkline-tooltip-flip', shouldFlip); }
   tooltip.setAttribute('aria-hidden','false');
   tooltip.textContent = formatSparklinePointTooltip(point);
   tooltip.style.top = y + 'px';
