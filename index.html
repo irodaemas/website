@@ -145,7 +145,7 @@
               <h2 id="lmHighlightTitle" class="h2">Pergerakan Harga Buyback Harian</h2>
             </div>
           </div>
-          <div id="lmBaruHighlight" class="card price-highlight" role="status" aria-live="polite" aria-busy="true">
+          <div id="lmBaruHighlight" class="card price-highlight" role="status" aria-live="polite" aria-busy="true" aria-describedby="lmBaruDeltaText lmBaruTrendSummary">
             <div class="skeleton-content" aria-hidden="true">
               <div class="flex-split">
                 <div class="skeleton skeleton-line" style="width: 150px; height: 1.1rem;"></div>
@@ -162,6 +162,11 @@
               <span id="lmBaruCurrent" class="price-highlight-value">Rp —</span>
               <span class="price-highlight-unit">/gram</span>
             </div>
+            <div class="price-highlight-chart">
+              <canvas id="lmBaruSparkline" height="60" aria-hidden="true"></canvas>
+              <div id="lmBaruChartFallback" class="chart-fallback is-visible" role="note">Grafik menunggu data riwayat harga.</div>
+            </div>
+            <p id="lmBaruTrendSummary" class="sr-only">Ringkasan tren 7 hari: menunggu data riwayat harga.</p>
             <div class="price-highlight-delta" id="lmBaruDelta">
               <span class="delta-icon" aria-hidden="true">-</span>
               <span id="lmBaruDeltaText">Selisih menunggu data</span>

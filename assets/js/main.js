@@ -169,8 +169,10 @@
 // Harga emas: fetch + fallback + waktu W.I.B
 const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
+const LM_HISTORY_DAYS_LIMIT = 7;
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
+const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
 const FACTOR_LM_BARU = 0.932;
 const FACTOR_LM_LAMA = 0.917;
 const FACTOR_PERHIASAN_24K = 0.862;
@@ -434,6 +436,45 @@ const DEFAULT_PRICE_TABLE = {
 };
 function saveLastBasePrice(p){ try{ localStorage.setItem(LAST_PRICE_KEY, JSON.stringify({ p, t: Date.now() })); }catch(_){} }
 function readLastBasePrice(){ try{ const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY)||''); /* istanbul ignore next */ if(o && typeof o.p==='number') return o; }catch(_){} return null; }
+function saveLastSparklineSeries(series){
+  try{
+    if(!Array.isArray(series) || !series.length){ localStorage.removeItem(LAST_SERIES_KEY); return; }
+    const payload = series.map(function(point){
+      if(point == null) return null;
+      const baseValue = typeof point.base === 'number' ? point.base : (typeof point === 'number' ? point : null);
+      if(baseValue === null || !isFinite(baseValue)) return null;
+      let timeValue = null;
+      if(point.time instanceof Date && !isNaN(point.time.getTime())){ timeValue = point.time.getTime(); }
+      else if(typeof point.time === 'number' && isFinite(point.time)){ timeValue = point.time; }
+      return [timeValue, baseValue];
+    }).filter(Boolean);
+    if(payload.length){ localStorage.setItem(LAST_SERIES_KEY, JSON.stringify(payload)); }
+    else { localStorage.removeItem(LAST_SERIES_KEY); }
+  }catch(_){ }
+}
+function readLastSparklineSeries(){
+  try{
+    const raw = JSON.parse(localStorage.getItem(LAST_SERIES_KEY) || '[]');
+    if(!Array.isArray(raw)) return [];
+    return raw.map(function(entry){
+      if(!Array.isArray(entry) || entry.length < 2) return null;
+      const baseValue = safeNumber(entry[1]);
+      if(baseValue === null) return null;
+      const timeValue = entry[0] == null ? null : resolveDate(entry[0]);
+      return {
+        base: baseValue,
+        price: computeLmBaruPrice(baseValue),
+        time: timeValue instanceof Date && !isNaN(timeValue.getTime()) ? timeValue : null
+      };
+    }).filter(Boolean);
+  }catch(_){
+    return [];
+  }
+}
+let LM_BARU_PRICE_SERIES = readLastSparklineSeries();
+const DEFAULT_SPARKLINE_PERIOD = `${LM_HISTORY_DAYS_LIMIT} hari terakhir`;
+let LM_BARU_SPARKLINE_META = { periodLabel: DEFAULT_SPARKLINE_PERIOD, hasSeries: false };
+let LM_BARU_SPARKLINE_RESIZE_FRAME = null;
 function updatePriceSchema(items){
   try{
     var el = document.getElementById('priceItemList');
@@ -579,6 +620,216 @@ function updateLmBaruHighlight(currentPrice, options){
     requestAnimationFrame(function(){ highlightCard.classList.add('is-updated'); });
   }
 }
+function prepareLmBaruHistorySeries(source, currentBase, limit){
+  var limitValue = typeof limit === 'number' && limit > 0 ? limit : LM_HISTORY_DAYS_LIMIT;
+  var entries = [];
+  var order = 0;
+  function pushEntry(entry){
+    if(!entry) return;
+    var baseValue = safeNumber(entry.buy);
+    if(baseValue === null) return;
+    entries.push({
+      base: baseValue,
+      time: resolveDate(entry.priceDate || entry.time || entry.timestamp || entry.date || entry.updatedAt),
+      order: order++
+    });
+  }
+  if(source){
+    if(Array.isArray(source.history)) source.history.forEach(pushEntry);
+    pushEntry(source.previous);
+    if(source.current && source.current.previous) pushEntry(source.current.previous);
+    pushEntry(source.current);
+  }
+  if(typeof currentBase === 'number' && isFinite(currentBase)){
+    var alreadyIncluded = entries.some(function(entry){ return Math.abs(entry.base - currentBase) < 0.5; });
+    if(!alreadyIncluded){ entries.push({ base: currentBase, time: null, order: order++ }); }
+  }
+  if(!entries.length) return [];
+  entries.sort(function(a, b){
+    if(a.time && b.time){ return a.time.getTime() - b.time.getTime(); }
+    if(a.time && !b.time) return -1;
+    if(!a.time && b.time) return 1;
+    return a.order - b.order;
+  });
+  var seenTimes = new Set();
+  var normalized = [];
+  entries.forEach(function(entry){
+    var timeKey = entry.time ? entry.time.getTime() : null;
+    if(timeKey !== null){ if(seenTimes.has(timeKey)) return; seenTimes.add(timeKey); }
+    normalized.push({
+      base: entry.base,
+      price: computeLmBaruPrice(entry.base),
+      time: entry.time
+    });
+  });
+  if(normalized.length > limitValue){ normalized = normalized.slice(normalized.length - limitValue); }
+  return normalized;
+}
+function describeSparklineSeries(series, periodLabel){
+  if(!Array.isArray(series) || series.length < 2) return 'Riwayat harga tidak tersedia.';
+  var firstPoint = series[0];
+  var lastPoint = series[series.length - 1];
+  if(!firstPoint || !lastPoint) return 'Riwayat harga tidak tersedia.';
+  var firstPrice = Number(firstPoint.price);
+  var lastPrice = Number(lastPoint.price);
+  if(!isFinite(firstPrice) || !isFinite(lastPrice)) return 'Riwayat harga tidak tersedia.';
+  var diff = Math.round(lastPrice - firstPrice);
+  var absDiff = Math.abs(diff);
+  var label = typeof periodLabel === 'string' && periodLabel.trim() ? periodLabel : DEFAULT_SPARKLINE_PERIOD;
+  if(diff > 0){
+    return 'Harga naik Rp ' + formatCurrencyIDR(absDiff) + ' selama ' + label + ', dari Rp ' + formatCurrencyIDR(firstPrice) + ' menjadi Rp ' + formatCurrencyIDR(lastPrice) + '.';
+  }
+  if(diff < 0){
+    return 'Harga turun Rp ' + formatCurrencyIDR(absDiff) + ' selama ' + label + ', dari Rp ' + formatCurrencyIDR(firstPrice) + ' menjadi Rp ' + formatCurrencyIDR(lastPrice) + '.';
+  }
+  return 'Harga relatif stabil selama ' + label + ' di sekitar Rp ' + formatCurrencyIDR(lastPrice) + '.';
+}
+function getSparklineReuseOptions(){
+  if(!LM_BARU_SPARKLINE_META) return { periodLabel: DEFAULT_SPARKLINE_PERIOD };
+  return {
+    periodLabel: LM_BARU_SPARKLINE_META.periodLabel || DEFAULT_SPARKLINE_PERIOD,
+    summaryText: typeof LM_BARU_SPARKLINE_META.summaryText === 'string' ? LM_BARU_SPARKLINE_META.summaryText : undefined,
+    summarySuffix: typeof LM_BARU_SPARKLINE_META.summarySuffix === 'string' ? LM_BARU_SPARKLINE_META.summarySuffix : undefined,
+    fallbackText: typeof LM_BARU_SPARKLINE_META.fallbackText === 'string' ? LM_BARU_SPARKLINE_META.fallbackText : undefined
+  };
+}
+function updateLmBaruSparkline(series, options){
+  options = options || {};
+  var previousLabel = (LM_BARU_SPARKLINE_META && typeof LM_BARU_SPARKLINE_META.periodLabel === 'string') ? LM_BARU_SPARKLINE_META.periodLabel : DEFAULT_SPARKLINE_PERIOD;
+  var renderOptions = {
+    periodLabel: typeof options.periodLabel === 'string' && options.periodLabel.trim() ? options.periodLabel : previousLabel,
+    summaryText: typeof options.summaryText === 'string' ? options.summaryText : undefined,
+    summarySuffix: typeof options.summarySuffix === 'string' ? options.summarySuffix : undefined,
+    fallbackText: typeof options.fallbackText === 'string' ? options.fallbackText : undefined
+  };
+  var highlightCard = document.getElementById('lmBaruHighlight');
+  var canvas = document.getElementById('lmBaruSparkline');
+  var fallbackEl = document.getElementById('lmBaruChartFallback');
+  var summaryEl = document.getElementById('lmBaruTrendSummary');
+  var hasSeries = Array.isArray(series) && series.length >= 2 && series.every(function(point){ return point && typeof point.price === 'number' && isFinite(point.price); });
+
+  if(!hasSeries){
+    if(canvas){
+      try{
+        var ctxClear = canvas.getContext && canvas.getContext('2d');
+        if(ctxClear){ ctxClear.setTransform(1,0,0,1,0,0); ctxClear.clearRect(0,0,canvas.width || 0, canvas.height || 0); }
+      }catch(_){ }
+      canvas.classList.remove('sparkline-visible');
+      canvas.setAttribute('aria-hidden','true');
+    }
+    if(fallbackEl){
+      var fallbackText = renderOptions.fallbackText || 'Riwayat harga belum tersedia.';
+      fallbackEl.textContent = fallbackText;
+      fallbackEl.classList.add('is-visible');
+    }
+    if(summaryEl){
+      var summaryText = renderOptions.summaryText || renderOptions.fallbackText || 'Riwayat harga belum tersedia.';
+      if(renderOptions.summarySuffix){ summaryText += ' ' + renderOptions.summarySuffix; }
+      summaryEl.textContent = summaryText;
+    }
+    if(highlightCard) highlightCard.setAttribute('data-sparkline-state','empty');
+    LM_BARU_SPARKLINE_META = Object.assign({}, renderOptions, { hasSeries: false });
+    return;
+  }
+
+  if(highlightCard) highlightCard.setAttribute('data-sparkline-state','ready');
+  if(fallbackEl){
+    fallbackEl.textContent = '';
+    fallbackEl.classList.remove('is-visible');
+  }
+  if(canvas){
+    canvas.removeAttribute('aria-hidden');
+    var rect = canvas.getBoundingClientRect();
+    var width = Math.max(1, rect.width || canvas.clientWidth || 160);
+    var height = Math.max(32, rect.height || canvas.clientHeight || 48);
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    var ctx = canvas.getContext('2d');
+    if(ctx){
+      ctx.setTransform(1,0,0,1,0,0);
+      ctx.clearRect(0,0,canvas.width, canvas.height);
+      ctx.scale(dpr, dpr);
+      var prices = series.map(function(point){ return Number(point.price) || 0; });
+      var min = Math.min.apply(null, prices);
+      var max = Math.max.apply(null, prices);
+      if(!isFinite(min) || !isFinite(max)){ min = max = 0; }
+      var range = max - min;
+      if(range <= 0){ range = 1; }
+      var verticalPadding = Math.max(4, Math.min(height * 0.24, height * 0.18));
+      if(verticalPadding * 2 >= height){ verticalPadding = Math.max(4, height * 0.1); }
+      var usableHeight = height - verticalPadding * 2;
+      if(usableHeight <= 0){ verticalPadding = 4; usableHeight = Math.max(8, height - 8); }
+      var step = prices.length > 1 ? width / (prices.length - 1) : width;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      prices.forEach(function(price, idx){
+        var x = idx * step;
+        var norm = (price - min) / range;
+        var y = height - verticalPadding - norm * usableHeight;
+        if(idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.lineTo(width, height);
+      ctx.lineTo(0, height);
+      ctx.closePath();
+      var gradient = ctx.createLinearGradient(0, verticalPadding, 0, height);
+      gradient.addColorStop(0, 'rgba(88, 255, 169, 0.22)');
+      gradient.addColorStop(1, 'rgba(88, 255, 169, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      ctx.beginPath();
+      prices.forEach(function(price, idx){
+        var x = idx * step;
+        var norm = (price - min) / range;
+        var y = height - verticalPadding - norm * usableHeight;
+        if(idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.strokeStyle = 'rgba(88, 255, 169, 0.95)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      var lastIndex = prices.length - 1;
+      var lastX = lastIndex * step;
+      var lastNorm = (prices[lastIndex] - min) / range;
+      var lastY = height - verticalPadding - lastNorm * usableHeight;
+      ctx.beginPath();
+      ctx.arc(lastX, lastY, 3, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(88, 255, 169, 1)';
+      ctx.fill();
+
+      canvas.classList.add('sparkline-visible');
+    }
+  }
+  if(summaryEl){
+    var summaryMessage = renderOptions.summaryText || describeSparklineSeries(series, renderOptions.periodLabel);
+    if(renderOptions.summarySuffix){ summaryMessage += ' ' + renderOptions.summarySuffix; }
+    summaryEl.textContent = summaryMessage;
+  }
+  LM_BARU_SPARKLINE_META = Object.assign({}, renderOptions, { hasSeries: true });
+}
+function applySparklineFromCache(summarySuffix, fallbackText){
+  if(!Array.isArray(LM_BARU_PRICE_SERIES) || LM_BARU_PRICE_SERIES.length < 2){
+    var storedSeries = readLastSparklineSeries();
+    if(Array.isArray(storedSeries) && storedSeries.length >= 2){ LM_BARU_PRICE_SERIES = storedSeries; }
+  }
+  if(Array.isArray(LM_BARU_PRICE_SERIES) && LM_BARU_PRICE_SERIES.length >= 2){
+    updateLmBaruSparkline(LM_BARU_PRICE_SERIES, {
+      periodLabel: (LM_BARU_SPARKLINE_META && LM_BARU_SPARKLINE_META.periodLabel) || DEFAULT_SPARKLINE_PERIOD,
+      summarySuffix: summarySuffix
+    });
+  } else {
+    var message = typeof fallbackText === 'string' ? fallbackText : (typeof summarySuffix === 'string' ? summarySuffix : 'Grafik riwayat tidak tersedia.');
+    updateLmBaruSparkline(null, {
+      fallbackText: message,
+      summaryText: message
+    });
+  }
+}
 function extractPreviousBase(data, currentBase){
   if(!data) return null;
   var entries = [];
@@ -720,66 +971,61 @@ function displayFromBasePrice(basePrice, options){
   }
 }
 
+function handleGoldPriceFallback(summarySuffix, fallbackSummary){
+  var last = readLastBasePrice();
+  /* istanbul ignore next */
+  if(last){
+    REI_LAST_BASE_P = last.p;
+    displayFromBasePrice(last.p, {
+      updatedAt: last.t,
+      infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
+      badgeLabel: 'Cache',
+      badgeState: 'price-neutral'
+    });
+    applySparklineFromCache(
+      typeof summarySuffix === 'string' ? summarySuffix : 'Menggunakan riwayat harga yang tersimpan.',
+      typeof fallbackSummary === 'string' ? fallbackSummary : 'Grafik riwayat tidak tersedia saat data cache digunakan.'
+    );
+  }
+  else { displayDefaultPrices(); }
+}
+
 async function fetchGoldPrice() {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
-    const ctl = new AbortController();
-    const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
-    const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=2', { signal: ctl.signal });
-    clearTimeout(t);
+    const response = await fetch(`https://pluang.com/api/asset/gold/pricing?daysLimit=${LM_HISTORY_DAYS_LIMIT}`, { signal: ctl.signal });
     const data = await response.json();
-    /* istanbul ignore else */
     if (data && data.statusCode === 200 && data.data && data.data.current) {
       const currentBase = safeNumber(data.data.current.buy);
       if(currentBase !== null){
         const previousBase = extractPreviousBase(data.data, currentBase);
         const updatedAtRaw = resolveDate(data.data.current.priceDate || data.data.current.time || data.data.current.timestamp || data.data.current.updatedAt);
         const updatedAt = updatedAtRaw || new Date();
-        REI_LAST_BASE_P = currentBase; saveLastBasePrice(currentBase);
+        const historySeries = prepareLmBaruHistorySeries(data.data, currentBase, LM_HISTORY_DAYS_LIMIT);
+        REI_LAST_BASE_P = currentBase;
+        saveLastBasePrice(currentBase);
+        if(Array.isArray(historySeries)){
+          LM_BARU_PRICE_SERIES = historySeries.slice();
+          if(historySeries.length >= 2){ saveLastSparklineSeries(historySeries); }
+        } else {
+          LM_BARU_PRICE_SERIES = [];
+        }
         displayFromBasePrice(currentBase, { previousBase: previousBase, updatedAt: updatedAt });
+        updateLmBaruSparkline(historySeries, {
+          periodLabel: DEFAULT_SPARKLINE_PERIOD,
+          fallbackText: 'Riwayat harga belum tersedia dari penyedia data.'
+        });
         return;
       }
-    } else {
-      const last = readLastBasePrice();
-      /* istanbul ignore next */
-      if(last){
-        REI_LAST_BASE_P = last.p;
-        displayFromBasePrice(last.p, {
-          updatedAt: last.t,
-          infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
-          badgeLabel: 'Cache',
-          badgeState: 'price-neutral'
-        });
-      }
-      else { displayDefaultPrices(); }
-      return;
     }
-    const last = readLastBasePrice();
-    /* istanbul ignore next */
-    if(last){
-      REI_LAST_BASE_P = last.p;
-      displayFromBasePrice(last.p, {
-        updatedAt: last.t,
-        infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
-        badgeLabel: 'Cache',
-        badgeState: 'price-neutral'
-      });
-    }
-    else { displayDefaultPrices(); }
+    handleGoldPriceFallback('Menggunakan riwayat harga yang tersimpan dari cache.', 'Grafik riwayat tidak tersedia karena respons layanan tidak lengkap.');
   } catch (err) {
     /* istanbul ignore next */
     console.warn('Harga gagal dimuat, pakai default:', err?.name || err);
-    const last = readLastBasePrice();
-    /* istanbul ignore next */
-    if(last){
-      REI_LAST_BASE_P = last.p;
-      displayFromBasePrice(last.p, {
-        updatedAt: last.t,
-        infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
-        badgeLabel: 'Cache',
-        badgeState: 'price-neutral'
-      });
-    }
-    else { displayDefaultPrices(); }
+    handleGoldPriceFallback('Menggunakan riwayat harga terakhir yang tersimpan.', 'Grafik riwayat tidak tersedia karena koneksi bermasalah.');
+  } finally {
+    clearTimeout(t);
   }
 }
 function displayDefaultPrices() {
@@ -789,12 +1035,17 @@ function displayDefaultPrices() {
   if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
     var highlightCard = document.getElementById('lmBaruHighlight');
   if(highlightCard) highlightCard.setAttribute('aria-busy', 'false');
+  LM_BARU_PRICE_SERIES = [];
   displayFromBasePrice(approxBase, {
     previousPrice: null,
     infoText: 'Terakhir diperbarui: menggunakan harga default',
     deltaText: 'Gunakan data live untuk melihat perbandingan',
     badgeLabel: 'Menunggu',
     badgeState: 'price-neutral'
+  });
+  updateLmBaruSparkline(null, {
+    fallbackText: 'Grafik riwayat tidak tersedia saat menggunakan harga default.',
+    summaryText: 'Grafik riwayat tidak tersedia saat menggunakan harga default.'
   });
 }
 function formatDateTimeIndo(date) {
@@ -819,6 +1070,16 @@ function displayDateTimeWIB() {
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
 fetchGoldPrice();
+
+window.addEventListener('resize', function(){
+  if(!LM_BARU_SPARKLINE_META || !LM_BARU_SPARKLINE_META.hasSeries) return;
+  if(!Array.isArray(LM_BARU_PRICE_SERIES) || LM_BARU_PRICE_SERIES.length < 2) return;
+  if(LM_BARU_SPARKLINE_RESIZE_FRAME){ cancelAnimationFrame(LM_BARU_SPARKLINE_RESIZE_FRAME); }
+  LM_BARU_SPARKLINE_RESIZE_FRAME = requestAnimationFrame(function(){
+    LM_BARU_SPARKLINE_RESIZE_FRAME = null;
+    updateLmBaruSparkline(LM_BARU_PRICE_SERIES, getSparklineReuseOptions());
+  });
+}, { passive: true });
 
 // Modal detail kadar emas dari tabel harga
 /* istanbul ignore next */

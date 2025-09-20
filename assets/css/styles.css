@@ -227,6 +227,11 @@ tbody tr:hover td{background:rgba(212,175,55,.14)}
 .price-badge.price-down{background:rgba(212,80,64,.18);color:#ff9f94}
 .price-badge.price-neutral{background:rgba(255,255,255,.16);color:#f4fdfa}
 .price-highlight-main{display:flex;align-items:flex-end;gap:.4rem}
+.price-highlight-chart{position:relative;width:100%;margin-top:.3rem}
+.price-highlight-chart canvas{width:100%;height:60px;display:block;border-radius:calc(var(--radius)/2);background:linear-gradient(180deg,rgba(2,44,41,.62),rgba(1,31,29,.08));box-shadow:inset 0 0 0 1px rgba(191,236,228,.08);opacity:0;transition:opacity .3s ease}
+.price-highlight-chart canvas.sparkline-visible{opacity:1}
+.chart-fallback{display:none;font-size:.85rem;color:rgba(225,250,246,.82);padding:.4rem .15rem 0}
+.chart-fallback.is-visible{display:block}
 .price-highlight-value{font-size:2.6rem;font-weight:700;color:var(--gold-2);transition:color .3s ease, transform .3s ease}
 .price-highlight-value.value-flash{animation:priceValueGlow .65s ease-out}
 .price-highlight-unit{font-size:1.1rem;font-weight:600;color:#e1faf6}
@@ -251,6 +256,7 @@ tbody tr:hover td{background:rgba(212,175,55,.14)}
 .price-highlight-delta.trend-flat .delta-icon{background:rgba(255,255,255,.18);color:#fdfefe}
 @media (max-width:720px){
   .price-highlight{padding:1.1rem;margin-bottom:1.1rem}
+  .price-highlight-chart canvas{height:54px}
   .price-highlight-value{font-size:2rem}
   .price-highlight-unit{font-size:1rem}
   .price-highlight-head{align-items:flex-start;flex-direction:column;gap:.4rem}
@@ -645,6 +651,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 
 #lmBaruHighlight[aria-busy="true"] .price-highlight-head,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-main,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-chart,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-delta {
   visibility: hidden;
 }
