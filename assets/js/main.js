@@ -1414,9 +1414,14 @@ function formatDateTimeIndo(date) {
 }
 function formatDateOnlyIndo(date){
   if(!(date instanceof Date) || isNaN(date.getTime())) return '';
-  var full = formatDateTimeIndo(date);
-  if(typeof full !== 'string') return '';
-  return full.replace(/\s\d{2}:\d{2}\sWIB$/, '');
+  var days = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+  var monthsShort = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+  var dayLabel = days[date.getDay()] || '';
+  var monthLabel = monthsShort[date.getMonth()] || '';
+  if(!dayLabel || !monthLabel) return '';
+  var dateNum = date.getDate();
+  var year = date.getFullYear();
+  return dayLabel + ', ' + dateNum + ' ' + monthLabel + ' ' + year;
 }
 function displayDateTimeWIB() {
   const now = new Date();
