@@ -499,7 +499,36 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
   .modal-foot .btn{width:100%}
 }
 /* --- Background utility for hostess image --- */
-.bg-hostess{ background: url('../img/wm.webp') center/cover no-repeat; border-color: rgba(255,255,255,.14) !important; min-height:300px; border-radius:12px; }
+.bg-hostess{
+  position:relative;
+  min-height:300px;
+  border-radius:12px;
+  border-color:rgba(255,255,255,.14) !important;
+  background-color:rgba(1,61,57,.72);
+  background-position:center;
+  background-size:cover;
+  background-repeat:no-repeat;
+}
+.bg-hostess::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), transparent 60%),
+    linear-gradient(135deg, rgba(1,61,57,.85), rgba(1,61,57,.62));
+  transition:opacity .4s ease;
+  pointer-events:none;
+}
+.bg-hostess.bg-loaded{
+  background-color:transparent;
+}
+.bg-hostess.bg-loaded::before{
+  opacity:0;
+}
+.bg-hostess.bg-error::before{
+  opacity:1;
+  background:linear-gradient(135deg, rgba(1,61,57,.85), rgba(1,61,57,.62));
+}
 /* ---------- blog layout ---------- */
 .page-blog .blog-main{ flex:1; }
 .blog-main{ padding-top:calc(clamp(2.5rem, 3.5vw + 1rem, 4rem) + 2rem); padding-bottom:clamp(3rem, 4vw + 1rem, 5rem); background:linear-gradient(180deg,var(--bg-tertiary) 0%, rgba(249,251,251,0) 100%); }
