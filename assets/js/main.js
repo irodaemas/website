@@ -612,7 +612,7 @@ function updateDiamondSchema(items, meta){
       "@context": "https://schema.org",
       "@type": "ItemList",
       "@id": "https://sentralemas.com/#diamond-price-list",
-      "name": "Referensi Harga Buyback Berlian",
+      "name": "Panduan Buyback Berlian",
       "itemListElement": schemaItems
     };
     var updatedAt = meta && meta.updatedAt ? resolveDate(meta.updatedAt) : null;
