@@ -832,22 +832,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
   visibility: hidden;
 }
 
-/* === Table row indicator === */
-.price-indicator-cell {
-  width: 1%;
-  padding-right: .75rem !important;
-  padding-left: 0 !important;
-  color: rgba(1, 61, 57, .2);
-  transition: color .2s ease;
-}
-.price-row[role="button"]:hover .price-indicator-cell {
-  color: rgba(1, 61, 57, .45);
-}
-.table-card th:last-child {
-  width: 1%;
-  padding-right: .75rem !important;
-  padding-left: 0 !important;
-}
+
 
 
 /* Dark mode color corrections */
@@ -892,10 +877,4 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
     border-color: rgba(212,175,55,.3);
 }
 
-[data-theme="dark"] .price-indicator-cell {
-    color: rgba(255, 255, 255, .2);
-}
 
-[data-theme="dark"] .price-row[role="button"]:hover .price-indicator-cell {
-    color: rgba(255, 255, 255, .45);
-}

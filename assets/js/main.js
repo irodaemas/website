@@ -1276,7 +1276,7 @@ function renderPriceTable(rows){
     var priceHtml = `<div class="price-amount" style="color:${color}">Rp <span class="num" data-to="${row.price}">0</span></div>`;
     var actionHtml = row.addCat ? addBtn : '';
     var indicatorIcon = row.infoKey ? `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>` : '';
-    tbody.insertAdjacentHTML('beforeend', `<tr class="price-row"${infoAttr}><td class="kadar">${iconHtml}${labelHtml}</td><td class="price-cell">${priceHtml}</td><td class="price-action">${actionHtml}</td><td class="price-indicator-cell">${indicatorIcon}</td></tr>`);
+    tbody.insertAdjacentHTML('beforeend', `<tr class="price-row"${infoAttr}><td class="kadar">${iconHtml}${labelHtml}</td><td class="price-cell">${priceHtml}</td><td class="price-action">${actionHtml}</td></tr>`);
     priceEntries.push({ name: row.schemaName || row.label, price: row.price });
   });
   tbody.setAttribute('aria-busy','false');
