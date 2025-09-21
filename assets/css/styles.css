@@ -937,6 +937,11 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .diamond-pillars{ display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1.2rem; }
 .diamond-card{ background:var(--paper); border:1px solid var(--border); border-radius:18px; padding:1.4rem 1.5rem; box-shadow:0 14px 28px rgba(1,36,37,.08); color:var(--text-primary); }
 .diamond-card p{ margin:.4rem 0 .9rem; color:var(--text-secondary); line-height:1.5; }
+.diamond-education-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.2rem; margin-top:1.8rem; }
+.diamond-edu-list{ margin:1rem 0 0; display:grid; gap:.8rem; }
+.diamond-edu-list div{ display:grid; gap:.25rem; }
+.diamond-edu-list dt{ font-weight:700; color:var(--text-primary); }
+.diamond-edu-list dd{ margin:0; color:var(--text-secondary); line-height:1.45; }
 .diamond-list{ margin:0; padding-left:1.2rem; display:grid; gap:.35rem; color:var(--text-secondary); }
 
 .diamond-color-layout{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1.6rem; align-items:start; }
