@@ -156,6 +156,17 @@
       try{ el.style.backgroundImage = 'url(' + JSON.stringify(src) + ')'; }
       catch(_){ el.style.backgroundImage = 'url("' + src.replace(/"/g, '\\"') + '")'; }
       el.classList.add('bg-loaded');
+      const fallback = el.querySelector('.bg-hostess__fallback');
+      if(fallback){
+        fallback.classList.add('is-hidden');
+        const cleanup = function(){
+          if(fallback && fallback.parentNode){
+            fallback.parentNode.removeChild(fallback);
+          }
+        };
+        fallback.addEventListener('transitionend', cleanup, { once: true });
+        setTimeout(cleanup, 700);
+      }
     }, { once: true });
     img.addEventListener('error', function(){ el.classList.add('bg-error'); }, { once: true });
     img.src = src;
