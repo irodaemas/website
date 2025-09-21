@@ -226,6 +226,15 @@ const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
+const DIAMOND_PRICE_API_URL = 'https://public.opendatasoft.com/api/explore/v2.1/catalog/datasets/diamond-prices/records?select=carat,cut,color,clarity,price&where=price%20IS%20NOT%20NULL%20AND%20carat%20IS%20NOT%20NULL&order_by=carat%20ASC&limit=120';
+const USD_TO_IDR_API_URL = 'https://open.er-api.com/v6/latest/USD';
+const USD_TO_IDR_FALLBACK = 15500;
+const DIAMOND_PRICE_TIMEOUT_MS = 6500;
+const DIAMOND_ROWS_LIMIT = 8;
+const DIAMOND_PRICE_ROUND_STEP = 250000;
+const DIAMOND_CUT_PRIORITY = ['IDEAL','EXCELLENT','PREMIUM','VERY GOOD','GOOD','FAIR'];
+const DIAMOND_CLARITY_PRIORITY = ['FL','IF','VVS1','VVS2','VS1','VS2','SI1','SI2','I1','I2','I3'];
+const DIAMOND_COLOR_PRIORITY = ['D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 const GOLD_KARAT_SERIES = [
   { karat: 24, purity: 1 },
   { karat: 23, purity: 0.9583 },
@@ -481,6 +490,21 @@ const DEFAULT_PRICE_TABLE = {
     { karat: 5, price: 378000 }
   ]
 };
+const DEFAULT_DIAMOND_DATA = {
+  updatedAt: '2024-03-10T00:00:00+07:00',
+  source: 'Estimasi internal Sentral Emas',
+  badgeText: 'Estimasi internal',
+  usdToIdr: USD_TO_IDR_FALLBACK,
+  note: 'Menggunakan rata-rata berlian round cut kualitas VS1–VS2 warna F–G.',
+  items: [
+    { carat: 0.30, cut: 'Ideal', color: 'F', clarity: 'VS1', priceUsd: 560, priceIdr: 8700000 },
+    { carat: 0.50, cut: 'Excellent', color: 'G', clarity: 'VS1', priceUsd: 1200, priceIdr: 18600000 },
+    { carat: 0.70, cut: 'Very Good', color: 'G', clarity: 'VS2', priceUsd: 1950, priceIdr: 30250000 },
+    { carat: 1.00, cut: 'Excellent', color: 'F', clarity: 'VS2', priceUsd: 3600, priceIdr: 55800000 },
+    { carat: 1.50, cut: 'Very Good', color: 'G', clarity: 'VS1', priceUsd: 6200, priceIdr: 96100000 },
+    { carat: 2.00, cut: 'Very Good', color: 'H', clarity: 'VS2', priceUsd: 9200, priceIdr: 142600000 }
+  ]
+};
 function saveLastBasePrice(p){ try{ localStorage.setItem(LAST_PRICE_KEY, JSON.stringify({ p, t: Date.now() })); }catch(_){} }
 function readLastBasePrice(){ try{ const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY)||''); /* istanbul ignore next */ if(o && typeof o.p==='number') return o; }catch(_){} return null; }
 function saveLastSparklineSeries(series){
@@ -562,6 +586,46 @@ function updatePriceSchema(items){
     el.textContent = JSON.stringify(data);
   }catch(_){ }
 }
+function updateDiamondSchema(items, meta){
+  try{
+    var el = document.getElementById('diamondPriceItemList');
+    if(!items || !items.length){ if(el) el.remove(); return; }
+    var schemaItems = items.map(function(item, idx){
+      var caratLabel = item.caratLabel || item.name || ('Berlian ' + (idx + 1));
+      var priceValue = safeNumber(item.priceIdr);
+      if(priceValue === null){ priceValue = safeNumber(item.price); }
+      return {
+        "@type": "ListItem",
+        "position": idx + 1,
+        "name": caratLabel,
+        "item": {
+          "@type": "Offer",
+          "name": caratLabel + ' Buyback',
+          "price": priceValue,
+          "priceCurrency": "IDR",
+          "availability": "https://schema.org/InStock",
+          "itemOffered": { "@id": "https://sentralemas.com/#service" }
+        }
+      };
+    });
+    var data = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "@id": "https://sentralemas.com/#diamond-price-list",
+      "name": "Referensi Harga Buyback Berlian",
+      "itemListElement": schemaItems
+    };
+    var updatedAt = meta && meta.updatedAt ? resolveDate(meta.updatedAt) : null;
+    if(updatedAt){ data.dateModified = updatedAt.toISOString(); }
+    if(!el){
+      el = document.createElement('script');
+      el.type = 'application/ld+json';
+      el.id = 'diamondPriceItemList';
+      document.head.appendChild(el);
+    }
+    el.textContent = JSON.stringify(data);
+  }catch(_){ }
+}
 function roundUpPrice(n, step){
   var s = step || 1000;
   return Math.ceil(n / s) * s;
@@ -607,6 +671,40 @@ function formatCurrencyIDR(value){
 }
 function escapeAttr(value){
   return String(value == null ? '' : value).replace(/"/g, '&quot;');
+}
+function escapeHTML(value){
+  return String(value == null ? '' : value).replace(/[&<>]/g, function(chr){
+    if(chr === '&') return '&amp;';
+    if(chr === '<') return '&lt;';
+    return '&gt;';
+  });
+}
+function toTitleCase(value){
+  return String(value == null ? '' : value).toLowerCase().replace(/\b\w/g, function(chr){ return chr.toUpperCase(); });
+}
+function formatCarat(value){
+  var num = safeNumber(value);
+  if(num === null) return '';
+  try {
+    return num.toLocaleString('id-ID', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  } catch (_){
+    return num.toFixed(2);
+  }
+}
+function qualityIndex(value, priority){
+  if(!value) return priority.length;
+  var upper = String(value).trim().toUpperCase();
+  var idx = priority.indexOf(upper);
+  return idx === -1 ? priority.length : idx;
+}
+function selectBestQuality(current, candidate, priority, transform){
+  var raw = candidate == null ? '' : String(candidate).trim();
+  if(!raw) return current;
+  var display = transform ? transform(raw) : raw;
+  var idx = qualityIndex(display, priority);
+  var currentIdx = qualityIndex(current, priority);
+  if(idx < currentIdx) return display;
+  return current || display;
 }
 function updateLmBaruHighlight(currentPrice, options){
   options = options || {};
@@ -1312,6 +1410,268 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
   });
   renderPriceTable(rows);
 }
+function normalizeDiamondRecords(payload){
+  if(!payload) return [];
+  var raw = [];
+  if(Array.isArray(payload.results)) raw = payload.results;
+  else if(Array.isArray(payload.records)) raw = payload.records;
+  else if(Array.isArray(payload)) raw = payload;
+  return raw.map(function(entry){
+    var fields = entry && entry.fields ? entry.fields : entry;
+    if(!fields) return null;
+    var carat = safeNumber(fields.carat);
+    var priceUsd = safeNumber(fields.price);
+    if(carat === null || priceUsd === null) return null;
+    if(carat <= 0 || priceUsd <= 0) return null;
+    var cut = fields.cut || fields.shape || '';
+    var color = fields.color || fields.colour || '';
+    var clarity = fields.clarity || fields.clarity_grade || '';
+    var timestamp = null;
+    if(entry && entry.record_timestamp){ timestamp = resolveDate(entry.record_timestamp); }
+    if(!timestamp && fields && fields.timestamp){ timestamp = resolveDate(fields.timestamp); }
+    if(!timestamp && payload && payload.updated_at){ timestamp = resolveDate(payload.updated_at); }
+    return {
+      carat: carat,
+      cut: cut,
+      color: color,
+      clarity: clarity,
+      priceUsd: priceUsd,
+      timestamp: timestamp instanceof Date && !isNaN(timestamp.getTime()) ? timestamp : null
+    };
+  }).filter(Boolean);
+}
+function aggregateDiamondEntries(entries){
+  if(!Array.isArray(entries) || !entries.length) return [];
+  var buckets = new Map();
+  entries.forEach(function(entry){
+    if(!entry) return;
+    var carat = entry.carat;
+    if(!Number.isFinite(carat)) return;
+    if(carat < 0.2 || carat > 2.5) return;
+    var bucketValue = Math.round(carat * 10) / 10;
+    var key = bucketValue.toFixed(1);
+    var bucket = buckets.get(key);
+    if(!bucket){
+      bucket = { carat: bucketValue, totalPriceUsd: 0, count: 0, cut: null, color: null, clarity: null, updatedAt: null };
+      buckets.set(key, bucket);
+    }
+    bucket.totalPriceUsd += entry.priceUsd;
+    bucket.count += 1;
+    bucket.cut = selectBestQuality(bucket.cut, entry.cut, DIAMOND_CUT_PRIORITY, toTitleCase);
+    bucket.color = selectBestQuality(bucket.color, entry.color, DIAMOND_COLOR_PRIORITY, function(v){ return String(v).toUpperCase(); });
+    bucket.clarity = selectBestQuality(bucket.clarity, entry.clarity, DIAMOND_CLARITY_PRIORITY, function(v){ return String(v).toUpperCase(); });
+    if(entry.timestamp instanceof Date && !isNaN(entry.timestamp.getTime())){
+      if(!bucket.updatedAt || entry.timestamp > bucket.updatedAt){ bucket.updatedAt = entry.timestamp; }
+    }
+  });
+  var result = Array.from(buckets.values()).map(function(bucket){
+    if(!bucket.count) return null;
+    return {
+      carat: bucket.carat,
+      cut: bucket.cut,
+      color: bucket.color,
+      clarity: bucket.clarity,
+      priceUsd: bucket.totalPriceUsd / bucket.count,
+      updatedAt: bucket.updatedAt || null
+    };
+  }).filter(Boolean);
+  result.sort(function(a, b){
+    var ac = a.carat;
+    var bc = b.carat;
+    if(ac == null && bc == null) return 0;
+    if(ac == null) return 1;
+    if(bc == null) return -1;
+    return ac - bc;
+  });
+  if(result.length > DIAMOND_ROWS_LIMIT){ result = result.slice(0, DIAMOND_ROWS_LIMIT); }
+  return result;
+}
+function buildDiamondRows(items, rate){
+  var rows = [];
+  var conversionRate = safeNumber(rate);
+  if(!conversionRate || conversionRate <= 0){ conversionRate = USD_TO_IDR_FALLBACK; }
+  (items || []).forEach(function(item){
+    if(!item) return;
+    var carat = safeNumber(item.carat);
+    var label = item.caratLabel || (carat !== null ? formatCarat(carat) + ' ct' : '');
+    if(!label){ label = 'Berlian'; }
+    var cut = item.cut ? toTitleCase(item.cut) : '';
+    var color = item.color ? String(item.color).toUpperCase() : '';
+    var clarity = item.clarity ? String(item.clarity).toUpperCase() : '';
+    var priceIdr = safeNumber(item.priceIdr);
+    var priceUsd = safeNumber(item.priceUsd);
+    if(priceIdr === null && priceUsd !== null){ priceIdr = roundUpPrice(priceUsd * conversionRate, DIAMOND_PRICE_ROUND_STEP); }
+    if(priceIdr === null || !Number.isFinite(priceIdr) || priceIdr <= 0) return;
+    rows.push({
+      carat: carat,
+      caratLabel: label,
+      cut: cut,
+      color: color,
+      clarity: clarity,
+      priceIdr: priceIdr,
+      priceUsd: priceUsd
+    });
+  });
+  rows.sort(function(a, b){
+    var ac = a.carat;
+    var bc = b.carat;
+    if(ac == null && bc == null) return 0;
+    if(ac == null) return 1;
+    if(bc == null) return -1;
+    return ac - bc;
+  });
+  if(rows.length > DIAMOND_ROWS_LIMIT){ rows = rows.slice(0, DIAMOND_ROWS_LIMIT); }
+  return rows;
+}
+function renderDiamondPriceTable(rows, meta){
+  var tbody = document.getElementById('diamondPriceTable');
+  if(!tbody) return;
+  tbody.setAttribute('aria-busy','true');
+  tbody.innerHTML = '';
+  if(!Array.isArray(rows) || !rows.length){
+    tbody.insertAdjacentHTML('beforeend', '<tr><td class="diamond-empty" colspan="3">Data berlian belum tersedia. Hubungi kami untuk info terbaru.</td></tr>');
+    tbody.setAttribute('aria-busy','false');
+    updateDiamondSchema(null);
+    document.dispatchEvent(new CustomEvent('prices:updated'));
+    return;
+  }
+  rows.forEach(function(row){
+    var caratLabel = row.caratLabel || (row.carat != null ? formatCarat(row.carat) + ' ct' : 'Berlian');
+    var tooltip = 'Berlian ' + caratLabel;
+    var labelHtml = `<div class="price-label price-label--diamond"><span>${escapeHTML(caratLabel)}</span><span class="price-meta">Per batu</span></div>`;
+    var qualityMain = row.cut || (row.color || row.clarity ? 'Kombinasi warna & kejernihan' : 'Kualitas tidak tersedia');
+    var detailParts = [];
+    if(row.color) detailParts.push('Warna ' + row.color);
+    if(row.clarity) detailParts.push('Kejernihan ' + row.clarity);
+    var detailsHtml = detailParts.length ? `<span class="diamond-quality-meta">${escapeHTML(detailParts.join(' • '))}</span>` : '';
+    var qualityHtml = `<span class="diamond-quality-main">${escapeHTML(qualityMain)}</span>${detailsHtml}`;
+    tbody.insertAdjacentHTML('beforeend', `<tr><td class="kadar"><span class="price-icon price-icon--diamond tooltip" data-tooltip="${escapeAttr(tooltip)}" role="img" aria-label="${escapeAttr(tooltip)}"></span>${labelHtml}</td><td class="diamond-quality">${qualityHtml}</td><td class="price-cell"><div class="price-amount">Rp <span class="num" data-to="${Math.round(row.priceIdr)}">0</span></div></td></tr>`);
+  });
+  tbody.setAttribute('aria-busy','false');
+  updateDiamondSchema(rows.map(function(row){ return { caratLabel: row.caratLabel, priceIdr: Math.round(row.priceIdr) }; }), meta);
+  document.dispatchEvent(new CustomEvent('prices:updated', { detail: { asset: 'diamond' } }));
+}
+function updateDiamondInfo(meta){
+  var badgeEl = document.getElementById('diamondUpdatedAt');
+  var infoEl = document.getElementById('diamondLastUpdatedInfo');
+  var fallback = meta && meta.fallback;
+  var updatedAt = resolveDate(meta && meta.updatedAt);
+  if(badgeEl){
+    if(updatedAt){
+      badgeEl.textContent = formatDateTimeIndo(updatedAt);
+      badgeEl.classList.toggle('date-badge--fallback', !!fallback);
+    } else if(meta && meta.badgeText){
+      badgeEl.textContent = meta.badgeText;
+      badgeEl.classList.add('date-badge--fallback');
+    } else {
+      badgeEl.textContent = '—';
+      badgeEl.classList.add('date-badge--fallback');
+    }
+  }
+  if(infoEl){
+    var message = 'Data berlian akan diperbarui otomatis setelah tersambung ke server kami.';
+    if(meta && typeof meta.description === 'string' && meta.description){
+      message = meta.description;
+    } else if(updatedAt){
+      message = 'Terakhir diperbarui: ' + formatDateTimeIndo(updatedAt);
+      if(meta && meta.source){ message += ' • Sumber: ' + meta.source; }
+    } else if(meta && meta.source){
+      message = 'Sumber data: ' + meta.source;
+    }
+    if(fallback){ message += ' (menggunakan data cadangan).'; }
+    infoEl.textContent = message;
+  }
+}
+async function fetchUsdIdrRate(){
+  const controller = new AbortController();
+  const timer = setTimeout(function(){ controller.abort(); }, DIAMOND_PRICE_TIMEOUT_MS);
+  try {
+    const response = await fetch(USD_TO_IDR_API_URL, { signal: controller.signal });
+    if(!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    var rate = null;
+    if(data){
+      if(data.rates && data.rates.IDR !== undefined) rate = data.rates.IDR;
+      else if(data.data && data.data.rates && data.data.rates.IDR !== undefined) rate = data.data.rates.IDR;
+      else if(data.result === 'success' && data.rates && data.rates.IDR !== undefined) rate = data.rates.IDR;
+    }
+    rate = safeNumber(rate);
+    if(rate && rate > 0) return rate;
+  } catch (err) {
+    console.warn('Kurs USD/IDR fallback:', err?.name || err);
+  } finally {
+    clearTimeout(timer);
+  }
+  return USD_TO_IDR_FALLBACK;
+}
+async function fetchDiamondPriceFromApi(){
+  const controller = new AbortController();
+  const timer = setTimeout(function(){ controller.abort(); }, DIAMOND_PRICE_TIMEOUT_MS);
+  try {
+    const response = await fetch(DIAMOND_PRICE_API_URL, { signal: controller.signal });
+    if(!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    const aggregated = aggregateDiamondEntries(normalizeDiamondRecords(data));
+    if(aggregated && aggregated.length){
+      var latest = null;
+      aggregated.forEach(function(item){
+        if(item.updatedAt && (!latest || item.updatedAt > latest)){ latest = item.updatedAt; }
+      });
+      if(!latest){
+        if(data && Array.isArray(data.results) && data.results[0] && data.results[0].record_timestamp){ latest = resolveDate(data.results[0].record_timestamp); }
+        else if(data && data.updated_at){ latest = resolveDate(data.updated_at); }
+      }
+      return { items: aggregated, updatedAt: latest };
+    }
+  } catch (err) {
+    console.warn('Diamond API fallback:', err?.name || err);
+  } finally {
+    clearTimeout(timer);
+  }
+  return null;
+}
+async function fetchDiamondPrices(){
+  var table = document.getElementById('diamondPriceTable');
+  if(!table) return;
+  table.setAttribute('aria-busy','true');
+  try {
+    const [apiData, usdRate] = await Promise.all([
+      fetchDiamondPriceFromApi(),
+      fetchUsdIdrRate()
+    ]);
+    var rate = safeNumber(usdRate);
+    if(!rate || rate <= 0) rate = USD_TO_IDR_FALLBACK;
+    var rows = null;
+    var meta = { source: 'OpenDataSoft Diamond Prices', updatedAt: apiData && apiData.updatedAt };
+    if(apiData && Array.isArray(apiData.items) && apiData.items.length){
+      rows = buildDiamondRows(apiData.items, rate);
+    }
+    if(!rows || !rows.length){
+      rows = buildDiamondRows(DEFAULT_DIAMOND_DATA.items, DEFAULT_DIAMOND_DATA.usdToIdr || rate);
+      meta = {
+        updatedAt: DEFAULT_DIAMOND_DATA.updatedAt,
+        source: DEFAULT_DIAMOND_DATA.source,
+        badgeText: DEFAULT_DIAMOND_DATA.badgeText,
+        description: DEFAULT_DIAMOND_DATA.note,
+        fallback: true
+      };
+    }
+    renderDiamondPriceTable(rows, meta);
+    updateDiamondInfo(meta);
+  } catch (err) {
+    console.warn('Diamond price fetch failed:', err?.name || err);
+    var fallbackRows = buildDiamondRows(DEFAULT_DIAMOND_DATA.items, DEFAULT_DIAMOND_DATA.usdToIdr);
+    var fallbackMeta = {
+      updatedAt: DEFAULT_DIAMOND_DATA.updatedAt,
+      source: DEFAULT_DIAMOND_DATA.source,
+      badgeText: DEFAULT_DIAMOND_DATA.badgeText,
+      description: DEFAULT_DIAMOND_DATA.note,
+      fallback: true
+    };
+    renderDiamondPriceTable(fallbackRows, fallbackMeta);
+    updateDiamondInfo(fallbackMeta);
+  }
+}
 function displayFromBasePrice(basePrice, options){
   options = options || {};
   var normalizedBase = Number(basePrice);
@@ -1468,6 +1828,7 @@ function displayDateTimeWIB() {
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
 fetchGoldPrice();
+fetchDiamondPrices();
 
 window.addEventListener('resize', function(){
   if(!LM_BARU_SPARKLINE_META || !LM_BARU_SPARKLINE_META.hasSeries) return;
@@ -2249,8 +2610,10 @@ if (typeof module !== 'undefined' && module.exports) {
     saveLastBasePrice,
     readLastBasePrice,
     updatePriceSchema,
+    updateDiamondSchema,
     displayFromBasePrice,
     fetchGoldPrice,
+    fetchDiamondPrices,
     displayDefaultPrices,
     formatDateTimeIndo,
     displayDateTimeWIB,
