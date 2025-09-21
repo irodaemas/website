@@ -60,6 +60,8 @@
     <!-- PWA: manifest & app capability -->
     <link rel="manifest" href="./manifest.webmanifest">
 
+    <link rel="icon" href="/assets/icons/favicon.ico" sizes="32x32" type="image/x-icon"/>
+    <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon"/>
     <link rel="icon" href="assets/icons/logo-48x48.png" type="image/png"/>
     
     <!-- Apple Touch (iOS/iPadOS) -->
@@ -626,18 +628,22 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": ["LocalBusiness","JewelryStore"],
+        "@type": ["Organization","LocalBusiness","JewelryStore"],
         "@id": "https://sentralemas.com/#business",
         "name": "Sentral Emas",
         "description": "Menerima jual emas, berlian, jam tangan mewah, batu mulia via buyback aman COD se‑Jabodetabek & sekitarnya, mengikuti harga pasar hari transaksi. Transparan, cepat, terpercaya.",
         "url": "https://sentralemas.com/",
+        "inLanguage": "id-ID",
+        "slogan": "Jual emas & berlian COD aman, cepat, transparan.",
         "logo": {
           "@type": "ImageObject",
+          "@id": "https://sentralemas.com/#logo",
           "url": "https://sentralemas.com/assets/img/logo.webp",
           "width": 512,
-          "height": 512
+          "height": 512,
+          "caption": "Logo Sentral Emas"
         },
-        "image": "https://sentralemas.com/assets/img/asset1.webp",
+        "image": {"@id": "https://sentralemas.com/#logo"},
         "priceRange": "Rp",
         "telephone": "+6285591088503",
         "currenciesAccepted": "IDR",
@@ -675,8 +681,15 @@
           "telephone": "+6285591088503",
           "availableLanguage": "id-ID"
         }],
+        "brand": {
+          "@type": "Brand",
+          "@id": "https://sentralemas.com/#brand",
+          "name": "Sentral Emas",
+          "logo": {"@id": "https://sentralemas.com/#logo"}
+        },
         "sameAs": [
-          "https://wa.me/6285591088503"
+          "https://wa.me/6285591088503",
+          "https://maps.app.goo.gl/S6YB3za28DqA6RQQ7"
         ],
         "knowsAbout": ["Buyback emas","Buyback berlian","COD emas","Jual emas cepat"],
         "makesOffer": [{
@@ -717,7 +730,7 @@
         "@type": "WebSite",
         "@id": "https://sentralemas.com/#website",
         "name": "Sentral Emas",
-        "alternateName": ["Sentral Emas","Sentral Emas"],
+        "alternateName": ["Sentral Emas","SentralEmas","Sentralemas"],
         "url": "https://sentralemas.com/",
         "inLanguage": "id-ID",
         "publisher": {"@id": "https://sentralemas.com/#business"},
