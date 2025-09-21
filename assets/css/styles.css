@@ -916,14 +916,6 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
   background:radial-gradient(circle at 50% 35%,rgba(255,255,255,.75),rgba(176,216,255,.22) 62%,rgba(4,64,80,.4) 100%);
   backdrop-filter:blur(4px);
 }
-.diamond-hero-graphic::before{
-  content:"";
-  width:62%;
-  aspect-ratio:1;
-  background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(176,216,255,.5));
-  clip-path:polygon(50% 0%, 100% 38%, 78% 100%, 22% 100%, 0% 38%);
-  box-shadow:0 18px 40px rgba(31,109,168,.38);
-}
 .diamond-hero-sparkle{
   position:absolute;
   display:block;
