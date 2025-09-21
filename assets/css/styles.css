@@ -123,9 +123,6 @@ nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .menu{display:flex;gap:1rem}
 .hamb{display:none}
 .header-actions{display:flex;align-items:center;gap:1rem}
-.dark-mode-toggle{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:var(--text-primary);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s ease;position:relative;overflow:hidden}
-.dark-mode-toggle:hover{background:rgba(255,255,255,.2);transform:scale(1.05)}
-.dark-mode-toggle:focus-visible{outline:3px solid var(--focus-ring-strong);outline-offset:2px}
 #darkModeToggle .sun-icon,
 #darkModeToggle .moon-icon,
 #darkModeToggle .auto-icon {
@@ -175,7 +172,7 @@ nav a{ font-size:1.06rem; padding:.8rem .6rem }
 /* --- Card hover tilt --- */
 .feature, .t-card{transform-style:preserve-3d}
 @media (hover:hover) and (pointer:fine){ .feature, .t-card{transition: transform .15s ease; will-change: transform} }
-@media (max-width:860px){.menu{display:none}.hamb{display:inline-flex}.header-actions{gap:.8rem}.dark-mode-toggle{width:40px;height:40px}}
+@media (max-width:860px){.menu{display:none}.hamb{display:inline-flex}.header-actions{gap:.8rem}}
 /* ---------- hero ---------- */
 .bling{position:relative}
 
@@ -616,8 +613,6 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
   @keyframes bob{ 0%,100%{transform: translateY(0)} 50%{transform: translateY(-3px)} }
 }
 @media (prefers-reduced-motion: reduce){ *, *::before, *::after{animation: none !important; transition: none !important} .text-shimmer{ color:var(--paper) } .text-rainbow{ color:var(--paper) } }
-.confetti{position:fixed;left:0;top:0;width:100%;height:0;pointer-events:none;overflow:visible;z-index:120}
-.confetti i{position:absolute;width:8px;height:12px;border-radius:2px;opacity:.9;will-change:transform}
 @media (min-width: 1024px){ .table-card table{font-size:1rem} .table-card th, .table-card td{padding:.8rem 1rem} }
 @media (min-width: 1280px){ .table-card{max-width:880px} .table-card table{font-size:1.02rem} }
 @media (max-width: 1024px){ .grid-4{grid-template-columns:repeat(3,minmax(0,1fr))} .cta-grid{grid-template-columns:1fr} }
@@ -655,7 +650,6 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .flex-split{ display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap }
 /* Padding utilities */
 .pad-1{ padding:var(--space-md) }
-.pad-12{ padding:var(--space-lg) }
 /* Form control */
 .form-control{ width:100%; padding:.8rem; border-radius:10px; border:1px solid var(--border) }
 /* Text helpers */
@@ -776,7 +770,6 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .mt-05{ margin-top:var(--space-sm) }
 .mb-06{ margin-bottom:calc(var(--space-xs) + var(--space-2xs)) }
 .my-02{ margin:var(--space-2xs) 0 }
-.gap-1{ gap:var(--space-md) }
 .t-text{ color:var(--text-secondary) }
 
 /* Align items center for CTA grid wrapper */
@@ -804,7 +797,6 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
   border-bottom: 1px solid var(--border);
 }
 .skeleton-line { display: inline-block; background-color: var(--border-subtle); height: 1rem; width: 80%; vertical-align: middle; border-radius: .25rem; }
-.skeleton-line-short { width: 50%; }
 .skeleton-box { height: 32px; width: 32px; border-radius: 10px; background-color: var(--border-subtle); }
 .skeleton-badge { height: 24px; width: 80px; border-radius: 999px; background-color: var(--border-subtle); }
 .skeleton-price { height: 1.5rem; width: 120px; background-color: var(--border-subtle); }
