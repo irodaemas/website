@@ -21,21 +21,78 @@
   <meta name="twitter:description" content="Anda sedang offline. Muat ulang situs Sentral Emas setelah kembali terhubung.">
   <meta name="twitter:image" content="https://sentralemas.com/assets/icons/android-chrome-512x512.png">
   <style>
-    :root{ --deep:#013D39; --gold:#D4AF37; }
+    :root{
+      --offline-gold:#D4AF37;
+      --offline-deep:#013D39;
+      --offline-bg-start:#f6fbfa;
+      --offline-bg-end:#e8f2f1;
+      --offline-text:#0b1110;
+      --offline-muted:#335e5a;
+      --offline-card-bg:#ffffff;
+      --offline-card-border:rgba(1,61,57,.12);
+      --offline-card-shadow:0 12px 30px rgba(1,61,57,.08);
+      --offline-ghost-border:rgba(1,61,57,.16);
+      --offline-ghost-text:#0b1110;
+    }
+    [data-theme="dark"]{
+      --offline-bg-start:#01332F;
+      --offline-bg-end:#012A27;
+      --offline-text:#eafffd;
+      --offline-muted:#cdecea;
+      --offline-card-bg:#083a37;
+      --offline-card-border:rgba(255,255,255,.14);
+      --offline-card-shadow:0 10px 30px rgba(0,0,0,.25);
+      --offline-ghost-border:rgba(255,255,255,.25);
+      --offline-ghost-text:#eafffd;
+    }
     *{box-sizing:border-box}
     html,body{height:100%;margin:0}
-    body{display:grid;place-items:center;background:linear-gradient(180deg,#01332F,#012A27);color:#eafffd;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-    .card{max-width:680px;margin:1rem;padding:1.25rem 1.25rem 1rem;background:#083a37;border:1px solid rgba(255,255,255,.14);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    h1{margin:.2rem 0;font-size:1.6rem;color:#fff}
-    p{margin:.4rem 0 0;color:#cdecea;line-height:1.6}
+    body{display:grid;place-items:center;min-height:100%;background:linear-gradient(180deg,var(--offline-bg-start),var(--offline-bg-end));color:var(--offline-text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:2rem}
+    .card{max-width:680px;margin:1rem;padding:1.25rem 1.25rem 1rem;background:var(--offline-card-bg);border:1px solid var(--offline-card-border);border-radius:14px;box-shadow:var(--offline-card-shadow)}
+    h1{margin:.2rem 0;font-size:1.6rem;color:var(--offline-text)}
+    p{margin:.4rem 0 0;color:var(--offline-muted);line-height:1.6}
     .actions{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
-    a.btn{display:inline-block;background:var(--gold);color:#013D39;text-decoration:none;padding:.6rem 1rem;border-radius:10px;font-weight:700}
-    a.btn.ghost{background:transparent;color:#eafffd;border:1px solid rgba(255,255,255,.25)}
+    .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1rem;border-radius:12px;border:1px solid transparent;font-weight:700;text-decoration:none;cursor:pointer;background:var(--offline-gold);color:var(--offline-deep);transition:filter .2s ease;}
+    .btn:hover{filter:brightness(1.05)}
+    .btn:focus-visible{outline:3px solid rgba(212,175,55,.4);outline-offset:2px}
+    .btn.ghost{background:transparent;color:var(--offline-ghost-text);border:1px solid var(--offline-ghost-border)}
+    .btn-icon{width:44px;height:44px;padding:0;justify-content:center;border-radius:50%}
+    #darkModeToggle .sun-icon,#darkModeToggle .moon-icon,#darkModeToggle .auto-icon{display:none}
+    #darkModeToggle[data-theme-mode="light"] .sun-icon{display:block}
+    #darkModeToggle[data-theme-mode="dark"] .moon-icon{display:block}
+    #darkModeToggle[data-theme-mode="auto"] .auto-icon{display:block}
+    .offline-actions{position:fixed;top:1rem;right:1rem;display:flex;gap:.75rem;align-items:center;z-index:10}
+    @media (max-width:600px){
+      body{padding:1.5rem}
+      .offline-actions{top:.75rem;right:.75rem}
+    }
   </style>
+  <script>
+    (function(){
+      try {
+        var theme = localStorage.getItem('sentral_emas_theme') || 'auto';
+        var prefersDark = theme === 'auto' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : null;
+        var isDark = theme === 'dark' || (theme === 'auto' && prefersDark);
+        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      } catch (err) {}
+    })();
+  </script>
   <link rel="icon" href="/assets/icons/favicon.ico" sizes="32x32" type="image/x-icon">
   <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
+  <div class="offline-actions">
+    <button id="darkModeToggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+      </svg>
+      <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+    </button>
+  </div>
   <div class="card" role="status" aria-live="polite">
     <h1>Anda sedang offline</h1>
     <p>Koneksi internet tidak tersedia. Beberapa fitur mungkin tidak dapat dimuat. Silakan coba lagi saat koneksi pulih.</p>
@@ -44,5 +101,6 @@
       <a class="btn ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
     </div>
   </div>
+  <script src="/assets/js/main.js" defer></script>
 </body>
 </html>
