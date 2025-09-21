@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v6';
+const CACHE_NAME = 'sentralemas-v7';
 const FONT_CACHE = 'sentralemas-fonts-v1';
 
 // Core assets gunakan path relatif terhadap scope
@@ -55,7 +55,7 @@ self.addEventListener('activate', (event) => {
 async function handleNavigate(request) {
     // Network-first untuk HTML (navigate)
     try {
-        const fresh = await fetch(request);
+        const fresh = await fetch(request, { cache: 'no-store' });
         // Jika server mengembalikan 404, tampilkan 404.html dari cache (lebih cepat & konsisten)
         if (fresh && fresh.status === 404) {
             const cache = await caches.open(CACHE_NAME);
@@ -89,34 +89,25 @@ async function handleNavigate(request) {
 
 async function handleAsset(event) {
     const { request } = event;
-    // Stale-while-revalidate untuk aset same-origin
     const cache = await caches.open(CACHE_NAME);
-    const cached = await cache.match(request);
-    const networkPromise = fetch(request)
-        .then((netRes) => {
-            if (netRes && netRes.ok) {
-                cache.put(request, netRes.clone());
-            }
-            return netRes;
-        })
-        .catch(() => null);
 
-    if (cached) {
-        // Kembalikan versi cache segera, update berjalan di background
-        event.waitUntil(networkPromise);
-        return cached;
-    }
-
-    const fresh = await networkPromise;
-    if (fresh) {
+    try {
+        const fresh = await fetch(request, { cache: 'no-store' });
+        if (fresh && fresh.ok) {
+            cache.put(request, fresh.clone());
+        }
         return fresh;
+    } catch (err) {
+        const cached = await cache.match(request);
+        if (cached) {
+            return cached;
+        }
+        return new Response('Offline', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
     }
-
-    return new Response('Offline', {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
 }
 
 async function handleFonts(event) {
