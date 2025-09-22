@@ -2404,7 +2404,7 @@ function format(number){
     document.addEventListener('keydown', function(ev){
       if(!ev) return;
       var key = ev.key || ev.keyCode;
-      if((key === 'Escape' || key === 'Esc' || key === 27) && isHeaderSearchOpen() && isMobile()){
+      if((key === 'Escape' || key === 'Esc' || key === 27) && isHeaderSearchOpen()){
         closeHeaderSearch();
         if(headerToggle && typeof headerToggle.focus === 'function'){
           try { headerToggle.focus(); } catch(_){}
@@ -2537,15 +2537,17 @@ function format(number){
   }
 
   function openHeaderSearch(){
-    if(!headerSearch || !isMobile()) return;
+    if(!headerSearch) return;
     if(headerSearch.classList){ headerSearch.classList.add('header-search--expanded'); }
     if(headerToggle){
       headerToggle.setAttribute('aria-expanded', 'true');
       headerToggle.setAttribute('aria-label', toggleCloseLabel);
     }
-    ensureBackdrop();
-    if(mobileBackdrop){ mobileBackdrop.classList.add('is-visible'); }
-    if(body && body.classList){ body.classList.add('has-mobile-search'); }
+    if(isMobile()){
+      ensureBackdrop();
+      if(mobileBackdrop){ mobileBackdrop.classList.add('is-visible'); }
+      if(body && body.classList){ body.classList.add('has-mobile-search'); }
+    }
     focusHeaderInput();
   }
 
