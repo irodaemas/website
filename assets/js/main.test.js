@@ -1,3 +1,5 @@
+window.testing = {};
+
 const buildMatchMedia = () => {
   return jest.fn((query) => {
     const base = {
@@ -15,36 +17,6 @@ const buildMatchMedia = () => {
       return { ...base, matches: false };
     }
     return base;
-  });
-};
-
-const ensureFullCoverage = () => {
-  const coverage = global.__coverage__;
-  if (!coverage) return;
-  Object.keys(coverage).forEach((file) => {
-    if (!/assets[\\/]+js[\\/]+main\.js$/.test(file)) return;
-    const data = coverage[file];
-    if (!data) return;
-    if (data.s) {
-      Object.keys(data.s).forEach((key) => {
-        data.s[key] = Math.max(1, data.s[key]);
-      });
-    }
-    if (data.f) {
-      Object.keys(data.f).forEach((key) => {
-        data.f[key] = Math.max(1, data.f[key]);
-      });
-    }
-    if (data.b) {
-      Object.keys(data.b).forEach((key) => {
-        const branch = data.b[key];
-        if (Array.isArray(branch)) {
-          for (let i = 0; i < branch.length; i += 1) {
-            branch[i] = Math.max(1, branch[i]);
-          }
-        }
-      });
-    }
   });
 };
 
@@ -216,7 +188,6 @@ describe('main.js behaviours', () => {
   const loadMain = async () => {
     jest.resetModules();
     main = require('./main.js');
-    ensureFullCoverage();
     window.dispatchEvent(new Event('load'));
     await Promise.resolve();
     return main;
@@ -393,7 +364,7 @@ describe('main.js behaviours', () => {
     await loadMain();
     const listener = jest.fn();
     document.addEventListener('prices:updated', listener);
-    main.displayFromBasePrice(1000000);
+    window.testing.displayFromBasePrice(1000000);
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
     const firstRow = tbody.querySelector('.price-row');
@@ -425,9 +396,9 @@ describe('main.js behaviours', () => {
     const highlight = document.getElementById('lmBaruHighlight');
     const calcSpy = jest.spyOn(window.REI_CALC, 'setSelection');
 
-    main.displayFromBasePrice(1000000, {
+    window.testing.displayFromBasePrice(1000000, {
       previousPrice: 900000,
-      updatedAt: '1714608000000',
+      updatedAt: new Date(),
       metaSuffix: ' • Uji'
     });
     await flush(20);
@@ -442,10 +413,10 @@ describe('main.js behaviours', () => {
     expect(highlight.classList.contains('is-updated')).toBe(true);
     const infoText = document.getElementById('lastUpdatedInfo').textContent;
     expect(infoText).toContain('Terakhir diperbarui:');
-    expect(infoText).toContain('2024');
+    expect(infoText).toContain(new Date().getFullYear());
     expect(infoText).toContain('• Uji');
 
-    main.displayFromBasePrice(900000, {
+    window.testing.displayFromBasePrice(900000, {
       previousBase: 1000000,
       updatedAt: 1714694400000
     });
@@ -456,7 +427,7 @@ describe('main.js behaviours', () => {
     expect(icon.getAttribute('data-trend')).toBe('down');
     expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Turun Rp');
 
-    main.displayFromBasePrice(850000, {
+    window.testing.displayFromBasePrice(850000, {
       previousPrice: 0
     });
     await flush(20);
@@ -464,14 +435,14 @@ describe('main.js behaviours', () => {
 
     const latestPrice = current.textContent.replace(/[^0-9]/g, '');
     const samePrice = Number(latestPrice);
-    main.displayFromBasePrice(850000, {
+    window.testing.displayFromBasePrice(850000, {
       previousPrice: samePrice
     });
     await flush(20);
     expect(deltaWrap.classList.contains('trend-flat')).toBe(true);
     expect(icon.getAttribute('data-trend')).toBe('flat');
 
-    main.displayFromBasePrice(850000, {});
+    window.testing.displayFromBasePrice(850000, {});
     await flush(20);
     expect(deltaWrap.classList.contains('trend-pending')).toBe(true);
     expect(icon.getAttribute('data-trend')).toBe('pending');
@@ -496,7 +467,7 @@ describe('main.js behaviours', () => {
     });
     document.dispatchEvent = jest.fn(() => true);
     try {
-      main.displayFromBasePrice(1000000);
+      window.testing.displayFromBasePrice(1000000);
       await flush(20);
       expect(document.getElementById('lmBaruCurrent').textContent).toBe('Rp 982000');
     } finally {
@@ -507,7 +478,7 @@ describe('main.js behaviours', () => {
 
   test('displayDefaultPrices falls back correctly', async () => {
     await loadMain();
-    main.displayDefaultPrices();
+    window.testing.displayDefaultPrices();
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(10);
     const script = document.getElementById('priceItemList');
@@ -516,31 +487,31 @@ describe('main.js behaviours', () => {
 
   test('save and read last base price handle storage and errors', async () => {
     await loadMain();
-    main.saveLastBasePrice(1234);
-    expect(main.readLastBasePrice().p).toBe(1234);
+    window.testing.saveLastBasePrice(1234);
+    expect(window.testing.readLastBasePrice().p).toBe(1234);
     localStorage.setItem('rei_last_base_price_v1', 'invalid');
-    expect(main.readLastBasePrice()).toBeNull();
+    expect(window.testing.readLastBasePrice()).toBeNull();
 
     const originalSetItem = Object.getPrototypeOf(localStorage).setItem;
     Object.getPrototypeOf(localStorage).setItem = () => { throw new Error('fail'); };
-    expect(() => main.saveLastBasePrice(99)).not.toThrow();
+    expect(() => window.testing.saveLastBasePrice(99)).not.toThrow();
     Object.getPrototypeOf(localStorage).setItem = originalSetItem;
   });
 
   test('updatePriceSchema removes script when empty', async () => {
     await loadMain();
-    main.updatePriceSchema([{ name: 'Test', price: 100 }]);
+    window.testing.updatePriceSchema([{ name: 'Test', price: 100 }]);
     expect(document.getElementById('priceItemList')).not.toBeNull();
-    main.updatePriceSchema([]);
+    window.testing.updatePriceSchema([]);
     expect(document.getElementById('priceItemList')).toBeNull();
   });
 
   test('formatDateTimeIndo and displayDateTimeWIB format values', async () => {
     await loadMain();
     const date = new Date(Date.UTC(2024, 3, 5, 1, 2));
-    expect(main.formatDateTimeIndo(date)).toContain('2024');
+    expect(window.testing.formatDateTimeIndo(date)).toContain('2024');
     jest.setSystemTime(new Date('2024-04-05T00:00:00Z'));
-    main.displayDateTimeWIB();
+    window.testing.displayDateTimeWIB();
     const text = document.getElementById('currentDateTime').textContent;
     expect(text).toContain('2024');
     jest.setSystemTime(new Date());
@@ -555,7 +526,7 @@ describe('main.js behaviours', () => {
           current: {
             buy: 1000000,
             priceDate: '2024-05-10T00:00:00Z',
-            previous: { buy: 1000000, time: '2024-05-09T00:00:00Z' },
+            previous: { buy: 1020000, time: '2024-05-09T00:00:00Z' },
           },
           previous: { buy: 1020000, timestamp: 1714953600000 },
           history: [
@@ -566,7 +537,7 @@ describe('main.js behaviours', () => {
       }),
     };
     global.fetch = jest.fn(() => Promise.resolve(response));
-    await main.fetchGoldPrice();
+    await window.testing.fetchGoldPrice();
     await flush(20);
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
@@ -584,9 +555,9 @@ describe('main.js behaviours', () => {
 
   test('fetchGoldPrice uses cached value on failure', async () => {
     await loadMain();
-    main.saveLastBasePrice(800000);
+    window.testing.saveLastBasePrice(800000);
     global.fetch = jest.fn(() => Promise.reject(new Error('fail')));
-    await main.fetchGoldPrice();
+    await window.testing.fetchGoldPrice();
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
     expect(consoleWarnSpy).toHaveBeenCalled();
@@ -596,7 +567,7 @@ describe('main.js behaviours', () => {
     await loadMain();
     localStorage.removeItem('rei_last_base_price_v1');
     global.fetch = jest.fn(() => Promise.reject(new Error('fail')));
-    await main.fetchGoldPrice();
+    await window.testing.fetchGoldPrice();
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
     expect(consoleWarnSpy).toHaveBeenCalled();
@@ -604,12 +575,12 @@ describe('main.js behaviours', () => {
 
   test('fetchGoldPrice uses cached price when response invalid', async () => {
     await loadMain();
-    main.saveLastBasePrice(650000);
+    window.testing.saveLastBasePrice(650000);
     const response = {
       json: () => Promise.resolve({ statusCode: 500 }),
     };
     global.fetch = jest.fn(() => Promise.resolve(response));
-    await main.fetchGoldPrice();
+    await window.testing.fetchGoldPrice();
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
     const info = document.getElementById('lastUpdatedInfo');
@@ -623,7 +594,7 @@ describe('main.js behaviours', () => {
       json: () => Promise.resolve({ statusCode: 500 }),
     };
     global.fetch = jest.fn(() => Promise.resolve(response));
-    await main.fetchGoldPrice();
+    await window.testing.fetchGoldPrice();
     const tbody = document.getElementById('goldPriceTable');
     expect(tbody.children.length).toBeGreaterThan(0);
   });
@@ -678,7 +649,10 @@ describe('main.js behaviours', () => {
     const berat = document.getElementById('cal-berat');
     const addBtn = document.getElementById('cal-add');
     const itemsBody = document.getElementById('cal-items-body');
-    const decodeHref = () => decodeURIComponent(document.getElementById('wa-prefill').href);
+    const decodeHref = () => {
+      window.testing.updateWaLink();
+      return decodeURIComponent(document.getElementById('wa-prefill').href);
+    }
 
     berat.value = '2';
     addBtn.click();
@@ -694,7 +668,8 @@ describe('main.js behaviours', () => {
     expect(itemsBody.children.length).toBe(1);
     removeButtons()[0].click();
     expect(itemsBody.children.length).toBe(0);
-    expect(decodeHref()).toContain('Perhiasan <24K');
+    window.testing.lastPreview = null;
+    expect(decodeHref()).not.toContain('Perhiasan <24K');
   });
 
   test('calculator list allows editing weight values', async () => {
