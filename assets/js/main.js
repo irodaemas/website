@@ -2333,16 +2333,14 @@ function format(number){
 /* istanbul ignore next */
 (function(){
   var searchSection = document.getElementById('searchResults');
-  if(!searchSection) return;
-
   var body = document.body || document.documentElement;
   var docEl = document.documentElement;
-  var resultsList = searchSection.querySelector('[data-search-results]');
-  var summary = searchSection.querySelector('[data-search-summary]');
-  var emptyState = searchSection.querySelector('[data-search-empty]');
-  var emptyQueryEl = searchSection.querySelector('[data-search-empty-query]');
-  var resetLink = searchSection.querySelector('[data-search-reset]');
-  var suggestionsWrap = searchSection.querySelector('[data-search-suggestions]');
+  var resultsList = searchSection ? searchSection.querySelector('[data-search-results]') : null;
+  var summary = searchSection ? searchSection.querySelector('[data-search-summary]') : null;
+  var emptyState = searchSection ? searchSection.querySelector('[data-search-empty]') : null;
+  var emptyQueryEl = searchSection ? searchSection.querySelector('[data-search-empty-query]') : null;
+  var resetLink = searchSection ? searchSection.querySelector('[data-search-reset]') : null;
+  var suggestionsWrap = searchSection ? searchSection.querySelector('[data-search-suggestions]') : null;
   var suggestionButtons = suggestionsWrap ? Array.prototype.slice.call(suggestionsWrap.querySelectorAll('[data-search-suggestion]')) : [];
   var headerSearch = document.querySelector('[data-header-search]');
   var headerToggle = headerSearch ? headerSearch.querySelector('[data-search-toggle]') : null;
@@ -2439,27 +2437,26 @@ function format(number){
   });
 
   if(!hasSearchParam){
-    searchSection.hidden = true;
+    if(searchSection){ searchSection.hidden = true; }
     removeSearchActiveClass();
     if(resetLink){ resetLink.hidden = true; }
-    return;
-  }
-
-  searchSection.hidden = false;
-
-  if(rawQuery){
-    addSearchActiveClass();
-    if(resetLink){ resetLink.hidden = false; }
-    renderResults(rawQuery);
-    updatePageTitle(rawQuery);
-    if(typeof searchSection.focus === 'function'){
-      try { searchSection.focus(); } catch(_){}
-    }
   } else {
-    removeSearchActiveClass();
-    if(resetLink){ resetLink.hidden = true; }
-    updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
-    if(emptyState){ emptyState.hidden = true; }
+    if(searchSection){ searchSection.hidden = false; }
+
+    if(rawQuery){
+      addSearchActiveClass();
+      if(resetLink){ resetLink.hidden = false; }
+      renderResults(rawQuery);
+      updatePageTitle(rawQuery);
+      if(searchSection && typeof searchSection.focus === 'function'){
+        try { searchSection.focus(); } catch(_){}
+      }
+    } else {
+      removeSearchActiveClass();
+      if(resetLink){ resetLink.hidden = true; }
+      updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
+      if(emptyState){ emptyState.hidden = true; }
+    }
   }
 
   forms.forEach(function(form){
