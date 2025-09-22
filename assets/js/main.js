@@ -1,5 +1,138 @@
 // Extracted from inline scripts in index.html
 
+function normalizeSearchText(value){
+  if(!value && value !== 0) return '';
+  var text = String(value);
+  try {
+    if(text.normalize){
+      text = text.normalize('NFD');
+    }
+  } catch(e) {}
+  return text.replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
+const SEARCH_INDEX = (function(){
+  const entries = [
+    {
+      id: 'home',
+      url: '/',
+      title: 'Sentral Emas – Terima Jual Emas & Berlian COD',
+      description: 'Menerima jual emas, berlian, jam tangan mewah, batu mulia via buyback aman COD se‑Jabodetabek & sekitarnya, mengikuti harga pasar hari transaksi. Transparan, cepat, terpercaya.',
+      excerpt: 'Layanan buyback emas, berlian, jam tangan mewah, serta batu mulia dengan COD aman dan appraisal transparan.',
+      type: 'Halaman',
+      category: 'Layanan',
+      date: '2025-01-05',
+      readingTime: '',
+      keywords: ['jual emas', 'buyback emas', 'cod', 'berlian', 'jam tangan mewah', 'batu mulia'],
+      priority: 6,
+      content: 'Sentral Emas menyediakan konsultasi buyback emas, berlian, jam tangan mewah, dan batu mulia dengan penjemputan COD Jabodetabek, estimasi harga pasar, proses appraisal terbuka, serta layanan cepat dan aman melalui WhatsApp.'
+    },
+    {
+      id: 'harga',
+      url: '/harga/',
+      title: 'Harga Buyback Emas COD | Sentral Emas',
+      description: 'Cek harga buyback emas, logam mulia, dan perhiasan terkini. Dilengkapi kalkulator estimasi dan kontak WhatsApp untuk update real-time.',
+      excerpt: 'Update harga buyback emas & logam mulia lengkap dengan kalkulator estimasi COD Sentral Emas.',
+      type: 'Halaman',
+      category: 'Harga',
+      date: '2025-09-17',
+      readingTime: '',
+      keywords: ['harga emas hari ini', 'harga buyback', 'kalkulator emas', 'logam mulia'],
+      priority: 5,
+      content: 'Halaman harga buyback menghadirkan tabel perhiasan, logam mulia baru dan lama, highlight pergerakan harga harian, waktu update WIB, tombol WhatsApp, dan kalkulator berat serta kadar emas untuk simulasi COD.'
+    },
+    {
+      id: 'blog',
+      url: '/blog/',
+      title: 'Blog Sentral Emas – Tips Jual Beli Emas COD',
+      description: 'Artikel dan panduan Sentral Emas seputar tips jual beli emas & berlian via COD yang aman dan transparan.',
+      excerpt: 'Kumpulan artikel, panduan, dan insight jual beli emas, berlian, serta layanan COD Sentral Emas.',
+      type: 'Blog',
+      category: 'Blog',
+      date: '2025-09-17',
+      readingTime: '',
+      keywords: ['blog emas', 'tips jual emas', 'panduan berlian', 'keaslian emas'],
+      priority: 4,
+      content: 'Blog Sentral Emas menyajikan edukasi jual beli emas dan berlian, referensi keaslian, strategi transaksi COD aman, hingga insight perhiasan dan harga pasar.'
+    },
+    {
+      id: 'panduan-buyback-berlian',
+      url: '/blog/panduan-buyback-berlian/',
+      title: 'Panduan Buyback Berlian: Kenali 4C, Bentuk, & Sertifikat',
+      description: 'Pelajari 4C berlian, variasi bentuk populer, dan panduan sertifikat untuk buyback berlian COD di Sentral Emas.',
+      excerpt: 'Ringkasan kualitas berlian, skala warna komersial, bentuk favorit, dan tips menyiapkan sertifikat saat buyback.',
+      type: 'Blog',
+      category: 'Panduan',
+      date: '2025-09-17',
+      readingTime: '±10 menit',
+      keywords: ['berlian', '4c', 'sertifikat gia', 'buyback berlian', 'panduan berlian'],
+      priority: 7,
+      content: 'Artikel membahas empat pilar 4C (cut, color, clarity, carat), tabel warna D sampai K, bentuk round, princess, cushion, hingga tips sertifikat GIA, perawatan, dan persiapan konsultasi buyback berlian COD bersama Sentral Emas.'
+    },
+    {
+      id: 'panduan-keaslian-emas',
+      url: '/blog/panduan-menilai-keaslian-emas-sebelum-cod/',
+      title: 'Panduan Menilai Keaslian Emas Sebelum COD',
+      description: 'Cara sederhana memeriksa keaslian emas di rumah sebelum transaksi COD bersama Sentral Emas. Lengkap dengan tips dokumentasi dan kapan perlu ahli.',
+      excerpt: 'Langkah memeriksa stempel, warna, densitas, uji magnet, dan dokumentasi sebelum transaksi emas COD.',
+      type: 'Blog',
+      category: 'Panduan',
+      date: '2025-09-12',
+      readingTime: '±7 menit',
+      keywords: ['keaslian emas', 'uji emas', 'uji magnet', 'uji asam', 'sentral emas'],
+      priority: 6,
+      content: 'Panduan menilai emas asli mencakup pemeriksaan stempel, perubahan warna, uji magnet dan uji asam, cara menimbang berat, menyiapkan foto atau video sebelum buyback, serta kapan berkonsultasi dengan tim Sentral Emas.'
+    },
+    {
+      id: 'keuntungan-jual-emas-cod',
+      url: '/blog/keuntungan-jual-emas-cod/',
+      title: 'Keuntungan Jual Emas via COD yang Aman',
+      description: 'Pelajari keuntungan menggunakan layanan buyback emas COD Sentral Emas beserta tips menyiapkan transaksi agar proses aman dan transparan.',
+      excerpt: 'Keunggulan transaksi buyback emas COD, keamanan penjemputan, dan tips menyiapkan barang sebelum tim datang.',
+      type: 'Blog',
+      category: 'Panduan',
+      date: '2025-09-05',
+      readingTime: '±6 menit',
+      keywords: ['jual emas cod', 'buyback emas', 'keamanan cod', 'tips jual emas'],
+      priority: 5,
+      content: 'Artikel merangkum manfaat buyback COD seperti appraisal transparan, pembayaran instan, transaksi di lokasi pelanggan, serta saran menata perhiasan dan dokumen sebelum tim Sentral Emas tiba.'
+    }
+  ];
+
+  return entries.map(function(entry, index){
+    const keywordList = Array.isArray(entry.keywords) ? entry.keywords : String(entry.keywords || '').split(',');
+    const keywords = keywordList.map(function(k){ return String(k || '').trim(); }).filter(function(k){ return k.length; });
+    const normalizedTitle = normalizeSearchText(entry.title);
+    const normalizedDescription = normalizeSearchText(entry.description || '');
+    const normalizedContent = normalizeSearchText(entry.content || '');
+    const normalizedKeywords = normalizeSearchText(keywords.join(' '));
+    const normalized = [normalizedTitle, normalizedDescription, normalizedContent, normalizedKeywords].join(' ').trim();
+    return {
+      id: entry.id || ('search-' + index),
+      url: entry.url,
+      title: entry.title,
+      description: entry.description || '',
+      excerpt: entry.excerpt || entry.description || '',
+      type: entry.type || 'Halaman',
+      category: entry.category || entry.type || 'Halaman',
+      date: entry.date || '',
+      readingTime: entry.readingTime || '',
+      keywords: keywords,
+      priority: entry.priority || 0,
+      content: entry.content || '',
+      normalized: normalized,
+      normalizedTitle: normalizedTitle,
+      normalizedDescription: normalizedDescription,
+      normalizedContent: normalizedContent,
+      normalizedKeywords: normalizedKeywords
+    };
+  });
+})();
+
+if(typeof window !== 'undefined'){
+  window.SENTRAL_EMAS_SEARCH_INDEX = SEARCH_INDEX;
+}
+
 /* istanbul ignore next */
 (function(){
   // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
@@ -2197,6 +2330,375 @@ function format(number){
   });
 })();
 
+/* istanbul ignore next */
+(function(){
+  var searchSection = document.getElementById('searchResults');
+  if(!searchSection) return;
+
+  var body = document.body || document.documentElement;
+  var resultsList = searchSection.querySelector('[data-search-results]');
+  var summary = searchSection.querySelector('[data-search-summary]');
+  var emptyState = searchSection.querySelector('[data-search-empty]');
+  var emptyQueryEl = searchSection.querySelector('[data-search-empty-query]');
+  var resetLink = searchSection.querySelector('[data-search-reset]');
+  var suggestionsWrap = searchSection.querySelector('[data-search-suggestions]');
+  var suggestionButtons = suggestionsWrap ? Array.prototype.slice.call(suggestionsWrap.querySelectorAll('[data-search-suggestion]')) : [];
+  var headerSearch = document.querySelector('[data-header-search]');
+  var headerToggle = headerSearch ? headerSearch.querySelector('[data-search-toggle]') : null;
+  var toggleOpenLabel = headerToggle ? (headerToggle.getAttribute('aria-label') || 'Buka pencarian') : 'Buka pencarian';
+  var toggleCloseLabel = headerToggle ? (headerToggle.getAttribute('data-close-label') || 'Tutup pencarian') : 'Tutup pencarian';
+  var headerForm = headerSearch ? headerSearch.querySelector('[data-search-form]') : null;
+  var headerInput = headerSearch ? headerSearch.querySelector('[data-search-input]') : null;
+  var searchSectionForm = searchSection ? searchSection.querySelector('[data-search-form]') : null;
+  var mobileMedia = null;
+  try {
+    if(window.matchMedia){
+      mobileMedia = window.matchMedia('(max-width: 720px)');
+    }
+  } catch(e){}
+  var mobileBackdrop = null;
+  var forms = Array.prototype.slice.call(document.querySelectorAll('[data-search-form]'));
+  var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-search-input]'));
+
+  if(headerToggle){
+    headerToggle.addEventListener('click', function(){
+      if(isHeaderSearchOpen()){
+        closeHeaderSearch();
+      } else {
+        openHeaderSearch();
+      }
+    });
+  }
+
+  if(mobileMedia){
+    var handleMediaChange = function(ev){
+      if(ev && ev.matches === false){
+        closeHeaderSearch();
+      }
+    };
+    if(typeof mobileMedia.addEventListener === 'function'){
+      mobileMedia.addEventListener('change', handleMediaChange);
+    } else if(typeof mobileMedia.addListener === 'function'){
+      mobileMedia.addListener(handleMediaChange);
+    }
+  }
+
+  if(typeof window !== 'undefined' && typeof window.addEventListener === 'function'){
+    window.addEventListener('resize', function(){
+      if(!isMobile()){
+        closeHeaderSearch();
+      }
+    }, { passive: true });
+  }
+
+  if(typeof document !== 'undefined' && typeof document.addEventListener === 'function'){
+    document.addEventListener('keydown', function(ev){
+      if(!ev) return;
+      var key = ev.key || ev.keyCode;
+      if((key === 'Escape' || key === 'Esc' || key === 27) && isHeaderSearchOpen() && isMobile()){
+        closeHeaderSearch();
+        if(headerToggle && typeof headerToggle.focus === 'function'){
+          try { headerToggle.focus(); } catch(_){}
+        }
+      }
+    });
+  }
+
+  var hasSearchParam = false;
+  var rawQuery = '';
+
+  try {
+    var params = new URLSearchParams(window.location.search || '');
+    if(params.has('s')){
+      hasSearchParam = true;
+      rawQuery = params.get('s') || '';
+    }
+  } catch(e){
+    if(window.location.search && window.location.search.indexOf('s=') !== -1){
+      hasSearchParam = true;
+      rawQuery = window.location.search.split('s=')[1] || '';
+    }
+  }
+
+  rawQuery = (rawQuery || '').replace(/\+/g, ' ').trim();
+
+  inputs.forEach(function(input){
+    if(!input) return;
+    input.value = rawQuery;
+  });
+
+  if(!hasSearchParam){
+    searchSection.hidden = true;
+    if(resetLink){ resetLink.hidden = true; }
+    return;
+  }
+
+  searchSection.hidden = false;
+
+  if(rawQuery){
+    if(body && body.classList){ body.classList.add('search-active'); }
+    if(resetLink){ resetLink.hidden = false; }
+    renderResults(rawQuery);
+    updatePageTitle(rawQuery);
+    if(typeof searchSection.focus === 'function'){
+      try { searchSection.focus(); } catch(_){}
+    }
+  } else {
+    if(body && body.classList){ body.classList.remove('search-active'); }
+    if(resetLink){ resetLink.hidden = true; }
+    updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
+    if(emptyState){ emptyState.hidden = true; }
+  }
+
+  forms.forEach(function(form){
+    if(!form) return;
+    form.addEventListener('submit', function(ev){
+      var input = form.querySelector('[data-search-input]');
+      if(!input) return;
+      var value = (input.value || '').trim();
+      if(!value){
+        ev.preventDefault();
+        updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
+        if(emptyState){ emptyState.hidden = true; }
+        input.focus();
+      } else if(form === headerForm){
+        closeHeaderSearch();
+      }
+    });
+  });
+
+  suggestionButtons.forEach(function(button){
+    button.addEventListener('click', function(){
+      var value = button.getAttribute('data-search-suggestion') || '';
+      if(!value) return;
+      inputs.forEach(function(input){ if(input){ input.value = value; } });
+      var primary = searchSectionForm || forms[0];
+      closeHeaderSearch();
+      if(primary){
+        if(typeof primary.requestSubmit === 'function'){
+          primary.requestSubmit();
+        } else {
+          primary.submit();
+        }
+      } else {
+        var url = new URL(window.location.href);
+        url.search = '?s=' + encodeURIComponent(value);
+        window.location.assign(url.toString());
+      }
+    });
+  });
+
+  function ensureBackdrop(){
+    if(mobileBackdrop || !document || !document.body) return;
+    mobileBackdrop = document.createElement('div');
+    mobileBackdrop.className = 'site-search-backdrop';
+    mobileBackdrop.setAttribute('data-search-backdrop', '');
+    mobileBackdrop.addEventListener('click', closeHeaderSearch);
+    document.body.appendChild(mobileBackdrop);
+  }
+
+  function openHeaderSearch(){
+    if(!headerSearch || !isMobile()) return;
+    if(headerSearch.classList){ headerSearch.classList.add('header-search--expanded'); }
+    if(headerToggle){
+      headerToggle.setAttribute('aria-expanded', 'true');
+      headerToggle.setAttribute('aria-label', toggleCloseLabel);
+    }
+    ensureBackdrop();
+    if(mobileBackdrop){ mobileBackdrop.classList.add('is-visible'); }
+    if(body && body.classList){ body.classList.add('has-mobile-search'); }
+    if(headerInput){
+      setTimeout(function(){
+        try {
+          headerInput.focus();
+          if(typeof headerInput.select === 'function'){ headerInput.select(); }
+        } catch(e){}
+      }, 16);
+    }
+  }
+
+  function closeHeaderSearch(){
+    if(!headerSearch) return;
+    if(headerSearch.classList){ headerSearch.classList.remove('header-search--expanded'); }
+    if(headerToggle){
+      headerToggle.setAttribute('aria-expanded', 'false');
+      headerToggle.setAttribute('aria-label', toggleOpenLabel);
+    }
+    if(mobileBackdrop){ mobileBackdrop.classList.remove('is-visible'); }
+    if(body && body.classList){ body.classList.remove('has-mobile-search'); }
+  }
+
+  function isMobile(){
+    if(mobileMedia && typeof mobileMedia.matches === 'boolean'){
+      return mobileMedia.matches;
+    }
+    if(typeof window !== 'undefined' && typeof window.innerWidth === 'number'){
+      return window.innerWidth <= 720;
+    }
+    return false;
+  }
+
+  function isHeaderSearchOpen(){
+    return !!(headerSearch && headerSearch.classList && headerSearch.classList.contains('header-search--expanded'));
+  }
+
+  function updateSummary(text){
+    if(summary){ summary.textContent = text; }
+  }
+
+  function renderResults(query){
+    if(!resultsList) return;
+    var normalizedQuery = normalizeSearchText(query);
+    var tokens = normalizedQuery.split(/\s+/).filter(Boolean);
+    var highlightTokens = query.split(/\s+/).filter(Boolean);
+    var matches = [];
+
+    if(tokens.length){
+      SEARCH_INDEX.forEach(function(entry){
+        if(!entry || !entry.normalized) return;
+        var matchesAll = tokens.every(function(token){ return entry.normalized.indexOf(token) !== -1; });
+        if(!matchesAll) return;
+        var score = computeScore(entry, tokens, normalizedQuery);
+        matches.push({ entry: entry, score: score });
+      });
+    }
+
+    matches.sort(function(a, b){
+      if(b.score !== a.score) return b.score - a.score;
+      var priorityDiff = (b.entry.priority || 0) - (a.entry.priority || 0);
+      if(priorityDiff) return priorityDiff;
+      var dateA = a.entry.date ? Date.parse(a.entry.date) : 0;
+      var dateB = b.entry.date ? Date.parse(b.entry.date) : 0;
+      if(dateB !== dateA) return dateB - dateA;
+      return a.entry.title.localeCompare(b.entry.title, 'id');
+    });
+
+    resultsList.innerHTML = '';
+
+    if(!matches.length){
+      updateSummary('Tidak ada hasil untuk "' + query + '".');
+      if(emptyState){ emptyState.hidden = false; }
+      if(emptyQueryEl){ emptyQueryEl.textContent = query; }
+      return;
+    }
+
+    var frag = document.createDocumentFragment();
+    matches.forEach(function(match){
+      var entry = match.entry;
+      var item = document.createElement('li');
+      item.className = 'search-result card';
+
+      var link = document.createElement('a');
+      link.className = 'search-result__link';
+      link.href = entry.url;
+
+      var metaText = buildMeta(entry);
+      if(metaText){
+        var meta = document.createElement('p');
+        meta.className = 'search-result__meta';
+        meta.textContent = metaText;
+        link.appendChild(meta);
+      }
+
+      var title = document.createElement('h2');
+      title.className = 'search-result__title';
+      title.innerHTML = highlightText(entry.title, highlightTokens);
+      link.appendChild(title);
+
+      var excerptSource = entry.excerpt || entry.description || entry.content;
+      if(excerptSource){
+        var excerpt = document.createElement('p');
+        excerpt.className = 'search-result__excerpt';
+        excerpt.innerHTML = highlightText(excerptSource, highlightTokens);
+        link.appendChild(excerpt);
+      }
+
+      item.appendChild(link);
+      frag.appendChild(item);
+    });
+
+    resultsList.appendChild(frag);
+    updateSummary('Menampilkan ' + matches.length + ' hasil untuk "' + query + '".');
+    if(emptyState){ emptyState.hidden = true; }
+    if(emptyQueryEl){ emptyQueryEl.textContent = query; }
+  }
+
+  function computeScore(entry, tokens, fullQuery){
+    var score = entry.priority || 0;
+    tokens.forEach(function(token){
+      if(entry.normalizedTitle && entry.normalizedTitle.indexOf(token) !== -1) score += 10;
+      if(entry.normalizedKeywords && entry.normalizedKeywords.indexOf(token) !== -1) score += 6;
+      if(entry.normalizedDescription && entry.normalizedDescription.indexOf(token) !== -1) score += 4;
+      if(entry.normalizedContent && entry.normalizedContent.indexOf(token) !== -1) score += 2;
+    });
+    if(fullQuery && entry.normalizedTitle && entry.normalizedTitle.indexOf(fullQuery) !== -1){
+      score += 5;
+    }
+    return score;
+  }
+
+  function buildMeta(entry){
+    var parts = [];
+    if(entry.category) parts.push(entry.category);
+    if(entry.date){
+      var formatted = formatDate(entry.date);
+      if(formatted) parts.push(formatted);
+    }
+    if(entry.readingTime) parts.push(entry.readingTime);
+    return parts.join(' • ');
+  }
+
+  function highlightText(text, tokens){
+    if(!text) return '';
+    var safe = escapeHtml(text);
+    if(!tokens || !tokens.length) return safe;
+    var escapedTokens = tokens.map(function(token){
+      return token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).filter(Boolean);
+    if(!escapedTokens.length) return safe;
+    var pattern = new RegExp('(' + escapedTokens.join('|') + ')', 'gi');
+    return safe.replace(pattern, '<mark>$1</mark>');
+  }
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, function(ch){
+      switch(ch){
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return ch;
+      }
+    });
+  }
+
+  function formatDate(value){
+    if(!value) return '';
+    var date = new Date(value);
+    if(isNaN(date.getTime())) return '';
+    if(typeof Intl !== 'undefined' && Intl.DateTimeFormat){
+      try {
+        return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+      } catch(e){}
+    }
+    var months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    var month = months[date.getMonth()] || '';
+    var day = ('0' + date.getDate()).slice(-2);
+    return month ? day + ' ' + month + ' ' + date.getFullYear() : '';
+  }
+
+  function updatePageTitle(query){
+    if(!query) return;
+    try {
+      var base = document.title || '';
+      if(base.toLowerCase().indexOf('sentral emas') !== -1){
+        document.title = 'Cari "' + query + '" | Sentral Emas';
+      }
+    } catch(e){}
+  }
+})();
+
 // Service worker register
 // SW register + Update Toast
 /* istanbul ignore next */
@@ -2359,6 +2861,8 @@ if ('serviceWorker' in navigator) {
 /* istanbul ignore else */
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
+    SEARCH_INDEX,
+    normalizeSearchText,
     PRICE_ADJUST_IDR,
     PRICE_TIMEOUT_MS,
     saveLastBasePrice,

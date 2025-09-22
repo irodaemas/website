@@ -45,6 +45,20 @@ describe('main.js behaviours', () => {
       <div class="gallery"><img class="gallery-img"></div>
       <div id="currentDateTime"></div>
       <div id="typer"></div>
+      <section id="searchResults" hidden>
+        <div data-search-summary></div>
+        <form data-search-form>
+          <input data-search-input name="s" />
+        </form>
+        <div data-search-suggestions>
+          <button type="button" data-search-suggestion="emas">emas</button>
+        </div>
+        <a data-search-reset></a>
+        <ul data-search-results></ul>
+        <div data-search-empty hidden>
+          <span data-search-empty-query></span>
+        </div>
+      </section>
       <table><tbody id="goldPriceTable"></tbody></table>
       <div id="lmBaruHighlight" class="price-highlight">
         <div class="price-highlight-head">
@@ -742,6 +756,26 @@ describe('main.js behaviours', () => {
     logSpy.mockRestore();
     window.gtag = jest.fn();
     window.dataLayer = { push: jest.fn() };
+  });
+
+  test('search renders results when query parameter is present', async () => {
+    const originalUrl = window.location.href;
+    const url = new URL(originalUrl);
+    url.search = '?s=berlian';
+    window.history.replaceState(null, '', url.toString());
+
+    await loadMain();
+
+    const section = document.getElementById('searchResults');
+    expect(section.hidden).toBe(false);
+    expect(document.body.classList.contains('search-active')).toBe(true);
+    const items = section.querySelectorAll('[data-search-results] li');
+    expect(items.length).toBeGreaterThan(0);
+    expect(items[0].textContent.toLowerCase()).toContain('berlian');
+    const summary = section.querySelector('[data-search-summary]').textContent;
+    expect(summary).toMatch(/Menampilkan/);
+
+    window.history.replaceState(null, '', originalUrl);
   });
 
   test('service worker registration shows toast when waiting worker exists', async () => {
