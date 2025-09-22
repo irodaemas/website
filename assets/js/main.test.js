@@ -769,6 +769,7 @@ describe('main.js behaviours', () => {
     const section = document.getElementById('searchResults');
     expect(section.hidden).toBe(false);
     expect(document.body.classList.contains('search-active')).toBe(true);
+    expect(document.documentElement.classList.contains('search-active')).toBe(true);
     const items = section.querySelectorAll('[data-search-results] li');
     expect(items.length).toBeGreaterThan(0);
     expect(items[0].textContent.toLowerCase()).toContain('berlian');

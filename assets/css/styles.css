@@ -218,6 +218,7 @@ nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .site-search-backdrop{position:fixed;inset:0;background:rgba(1,33,30,.55);backdrop-filter:blur(2px);z-index:40;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s ease}
 .site-search-backdrop.is-visible{opacity:1;visibility:visible;pointer-events:auto}
 body.has-mobile-search{overflow:hidden}
+html.search-active,body.search-active{overflow:hidden}
 /* ---------- search results ---------- */
 .search-section {
     position: fixed;
