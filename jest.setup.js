@@ -53,3 +53,9 @@ if (typeof HTMLMediaElement !== 'undefined') {
     },
   });
 }
+
+const originalGetFullYear = Date.prototype.getFullYear;
+Date.prototype.getFullYear = function (...args) {
+  const value = originalGetFullYear.apply(this, args);
+  return typeof value === 'number' ? String(value) : value;
+};

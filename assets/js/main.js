@@ -1490,20 +1490,6 @@ function bindHighlightAddButton(){
 }
 function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
   var rows = [];
-  if(typeof lmLama === 'number' && isFinite(lmLama)){
-    rows.push({
-      label: 'Logam Mulia (LM) Lama',
-      schemaName: 'Logam Mulia (LM) Lama',
-      price: lmLama,
-      color: GOLD_ROW_SECONDARY,
-      infoKey: 'lm_lama',
-      icon: 'lm',
-      iconTitle: 'Keping logam mulia',
-      iconTooltip: 'Logam Mulia (LM) Lama',
-      addCat: 'lm_lama',
-      addKadar: '24'
-    });
-  }
   if(typeof lmBaru === 'number' && isFinite(lmBaru)){
     rows.push({
       label: 'Logam Mulia (LM) Baru',
@@ -1515,6 +1501,20 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
       iconTitle: 'Keping logam mulia',
       iconTooltip: 'Logam Mulia (LM) Baru',
       addCat: 'lm_baru',
+      addKadar: '24'
+    });
+  }
+  if(typeof lmLama === 'number' && isFinite(lmLama)){
+    rows.push({
+      label: 'Logam Mulia (LM) Lama',
+      schemaName: 'Logam Mulia (LM) Lama',
+      price: lmLama,
+      color: GOLD_ROW_SECONDARY,
+      infoKey: 'lm_lama',
+      icon: 'lm',
+      iconTitle: 'Keping logam mulia',
+      iconTooltip: 'Logam Mulia (LM) Lama',
+      addCat: 'lm_lama',
       addKadar: '24'
     });
   }
@@ -2193,6 +2193,19 @@ window.addEventListener('resize', function(){
     if(options.skipScroll) return;
     var section = document.getElementById('kalkulator');
     if(section){ section.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  }
+
+  if(typeof window !== 'undefined'){
+    window.testing = window.testing || {};
+    window.testing.updateWaLink = updateWaLink;
+    Object.defineProperty(window.testing, 'lastPreview', {
+      configurable: true,
+      get: function(){ return lastPreview; },
+      set: function(value){
+        lastPreview = value;
+        if(!items.length){ updateWaLink(); }
+      }
+    });
   }
 
   window.REI_CALC = window.REI_CALC || {};
@@ -2890,6 +2903,18 @@ if ('serviceWorker' in navigator) {
     });
   }
 })();
+
+if (typeof window !== 'undefined') {
+  var testingApi = window.testing || (window.testing = {});
+  testingApi.saveLastBasePrice = saveLastBasePrice;
+  testingApi.readLastBasePrice = readLastBasePrice;
+  testingApi.updatePriceSchema = updatePriceSchema;
+  testingApi.displayFromBasePrice = displayFromBasePrice;
+  testingApi.fetchGoldPrice = fetchGoldPrice;
+  testingApi.displayDefaultPrices = displayDefaultPrices;
+  testingApi.formatDateTimeIndo = formatDateTimeIndo;
+  testingApi.displayDateTimeWIB = displayDateTimeWIB;
+}
 
 // Expose selected helpers for testing under Node/Jest without affecting browser usage
 /* istanbul ignore else */

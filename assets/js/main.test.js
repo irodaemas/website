@@ -383,11 +383,13 @@ describe('main.js behaviours', () => {
     expect(tbody.children.length).toBeGreaterThan(0);
     const firstRow = tbody.querySelector('.price-row');
     expect(firstRow).not.toBeNull();
-    expect(firstRow.getAttribute('data-info-key')).toBe('lm_lama');
+    expect(firstRow.getAttribute('data-info-key')).toBe('lm_baru');
     const addBtn = firstRow.querySelector('.price-add-btn');
     expect(addBtn).not.toBeNull();
-    expect(addBtn.getAttribute('data-add-cat')).toBe('lm_lama');
+    expect(addBtn.getAttribute('data-add-cat')).toBe('lm_baru');
     expect(addBtn.getAttribute('data-add-kadar')).toBe('24');
+    const lmLamaRow = tbody.querySelector('.price-row[data-info-key="lm_lama"]');
+    expect(lmLamaRow).not.toBeNull();
     const icon = firstRow.querySelector('.price-icon');
     expect(icon).not.toBeNull();
     expect(icon.getAttribute('data-tooltip')).toContain('Logam Mulia');
