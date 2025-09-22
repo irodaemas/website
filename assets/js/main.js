@@ -2343,8 +2343,66 @@ function format(number){
   var resetLink = searchSection.querySelector('[data-search-reset]');
   var suggestionsWrap = searchSection.querySelector('[data-search-suggestions]');
   var suggestionButtons = suggestionsWrap ? Array.prototype.slice.call(suggestionsWrap.querySelectorAll('[data-search-suggestion]')) : [];
+  var headerSearch = document.querySelector('[data-header-search]');
+  var headerToggle = headerSearch ? headerSearch.querySelector('[data-search-toggle]') : null;
+  var toggleOpenLabel = headerToggle ? (headerToggle.getAttribute('aria-label') || 'Buka pencarian') : 'Buka pencarian';
+  var toggleCloseLabel = headerToggle ? (headerToggle.getAttribute('data-close-label') || 'Tutup pencarian') : 'Tutup pencarian';
+  var headerForm = headerSearch ? headerSearch.querySelector('[data-search-form]') : null;
+  var headerInput = headerSearch ? headerSearch.querySelector('[data-search-input]') : null;
+  var searchSectionForm = searchSection ? searchSection.querySelector('[data-search-form]') : null;
+  var mobileMedia = null;
+  try {
+    if(window.matchMedia){
+      mobileMedia = window.matchMedia('(max-width: 720px)');
+    }
+  } catch(e){}
+  var mobileBackdrop = null;
   var forms = Array.prototype.slice.call(document.querySelectorAll('[data-search-form]'));
   var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-search-input]'));
+
+  if(headerToggle){
+    headerToggle.addEventListener('click', function(){
+      if(isHeaderSearchOpen()){
+        closeHeaderSearch();
+      } else {
+        openHeaderSearch();
+      }
+    });
+  }
+
+  if(mobileMedia){
+    var handleMediaChange = function(ev){
+      if(ev && ev.matches === false){
+        closeHeaderSearch();
+      }
+    };
+    if(typeof mobileMedia.addEventListener === 'function'){
+      mobileMedia.addEventListener('change', handleMediaChange);
+    } else if(typeof mobileMedia.addListener === 'function'){
+      mobileMedia.addListener(handleMediaChange);
+    }
+  }
+
+  if(typeof window !== 'undefined' && typeof window.addEventListener === 'function'){
+    window.addEventListener('resize', function(){
+      if(!isMobile()){
+        closeHeaderSearch();
+      }
+    }, { passive: true });
+  }
+
+  if(typeof document !== 'undefined' && typeof document.addEventListener === 'function'){
+    document.addEventListener('keydown', function(ev){
+      if(!ev) return;
+      var key = ev.key || ev.keyCode;
+      if((key === 'Escape' || key === 'Esc' || key === 27) && isHeaderSearchOpen() && isMobile()){
+        closeHeaderSearch();
+        if(headerToggle && typeof headerToggle.focus === 'function'){
+          try { headerToggle.focus(); } catch(_){}
+        }
+      }
+    });
+  }
 
   var hasSearchParam = false;
   var rawQuery = '';
@@ -2403,6 +2461,8 @@ function format(number){
         updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
         if(emptyState){ emptyState.hidden = true; }
         input.focus();
+      } else if(form === headerForm){
+        closeHeaderSearch();
       }
     });
   });
@@ -2412,7 +2472,8 @@ function format(number){
       var value = button.getAttribute('data-search-suggestion') || '';
       if(!value) return;
       inputs.forEach(function(input){ if(input){ input.value = value; } });
-      var primary = forms[0];
+      var primary = searchSectionForm || forms[0];
+      closeHeaderSearch();
       if(primary){
         if(typeof primary.requestSubmit === 'function'){
           primary.requestSubmit();
@@ -2426,6 +2487,60 @@ function format(number){
       }
     });
   });
+
+  function ensureBackdrop(){
+    if(mobileBackdrop || !document || !document.body) return;
+    mobileBackdrop = document.createElement('div');
+    mobileBackdrop.className = 'site-search-backdrop';
+    mobileBackdrop.setAttribute('data-search-backdrop', '');
+    mobileBackdrop.addEventListener('click', closeHeaderSearch);
+    document.body.appendChild(mobileBackdrop);
+  }
+
+  function openHeaderSearch(){
+    if(!headerSearch || !isMobile()) return;
+    if(headerSearch.classList){ headerSearch.classList.add('header-search--expanded'); }
+    if(headerToggle){
+      headerToggle.setAttribute('aria-expanded', 'true');
+      headerToggle.setAttribute('aria-label', toggleCloseLabel);
+    }
+    ensureBackdrop();
+    if(mobileBackdrop){ mobileBackdrop.classList.add('is-visible'); }
+    if(body && body.classList){ body.classList.add('has-mobile-search'); }
+    if(headerInput){
+      setTimeout(function(){
+        try {
+          headerInput.focus();
+          if(typeof headerInput.select === 'function'){ headerInput.select(); }
+        } catch(e){}
+      }, 16);
+    }
+  }
+
+  function closeHeaderSearch(){
+    if(!headerSearch) return;
+    if(headerSearch.classList){ headerSearch.classList.remove('header-search--expanded'); }
+    if(headerToggle){
+      headerToggle.setAttribute('aria-expanded', 'false');
+      headerToggle.setAttribute('aria-label', toggleOpenLabel);
+    }
+    if(mobileBackdrop){ mobileBackdrop.classList.remove('is-visible'); }
+    if(body && body.classList){ body.classList.remove('has-mobile-search'); }
+  }
+
+  function isMobile(){
+    if(mobileMedia && typeof mobileMedia.matches === 'boolean'){
+      return mobileMedia.matches;
+    }
+    if(typeof window !== 'undefined' && typeof window.innerWidth === 'number'){
+      return window.innerWidth <= 720;
+    }
+    return false;
+  }
+
+  function isHeaderSearchOpen(){
+    return !!(headerSearch && headerSearch.classList && headerSearch.classList.contains('header-search--expanded'));
+  }
 
   function updateSummary(text){
     if(summary){ summary.textContent = text; }
