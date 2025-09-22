@@ -752,15 +752,52 @@ function findLmBaruSeriesPair(series, currentBase){
     return result;
   }
   var points = series.filter(function(point){ return point && typeof point.base === 'number' && isFinite(point.base); });
-  for(var i = points.length - 1; i >= 0; i--){
-    var point = points[i];
-    if(!point) continue;
-    if(!result.current){
-      result.current = point;
-      continue;
+  if(!points.length){
+    if(typeof currentBase === 'number' && isFinite(currentBase)){
+      result.current = { base: currentBase, price: computeLmBaruPrice(currentBase), time: null };
     }
-    result.previous = point;
-    break;
+    return result;
+  }
+  var currentIndex = -1;
+  for(var idx = points.length - 1; idx >= 0; idx--){
+    var candidate = points[idx];
+    if(!candidate) continue;
+    var role = candidate.role || '';
+    if(role === 'current' || role === 'current-fallback'){
+      currentIndex = idx;
+      result.current = candidate;
+      break;
+    }
+    if(currentIndex === -1 && !result.current){
+      currentIndex = idx;
+      result.current = candidate;
+    }
+  }
+  if(currentIndex === -1){
+    currentIndex = points.length - 1;
+    result.current = points[currentIndex] || null;
+  }
+  if(result.current){
+    for(var j = currentIndex - 1; j >= 0; j--){
+      var previousCandidate = points[j];
+      if(!previousCandidate) continue;
+      if(typeof previousCandidate.base === 'number' && typeof result.current.base === 'number'){
+        if(Math.abs(previousCandidate.base - result.current.base) < 0.5){
+          continue;
+        }
+      }
+      result.previous = previousCandidate;
+      break;
+    }
+    if(!result.previous){
+      for(var k = points.length - 1; k >= 0; k--){
+        if(k === currentIndex) continue;
+        var fallbackCandidate = points[k];
+        if(!fallbackCandidate) continue;
+        result.previous = fallbackCandidate;
+        break;
+      }
+    }
   }
   if(typeof currentBase === 'number' && isFinite(currentBase)){
     if(!result.current || Math.abs(result.current.base - currentBase) > 0.5){
@@ -1290,11 +1327,64 @@ function renderPriceTable(rows){
   updatePriceSchema(priceEntries);
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
+var HIGHLIGHT_ADD_BOUND = false;
+function buildCalcSelectionOptionsFromButton(addBtn){
+  if(!addBtn) return null;
+  var options = {};
+  var catAttr = addBtn.getAttribute('data-add-cat');
+  var kadarAttr = addBtn.getAttribute('data-add-kadar');
+  if(catAttr) options.cat = catAttr;
+  if(kadarAttr !== null) options.kadar = kadarAttr;
+  return options;
+}
+function triggerCalculatorSelection(addBtn, overrides){
+  if(!addBtn) return;
+  var options = buildCalcSelectionOptionsFromButton(addBtn) || {};
+  if(overrides){ options = Object.assign(options, overrides); }
+  if(window.REI_CALC && typeof window.REI_CALC.setSelection === 'function'){
+    window.REI_CALC.setSelection(options);
+  }
+}
+function bindHighlightAddButton(){
+  if(HIGHLIGHT_ADD_BOUND) return;
+  var highlightAdd = document.getElementById('highlight-add');
+  if(!highlightAdd) return;
+  highlightAdd.addEventListener('click', function(ev){
+    ev.preventDefault();
+    triggerCalculatorSelection(highlightAdd);
+  });
+  HIGHLIGHT_ADD_BOUND = true;
+}
 function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries){
-  var rows = [
-    { label: 'Logam Mulia (LM) Baru', schemaName: 'Logam Mulia (LM) Baru', price: lmBaru, color: GOLD_ROW_PRIMARY, infoKey: 'lm_baru', icon: 'lm', iconTitle: 'Keping logam mulia', iconTooltip: 'Logam Mulia (LM) Baru', addCat: 'lm_baru', addKadar: '24' },
-    { label: 'Logam Mulia (LM) Lama', schemaName: 'Logam Mulia (LM) Lama', price: lmLama, color: GOLD_ROW_SECONDARY, infoKey: 'lm_lama', icon: 'lm', iconTitle: 'Keping logam mulia', iconTooltip: 'Logam Mulia (LM) Lama', addCat: 'lm_lama', addKadar: '24' }
-  ];
+  var rows = [];
+  if(typeof lmLama === 'number' && isFinite(lmLama)){
+    rows.push({
+      label: 'Logam Mulia (LM) Lama',
+      schemaName: 'Logam Mulia (LM) Lama',
+      price: lmLama,
+      color: GOLD_ROW_SECONDARY,
+      infoKey: 'lm_lama',
+      icon: 'lm',
+      iconTitle: 'Keping logam mulia',
+      iconTooltip: 'Logam Mulia (LM) Lama',
+      addCat: 'lm_lama',
+      addKadar: '24'
+    });
+  }
+  if(typeof lmBaru === 'number' && isFinite(lmBaru)){
+    rows.push({
+      label: 'Logam Mulia (LM) Baru',
+      schemaName: 'Logam Mulia (LM) Baru',
+      price: lmBaru,
+      color: GOLD_ROW_PRIMARY,
+      infoKey: 'lm_baru',
+      icon: 'lm',
+      iconTitle: 'Keping logam mulia',
+      iconTooltip: 'Logam Mulia (LM) Baru',
+      addCat: 'lm_baru',
+      addKadar: '24'
+    });
+  }
   (perhiasanEntries || []).forEach(function(entry){
     var iconType = 'jewelry';
     var iconTitle = 'Perhiasan emas';
@@ -1353,6 +1443,7 @@ function displayFromBasePrice(basePrice, options){
       info.textContent = infoText;
     }
   }
+  bindHighlightAddButton();
 }
 
 function handleGoldPriceFallback(summarySuffix, fallbackSummary){
@@ -1582,14 +1673,7 @@ window.addEventListener('resize', function(){
     if(addBtn){
       ev.preventDefault();
       ev.stopPropagation();
-      var options = {};
-      var catAttr = addBtn.getAttribute('data-add-cat');
-      var kadarAttr = addBtn.getAttribute('data-add-kadar');
-      if(catAttr) options.cat = catAttr;
-      if(kadarAttr !== null) options.kadar = kadarAttr;
-      if(window.REI_CALC && typeof window.REI_CALC.setSelection === 'function'){
-        window.REI_CALC.setSelection(options);
-      }
+      triggerCalculatorSelection(addBtn);
       return;
     }
     var row = ev.target.closest('tr[data-info-key]');
@@ -1928,6 +2012,12 @@ window.addEventListener('resize', function(){
 
   function setSelection(options){
     if(!options) return;
+    var previousState = {
+      cat: cat.value,
+      kadar: kadar.value,
+      berat: berat.value,
+      kadarDisabled: !!kadar.disabled
+    };
     if(options.cat){
       var desired = String(options.cat);
       var hasOption = Array.prototype.some.call(cat.options, function(opt){ return opt.value === desired; });
@@ -1945,9 +2035,27 @@ window.addEventListener('resize', function(){
       berat.value = String(options.berat);
     }
     updatePreview();
-    if(options.addToList !== false){
+    var shouldAdd = options.addToList !== false;
+    if(shouldAdd){
       var weightValue = (options.berat !== undefined && options.berat !== null) ? options.berat : berat.value;
       addItem(cat.value, kadar.value, weightValue);
+    }
+    if(options.restoreForm !== false){
+      var needsRestore = previousState.cat !== cat.value || previousState.kadar !== kadar.value || previousState.berat !== berat.value || previousState.kadarDisabled !== !!kadar.disabled;
+      if(needsRestore){
+        cat.value = previousState.cat;
+        toggleKadar();
+        if(previousState.kadar !== undefined && previousState.kadar !== null){
+          kadar.value = previousState.kadar;
+        }
+        if(previousState.berat !== undefined && previousState.berat !== null){
+          berat.value = previousState.berat;
+        }
+        if(previousState.kadarDisabled){
+          kadar.disabled = true;
+        }
+        updatePreview();
+      }
     }
     if(options.skipScroll) return;
     var section = document.getElementById('kalkulator');
