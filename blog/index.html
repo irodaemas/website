@@ -101,7 +101,35 @@
           </svg>
           <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
         </button>
-        <a class="btn btn-gold hamb" href="/#kontak">Hubungi</a>
+        <div class="header-search" data-header-search>
+          <button class="btn btn-gold btn-icon site-search-toggle" type="button" aria-label="Buka pencarian" aria-expanded="false" aria-controls="headerSearchInput" data-search-toggle data-close-label="Tutup pencarian">
+            <svg class="site-search-toggle__icon site-search-toggle__icon--open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <svg class="site-search-toggle__icon site-search-toggle__icon--close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="6" y1="6" x2="18" y2="18"/>
+              <line x1="18" y1="6" x2="6" y2="18"/>
+            </svg>
+          </button>
+          <form class="site-search" role="search" action="/" method="get" data-search-form>
+            <label class="sr-only" for="headerSearchInput">Cari di Sentral Emas</label>
+            <div class="site-search__field">
+              <input id="headerSearchInput" class="site-search__input" type="search" name="s" placeholder="Cari..." autocomplete="off" data-search-input />
+              <button class="site-search__submit" type="submit" aria-label="Kirim pencarian">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7"/>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+              </button>
+            </div>
+          </form>
+        </div>
+        <a class="btn btn-gold btn-icon hamb" href="/#kontak" aria-label="Hubungi Sentral Emas">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.92V21a1 1 0 0 1-1.09 1 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 3 3.09 1 1 0 0 1 4 2h3a1 1 0 0 1 1 .75l1 3a1 1 0 0 1-.27 1L7.91 9.91a16 16 0 0 0 6.18 6.18l3.16-1.82a1 1 0 0 1 1 .05l2.5 1.5A1 1 0 0 1 22 16.92z"/>
+          </svg>
+        </a>
       </div>
     </div>
   </header>

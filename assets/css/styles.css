@@ -115,7 +115,7 @@ body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
 /* ---------- navbar ---------- */
 header{position:sticky;top:0;z-index:50;background:linear-gradient(180deg, rgba(1,61,57,.92), rgba(1,61,57,.86));backdrop-filter:saturate(120%) blur(6px);border-bottom:1px solid var(--glass-outline)}
 .page-blog header{position:relative;top:auto;backdrop-filter:none}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 0}
+.nav{display:flex;align-items:center;gap:1.2rem;padding:1rem 0}
 .brand{display:flex;align-items:center;gap:.8rem;color:var(--paper);text-decoration:none}
 .brand svg{width:32px;height:32px}
 .brand img{width:32px;height:32px;display:block}
@@ -126,10 +126,11 @@ nav a, .foot a{display:inline-block; padding:.6rem .4rem; line-height:1.2}
 /* Navbar sizing tweak */
 nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .nav a:focus-visible{outline:2px solid var(--focus-ring-strong);outline-offset:6px;border-radius:8px}
-.menu{display:flex;gap:1rem}
+.menu{display:flex;align-items:center;gap:.8rem;flex:1 1 auto;justify-content:center;min-width:0}
+.menu a{font-size:1.02rem;padding:.7rem .5rem}
 .hamb{display:none}
-.header-actions{display:flex;align-items:center;gap:1rem}
-.header-search{display:flex;align-items:center;gap:.6rem;position:relative}
+.header-actions{display:flex;align-items:center;gap:.9rem;margin-left:auto;flex:0 0 auto}
+.header-search{display:flex;align-items:center;gap:.6rem;position:relative;flex:0 1 auto;min-width:0}
 .site-search-toggle{display:none;position:relative;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
 .site-search-toggle:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 .site-search-toggle__icon{display:block}
@@ -146,7 +147,7 @@ nav a{ font-size:1.06rem; padding:.8rem .6rem }
 .site-search__submit:hover{background:rgba(255,255,255,.18)}
 .site-search__submit:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}
 .site-search--wide{max-width:640px;width:100%}
-.header-search .site-search{max-width:240px}
+.header-search .site-search{flex:0 1 clamp(160px,20vw,220px);width:clamp(160px,20vw,220px)}
 .header-search .site-search__input{width:100%}
 #darkModeToggle .sun-icon,
 #darkModeToggle .moon-icon,
