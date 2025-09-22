@@ -2336,6 +2336,7 @@ function format(number){
   if(!searchSection) return;
 
   var body = document.body || document.documentElement;
+  var docEl = document.documentElement;
   var resultsList = searchSection.querySelector('[data-search-results]');
   var summary = searchSection.querySelector('[data-search-summary]');
   var emptyState = searchSection.querySelector('[data-search-empty]');
@@ -2359,6 +2360,16 @@ function format(number){
   var mobileBackdrop = null;
   var forms = Array.prototype.slice.call(document.querySelectorAll('[data-search-form]'));
   var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-search-input]'));
+
+  function addSearchActiveClass(){
+    if(body && body.classList){ body.classList.add('search-active'); }
+    if(docEl && docEl.classList){ docEl.classList.add('search-active'); }
+  }
+
+  function removeSearchActiveClass(){
+    if(body && body.classList){ body.classList.remove('search-active'); }
+    if(docEl && docEl.classList){ docEl.classList.remove('search-active'); }
+  }
 
   if(headerToggle){
     headerToggle.addEventListener('click', function(){
@@ -2429,6 +2440,7 @@ function format(number){
 
   if(!hasSearchParam){
     searchSection.hidden = true;
+    removeSearchActiveClass();
     if(resetLink){ resetLink.hidden = true; }
     return;
   }
@@ -2436,7 +2448,7 @@ function format(number){
   searchSection.hidden = false;
 
   if(rawQuery){
-    if(body && body.classList){ body.classList.add('search-active'); }
+    addSearchActiveClass();
     if(resetLink){ resetLink.hidden = false; }
     renderResults(rawQuery);
     updatePageTitle(rawQuery);
@@ -2444,7 +2456,7 @@ function format(number){
       try { searchSection.focus(); } catch(_){}
     }
   } else {
-    if(body && body.classList){ body.classList.remove('search-active'); }
+    removeSearchActiveClass();
     if(resetLink){ resetLink.hidden = true; }
     updateSummary('Masukkan kata kunci pencarian untuk melihat hasil.');
     if(emptyState){ emptyState.hidden = true; }
