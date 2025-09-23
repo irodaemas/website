@@ -308,10 +308,11 @@ footer .wa-badge{margin-top:1.6rem;align-items:flex-start;text-align:left}
 .wa-badge__cta:hover{filter:brightness(1.05);box-shadow:0 12px 28px rgba(37,211,102,.28);transform:translateY(-1px)}
 .wa-badge__cta:focus-visible{outline:3px solid rgba(37,211,102,.45);outline-offset:3px}
 .wa-badge__cta:active{transform:translateY(0)}
-.stat{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;min-width:0}
-.stat b{font-size:1.3rem;color:var(--gold)}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:.25rem;min-width:0;min-height:clamp(3.6rem,4.8vw,4.6rem)}
+.stat b{font-size:1.3rem;color:var(--gold);line-height:1.2;display:flex;align-items:flex-end;gap:.35rem}
 .stat b small{font-size:.9rem;color:inherit;opacity:.9}
-.count, .num{font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1}
+.count, .num{font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1, "lnum" 1; display:inline-block}
+.stat .count{min-width:3ch}
 .stat span{overflow-wrap:anywhere;word-break:normal;white-space:normal}
 .glass.stat{min-width:0; overflow:hidden}
 @media (max-width:860px){.hero .wrap{grid-template-columns:1fr}}
