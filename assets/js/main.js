@@ -166,28 +166,55 @@ if(typeof window !== 'undefined'){
   // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
   var bar = document.querySelector('.scroll-progress');
   var hero = document.querySelector('.hero');
-  var lastSP = -1, lastPar = -1, ticking = false, maxScroll = 1;
-  function recalc(){
-    var h = document.documentElement;
-    maxScroll = Math.max(1, h.scrollHeight - h.clientHeight);
+  var root = document.scrollingElement || document.documentElement || document.body;
+  var lastSP = -1, lastPar = -1, ticking = false, maxScroll = 1, maxPending = false;
+  var schedule = window.requestAnimationFrame ? function(cb){ return window.requestAnimationFrame(cb); } : function(cb){ return setTimeout(cb, 16); };
+  function updateMaxScroll(){
+    maxPending = false;
+    var h = root || document.documentElement;
+    var docEl = document.documentElement;
+    var body = document.body;
+    if(!h && !docEl && !body) return;
+    var scrollHeight = (h && h.scrollHeight) || (docEl && docEl.scrollHeight) || (body && body.scrollHeight) || 0;
+    var clientHeight = (h && h.clientHeight) || (docEl && docEl.clientHeight) || window.innerHeight || 0;
+    maxScroll = Math.max(1, scrollHeight - clientHeight);
+    if(!ticking){ onScroll(); }
+  }
+  function scheduleMaxScroll(){
+    if(maxPending) return;
+    maxPending = true;
+    schedule(updateMaxScroll);
+  }
+  function applyScrollEffects(){
+    var scroller = root || document.documentElement;
+    var scrollTop = 0;
+    if(scroller && typeof scroller.scrollTop === 'number'){ scrollTop = scroller.scrollTop; }
+    else { scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0; }
+    var denom = maxScroll > 0 ? maxScroll : 1;
+    var p = (scrollTop / denom) * 100;
+    var sp = Math.max(0, Math.min(20, Math.round(p/5))); // 0..20
+    if(bar && sp !== lastSP){ if(lastSP>=0) bar.classList.remove('sp-'+lastSP); bar.classList.add('sp-'+sp); lastSP = sp; }
+    // Parallax hero translate mapped to classes (no inline style)
+    var par = Math.max(0, Math.min(20, Math.round(Math.min(40, scrollTop*0.04)/2)));
+    if(hero && par !== lastPar){ if(lastPar>=0) hero.classList.remove('par-'+lastPar); hero.classList.add('par-'+par); lastPar = par; }
+    ticking = false;
   }
   function onScroll(){
     if(ticking) return; ticking = true;
-    requestAnimationFrame(function(){
-      var h = document.documentElement;
-      var p = (h.scrollTop / maxScroll) * 100;
-      var sp = Math.max(0, Math.min(20, Math.round(p/5))); // 0..20
-      if(bar && sp !== lastSP){ if(lastSP>=0) bar.classList.remove('sp-'+lastSP); bar.classList.add('sp-'+sp); lastSP = sp; }
-      // Parallax hero translate mapped to classes (no inline style)
-      var y = h.scrollTop || document.body.scrollTop; var par = Math.max(0, Math.min(20, Math.round(Math.min(40, y*0.04)/2)));
-      if(hero && par !== lastPar){ if(lastPar>=0) hero.classList.remove('par-'+lastPar); hero.classList.add('par-'+par); lastPar = par; }
-      ticking = false;
-    });
+    schedule(applyScrollEffects);
   }
   window.addEventListener('scroll', onScroll, {passive:true});
-  window.addEventListener('resize', function(){ recalc(); onScroll(); }, {passive:true});
-  document.addEventListener('prices:updated', function(){ recalc(); onScroll(); });
-  recalc(); onScroll();
+  window.addEventListener('resize', scheduleMaxScroll, {passive:true});
+  document.addEventListener('prices:updated', scheduleMaxScroll);
+  if('ResizeObserver' in window){
+    try {
+      var ro = new ResizeObserver(scheduleMaxScroll);
+      if(root){ ro.observe(root); }
+      else { ro.observe(document.documentElement); }
+    } catch(e){}
+  }
+  scheduleMaxScroll();
+  onScroll();
 
   // ---- WA click pulse (no inline styles) ----
   document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function(el){
@@ -2811,15 +2838,29 @@ if ('serviceWorker' in navigator) {
 
   // Toggle visibility based on scroll position
   var scrollThreshold = 200; // Show after scrolling 200px
-  function toggleBackToTop() {
-    if (window.scrollY > scrollThreshold) {
-      btn.classList.add('visible');
-    } else {
-      btn.classList.remove('visible');
+  var lastVisible = null;
+  var togglePending = false;
+  var schedule = window.requestAnimationFrame ? function(cb){ return window.requestAnimationFrame(cb); } : function(cb){ return setTimeout(cb, 16); };
+  function getScrollTop(){
+    var scroller = document.scrollingElement || document.documentElement || document.body;
+    if(scroller && typeof scroller.scrollTop === 'number'){ return scroller.scrollTop; }
+    return window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+  }
+  function applyToggle(){
+    togglePending = false;
+    var shouldShow = getScrollTop() > scrollThreshold;
+    if(shouldShow !== lastVisible){
+      btn.classList.toggle('visible', shouldShow);
+      lastVisible = shouldShow;
     }
   }
-  window.addEventListener('scroll', toggleBackToTop, { passive: true });
-  toggleBackToTop(); // Check initial state
+  function requestToggle(){
+    if(togglePending) return;
+    togglePending = true;
+    schedule(applyToggle);
+  }
+  window.addEventListener('scroll', requestToggle, { passive: true });
+  requestToggle(); // Check initial state
 })();
 
 // Nav aria-current
