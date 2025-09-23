@@ -1111,14 +1111,13 @@ function showSparklineTooltip(point, index, rect){
   }
   tooltip.classList.remove('is-visible');
   var shouldFlip = y < 32;
-  tooltip.classList.toggle('is-flip', shouldFlip);
-  tooltip.setAttribute('aria-hidden','false');
-  tooltip.textContent = formatSparklinePointTooltip(point);
-  tooltip.style.top = y + 'px';
-  tooltip.style.left = x + 'px';
+  var tooltipMessage = formatSparklinePointTooltip(point);
+  if (tooltip.textContent !== tooltipMessage) {
+    tooltip.textContent = tooltipMessage;
+  }
   tooltip.style.removeProperty('--sparkline-arrow-position');
-  var tooltipWidth = tooltip.offsetWidth || 0;
   var containerWidth = width > 0 ? width : (container ? container.clientWidth : 0);
+  var tooltipWidth = tooltip.offsetWidth || tooltip.clientWidth || 0;
   var adjustedX = x;
   var arrowPosition = null;
   if(containerWidth > 0 && tooltipWidth > 0){
@@ -1145,10 +1144,13 @@ function showSparklineTooltip(point, index, rect){
       arrowPosition = anchorOffset;
     }
   }
+  tooltip.style.top = y + 'px';
   tooltip.style.left = adjustedX + 'px';
   if(arrowPosition !== null && isFinite(arrowPosition)){
     tooltip.style.setProperty('--sparkline-arrow-position', arrowPosition + 'px');
   }
+  tooltip.setAttribute('aria-hidden','false');
+  tooltip.classList.toggle('is-flip', shouldFlip);
   if(typeof index === 'number') tooltip.dataset.index = String(index);
   else delete tooltip.dataset.index;
   requestAnimationFrame(function(){ tooltip.classList.add('is-visible'); });
