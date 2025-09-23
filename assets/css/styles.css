@@ -304,7 +304,7 @@ footer .wa-badge{margin-top:1.6rem;align-items:flex-start;text-align:left}
 .wa-badge__identity{display:inline-flex;align-items:center;gap:.45rem;font-weight:700;font-size:1.05rem;letter-spacing:.01em;color:inherit}
 .wa-badge__verified{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px}
 .wa-badge__verified img{display:block;width:100%;height:auto}
-.wa-badge__cta{margin-top:.2rem;display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.3rem !important;border-radius:999px;background:#128c7e;color:#fff;font-weight:600;text-decoration:none;border:0;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
+.wa-badge__cta{margin-top:.2rem;display:inline-flex;align-items:center;justify-content:center;padding:.7rem 1.3rem !important;border-radius:999px;background:#075e54;color:#fff;font-weight:600;text-decoration:none;border:0;transition:transform .2s ease,box-shadow .2s ease,filter .2s ease}
 .wa-badge__cta:hover{filter:brightness(1.05);box-shadow:0 12px 28px rgba(37,211,102,.28);transform:translateY(-1px)}
 .wa-badge__cta:focus-visible{outline:3px solid rgba(37,211,102,.45);outline-offset:3px}
 .wa-badge__cta:active{transform:translateY(0)}
@@ -665,7 +665,8 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .blog-chip{ color:var(--text-primary); border:1px solid rgba(1,61,57,.16); font-size:.85rem; text-transform:uppercase; letter-spacing:.06em }
 .blog-title{ margin:0 }
 .blog-lead{ margin:0; color:var(--text-secondary); max-width:65ch }
-.blog-grid{ display:grid; gap:1.6rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:760px; margin:0 auto }
+.blog-grid{ display:grid; gap:1.6rem; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); max-width:760px; margin:0 auto; padding:0; list-style:none }
+.blog-grid>li{ list-style:none; margin:0; padding:0 }
 .home-blog-grid{ max-width:none; margin:1.6rem 0 0; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)) }
 .home-blog-grid .blog-card{ height:100% }
 .home-blog-grid .blog-card__link{ height:100% }
