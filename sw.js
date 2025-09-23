@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v9';
+const CACHE_NAME = 'sentralemas-v10';
 const FONT_CACHE = 'sentralemas-fonts-v1';
 
 // Core assets gunakan path relatif terhadap scope
@@ -96,24 +96,33 @@ async function handleNavigate(request) {
 async function handleAsset(event) {
     const { request } = event;
     const cache = await caches.open(CACHE_NAME);
+    const cached = await cache.match(request);
 
-    try {
-        const fresh = await fetch(request, { cache: 'no-store' });
-        if (fresh && fresh.ok) {
-            cache.put(request, fresh.clone());
-        }
-        return fresh;
-    } catch (err) {
-        const cached = await cache.match(request);
-        if (cached) {
-            return cached;
-        }
-        return new Response('Offline', {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-        });
+    const networkPromise = fetch(request)
+        .then((response) => {
+            if (response && response.ok) {
+                cache.put(request, response.clone());
+            }
+            return response;
+        })
+        .catch(() => null);
+
+    if (cached) {
+        // Update cache in the background without blocking the response
+        event.waitUntil(networkPromise);
+        return cached;
     }
+
+    const fresh = await networkPromise;
+    if (fresh) {
+        return fresh;
+    }
+
+    return new Response('Offline', {
+        status: 503,
+        statusText: 'Service Unavailable',
+        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
 }
 
 async function handleFonts(event) {
