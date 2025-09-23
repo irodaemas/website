@@ -15,7 +15,7 @@
       content="default-src 'self';
         img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.co.id https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
         media-src 'self';
-        script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net 'sha256-VMze8vM9iA5eoGxZgMy2QJAu0Hascu5XdrfQ2zictRE=' 'sha256-lKSmt9/xy5jtn0F2bQ4hRVO7kwPtze8xYlDunJfkX88=' 'sha256-BybwlXa4RsTIZMbwN99QXwHYOG9Gi+1qAWr/wBQIl4M=' 'sha256-5hmGas9SExqwK9qN5Bclww8MuhIW7wONGqJRQ2KXb18=';
+        script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net https://unpkg.com 'sha256-VMze8vM9iA5eoGxZgMy2QJAu0Hascu5XdrfQ2zictRE=' 'sha256-lKSmt9/xy5jtn0F2bQ4hRVO7kwPtze8xYlDunJfkX88=' 'sha256-BybwlXa4RsTIZMbwN99QXwHYOG9Gi+1qAWr/wBQIl4M=' 'sha256-5hmGas9SExqwK9qN5Bclww8MuhIW7wONGqJRQ2KXb18=';
         style-src 'self' 'unsafe-inline';
         font-src 'self';
         connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
@@ -427,23 +427,6 @@
       }
     </script>
     <script src="/assets/js/main.js" defer></script>
-    <script type="module">
-      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
-
-      function sendToDataLayer({name, delta, id, attribution}) {
-        dataLayer.push({
-          event: 'web-vitals',
-          event_category: 'Web Vitals',
-          event_action: name,
-          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
-          event_label: id,
-          ...attribution,
-        });
-      }
-
-      onCLS(sendToDataLayer);
-      onFID(sendToDataLayer);
-      onLCP(sendToDataLayer);
-    </script>
+    <script type="module" src="/assets/js/web-vitals.js"></script>
   </body>
 </html>

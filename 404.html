@@ -8,7 +8,7 @@
     content="default-src 'self';
       img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.co.id https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
       media-src 'self';
-      script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
+      script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net https://unpkg.com ;
       style-src 'self' 'unsafe-inline';
       font-src 'self';
       connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
@@ -150,23 +150,6 @@
 
   
   <script src="/assets/js/main.js" defer></script>
-    <script type="module">
-      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
-
-      function sendToDataLayer({name, delta, id, attribution}) {
-        dataLayer.push({
-          event: 'web-vitals',
-          event_category: 'Web Vitals',
-          event_action: name,
-          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
-          event_label: id,
-          ...attribution,
-        });
-      }
-
-      onCLS(sendToDataLayer);
-      onFID(sendToDataLayer);
-      onLCP(sendToDataLayer);
-    </script>
+  <script type="module" src="/assets/js/web-vitals.js"></script>
 </body>
 </html>

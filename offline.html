@@ -103,23 +103,6 @@
     </div>
   </div>
   <script src="/assets/js/main.js" defer></script>
-    <script type="module">
-      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
-
-      function sendToDataLayer({name, delta, id, attribution}) {
-        dataLayer.push({
-          event: 'web-vitals',
-          event_category: 'Web Vitals',
-          event_action: name,
-          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
-          event_label: id,
-          ...attribution,
-        });
-      }
-
-      onCLS(sendToDataLayer);
-      onFID(sendToDataLayer);
-      onLCP(sendToDataLayer);
-    </script>
+  <script type="module" src="/assets/js/web-vitals.js"></script>
 </body>
 </html>
