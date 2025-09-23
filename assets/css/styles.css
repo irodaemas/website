@@ -677,6 +677,9 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
 .blog-article__meta{ margin:0; color:var(--text-muted); font-size:.95rem }
 .blog-article__title{ margin:0; color:var(--text-primary); font-size:clamp(1.8rem,3vw + 1rem,2.6rem); line-height:1.2 }
 .blog-article__lead{ margin:0; color:var(--text-secondary); line-height:1.6 }
+.blog-article__figure{ margin:var(--space-lg) 0; border-radius:var(--radius); overflow:hidden; border:1px solid rgba(212,175,55,.28); background:rgba(1,61,57,.04); display:flex; flex-direction:column }
+.blog-article__figure img{ display:block; width:100%; height:auto }
+.blog-article__figure figcaption{ margin:0; padding:var(--space-sm) var(--space-md); color:var(--text-secondary); font-size:.95rem; background:linear-gradient(135deg,rgba(212,175,55,.12),rgba(1,61,57,.05)); text-align:center }
 .blog-article section{ display:flex; flex-direction:column; gap:var(--space-sm); color:var(--text-secondary) }
 .blog-article section + section{ margin-top:var(--space-xl) }
 .blog-article h2{ margin:0; font-size:clamp(1.3rem,1.4vw + .9rem,1.8rem); color:var(--text-primary) }
