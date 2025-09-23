@@ -2904,7 +2904,261 @@ if ('serviceWorker' in navigator) {
   }
 })();
 
+const VISITOR_COUNTER_CONFIG = {
+  api: 'https://api.countapi.xyz',
+  namespace: 'sentralemas.com',
+  totalKey: 'hidden_total_v1',
+  onlineKey: 'hidden_online_v1',
+  sessionTotalKey: 'se_total_session_v1',
+  sessionOnlineKey: 'se_online_session_v1',
+  refreshInterval: 60000
+};
+const VISITOR_COUNTER_NAMESPACE = encodeURIComponent(VISITOR_COUNTER_CONFIG.namespace);
+const VISITOR_COUNTER_TOTAL_KEY = encodeURIComponent(VISITOR_COUNTER_CONFIG.totalKey);
+const VISITOR_COUNTER_ONLINE_KEY = encodeURIComponent(VISITOR_COUNTER_CONFIG.onlineKey);
+const VISITOR_COUNTER_URLS = {
+  totalHit: VISITOR_COUNTER_CONFIG.api + '/hit/' + VISITOR_COUNTER_NAMESPACE + '/' + VISITOR_COUNTER_TOTAL_KEY,
+  totalGet: VISITOR_COUNTER_CONFIG.api + '/get/' + VISITOR_COUNTER_NAMESPACE + '/' + VISITOR_COUNTER_TOTAL_KEY,
+  onlineIncrement: VISITOR_COUNTER_CONFIG.api + '/update/' + VISITOR_COUNTER_NAMESPACE + '/' + VISITOR_COUNTER_ONLINE_KEY + '?amount=1&minimum=0',
+  onlineDecrement: VISITOR_COUNTER_CONFIG.api + '/update/' + VISITOR_COUNTER_NAMESPACE + '/' + VISITOR_COUNTER_ONLINE_KEY + '?amount=-1&minimum=0',
+  onlineGet: VISITOR_COUNTER_CONFIG.api + '/get/' + VISITOR_COUNTER_NAMESPACE + '/' + VISITOR_COUNTER_ONLINE_KEY
+};
+const VISITOR_COUNTER_STATE = {
+  totalVisitors: null,
+  onlineVisitors: null,
+  lastUpdated: null,
+  lastError: null,
+  sessionCounted: false,
+  onlineRegistered: false,
+  deregistered: false
+};
+let VISITOR_COUNTER_INITIALIZED = false;
+let VISITOR_COUNTER_REFRESH_HANDLE = null;
+
+function sanitizeVisitorValue(value){
+  const num = Number(value);
+  if(!Number.isFinite(num)) return null;
+  if(num < 0) return 0;
+  return Math.round(num);
+}
+
+function storageAvailable(type){
+  if(typeof window === 'undefined') return false;
+  try {
+    const storage = window[type];
+    if(!storage) return false;
+    const testKey = '__se_storage_test__';
+    storage.setItem(testKey, '1');
+    storage.removeItem(testKey);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+function getVisitorMetricsSnapshot(){
+  return {
+    totalVisitors: VISITOR_COUNTER_STATE.totalVisitors,
+    onlineVisitors: VISITOR_COUNTER_STATE.onlineVisitors,
+    lastUpdated: VISITOR_COUNTER_STATE.lastUpdated,
+    lastError: VISITOR_COUNTER_STATE.lastError,
+    sessionCounted: VISITOR_COUNTER_STATE.sessionCounted,
+    onlineRegistered: VISITOR_COUNTER_STATE.onlineRegistered,
+    deregistered: VISITOR_COUNTER_STATE.deregistered
+  };
+}
+
+function publishHiddenVisitorState(){
+  if(typeof window === 'undefined') return;
+  const payload = {
+    total: VISITOR_COUNTER_STATE.totalVisitors,
+    online: VISITOR_COUNTER_STATE.onlineVisitors,
+    updatedAt: VISITOR_COUNTER_STATE.lastUpdated
+  };
+  try {
+    Object.defineProperty(payload, 'snapshot', {
+      value: function(){ return getVisitorMetricsSnapshot(); },
+      enumerable: false
+    });
+  } catch (err) {
+    payload.snapshot = function(){ return getVisitorMetricsSnapshot(); };
+  }
+  try {
+    Object.defineProperty(window, '__SE_PRIVATE_VISITORS__', {
+      value: Object.freeze(payload),
+      configurable: true,
+      enumerable: false,
+      writable: false
+    });
+  } catch (err) {
+    window.__SE_PRIVATE_VISITORS__ = Object.freeze(payload);
+  }
+}
+
+function handleVisitorError(err){
+  VISITOR_COUNTER_STATE.lastError = err && err.message ? err.message : String(err || 'error');
+  publishHiddenVisitorState();
+}
+
+function visitorRequestJson(customFetch, url, overrides){
+  const baseOptions = {
+    method: 'GET',
+    mode: 'cors',
+    cache: 'no-store',
+    credentials: 'omit'
+  };
+  const options = overrides && typeof overrides === 'object' ? Object.assign({}, baseOptions, overrides) : baseOptions;
+  return customFetch(url, options).then(function(response){
+    if(!response){
+      throw new Error('Empty response');
+    }
+    if(Object.prototype.hasOwnProperty.call(response, 'ok') && !response.ok){
+      const statusError = new Error('Request failed: ' + (response.status || 'unknown'));
+      statusError.status = response.status;
+      throw statusError;
+    }
+    if(typeof response.json !== 'function'){
+      throw new Error('Invalid response payload');
+    }
+    return response.json();
+  });
+}
+
+function applyVisitorValue(kind, data){
+  if(!data || typeof data.value === 'undefined') return data;
+  const sanitized = sanitizeVisitorValue(data.value);
+  if(sanitized === null) return data;
+  if(kind === 'total'){
+    VISITOR_COUNTER_STATE.totalVisitors = sanitized;
+  } else if(kind === 'online'){
+    VISITOR_COUNTER_STATE.onlineVisitors = sanitized;
+  }
+  VISITOR_COUNTER_STATE.lastUpdated = Date.now();
+  publishHiddenVisitorState();
+  return data;
+}
+
+function fetchVisitorTotal(customFetch, shouldIncrement, sessionEnabled, sessionKey){
+  const url = shouldIncrement ? VISITOR_COUNTER_URLS.totalHit : VISITOR_COUNTER_URLS.totalGet;
+  return visitorRequestJson(customFetch, url).then(function(data){
+    applyVisitorValue('total', data);
+    if(shouldIncrement){
+      VISITOR_COUNTER_STATE.sessionCounted = true;
+      if(sessionEnabled){
+        try { window.sessionStorage.setItem(sessionKey, '1'); } catch (err) {}
+      }
+    }
+    return data;
+  }).catch(function(err){
+    handleVisitorError(err);
+    if(shouldIncrement){
+      return fetchVisitorTotal(customFetch, false, sessionEnabled, sessionKey);
+    }
+    return Promise.reject(err);
+  });
+}
+
+function fetchVisitorOnlineValue(customFetch){
+  return visitorRequestJson(customFetch, VISITOR_COUNTER_URLS.onlineGet).then(function(data){
+    return applyVisitorValue('online', data);
+  }).catch(function(err){
+    handleVisitorError(err);
+    return Promise.reject(err);
+  });
+}
+
+function fetchVisitorOnlineIncrement(customFetch, sessionEnabled, sessionKey){
+  return visitorRequestJson(customFetch, VISITOR_COUNTER_URLS.onlineIncrement).then(function(data){
+    VISITOR_COUNTER_STATE.onlineRegistered = true;
+    VISITOR_COUNTER_STATE.deregistered = false;
+    if(sessionEnabled){
+      try { window.sessionStorage.setItem(sessionKey, '1'); } catch (err) {}
+    }
+    return applyVisitorValue('online', data);
+  }).catch(function(err){
+    handleVisitorError(err);
+    return fetchVisitorOnlineValue(customFetch);
+  });
+}
+
+function sendVisitorOnlineDecrement(customFetch){
+  try {
+    return customFetch(VISITOR_COUNTER_URLS.onlineDecrement, {
+      method: 'GET',
+      mode: 'cors',
+      cache: 'no-store',
+      credentials: 'omit',
+      keepalive: true
+    }).catch(function(){ });
+  } catch (err) {
+    return Promise.resolve();
+  }
+}
+
+function startVisitorHeartbeat(customFetch, interval){
+  if(VISITOR_COUNTER_REFRESH_HANDLE){
+    clearInterval(VISITOR_COUNTER_REFRESH_HANDLE);
+    VISITOR_COUNTER_REFRESH_HANDLE = null;
+  }
+  if(!interval) return;
+  VISITOR_COUNTER_REFRESH_HANDLE = setInterval(function(){
+    fetchVisitorOnlineValue(customFetch).catch(function(){ });
+  }, interval);
+}
+
+function initHiddenVisitorMetrics(options){
+  if(typeof window === 'undefined') return;
+  if(VISITOR_COUNTER_INITIALIZED) return;
+  VISITOR_COUNTER_INITIALIZED = true;
+
+  const opts = options || {};
+  const customFetch = typeof opts.fetch === 'function' ? opts.fetch : (typeof fetch === 'function' ? fetch.bind(window) : null);
+  const refreshInterval = typeof opts.refreshInterval === 'number' && opts.refreshInterval > 0 ? opts.refreshInterval : VISITOR_COUNTER_CONFIG.refreshInterval;
+  const sessionEnabled = storageAvailable('sessionStorage');
+  const sessionTotalKey = VISITOR_COUNTER_CONFIG.sessionTotalKey;
+  const sessionOnlineKey = VISITOR_COUNTER_CONFIG.sessionOnlineKey;
+
+  publishHiddenVisitorState();
+
+  if(!customFetch) return;
+
+  if(sessionEnabled && window.sessionStorage.getItem(sessionOnlineKey)){
+    try { window.sessionStorage.removeItem(sessionOnlineKey); } catch (err) {}
+  }
+
+  const countedThisSession = sessionEnabled && window.sessionStorage.getItem(sessionTotalKey) === '1';
+  if(countedThisSession){
+    VISITOR_COUNTER_STATE.sessionCounted = true;
+  }
+
+  fetchVisitorTotal(customFetch, !countedThisSession, sessionEnabled, sessionTotalKey).catch(function(){ });
+
+  const registerPromise = fetchVisitorOnlineIncrement(customFetch, sessionEnabled, sessionOnlineKey).catch(function(){ return null; });
+  registerPromise.then(function(){
+    startVisitorHeartbeat(customFetch, refreshInterval);
+  }, function(){
+    startVisitorHeartbeat(customFetch, refreshInterval);
+  });
+
+  const cleanup = function(){
+    if(!VISITOR_COUNTER_STATE.onlineRegistered || VISITOR_COUNTER_STATE.deregistered) return;
+    VISITOR_COUNTER_STATE.deregistered = true;
+    if(VISITOR_COUNTER_REFRESH_HANDLE){
+      clearInterval(VISITOR_COUNTER_REFRESH_HANDLE);
+      VISITOR_COUNTER_REFRESH_HANDLE = null;
+    }
+    if(sessionEnabled){
+      try { window.sessionStorage.removeItem(sessionOnlineKey); } catch (err) {}
+    }
+    sendVisitorOnlineDecrement(customFetch);
+  };
+
+  window.addEventListener('pagehide', cleanup, { once: true });
+  window.addEventListener('beforeunload', cleanup, { once: true });
+}
+
 if (typeof window !== 'undefined') {
+  initHiddenVisitorMetrics();
   var testingApi = window.testing || (window.testing = {});
   testingApi.saveLastBasePrice = saveLastBasePrice;
   testingApi.readLastBasePrice = readLastBasePrice;
@@ -2914,6 +3168,8 @@ if (typeof window !== 'undefined') {
   testingApi.displayDefaultPrices = displayDefaultPrices;
   testingApi.formatDateTimeIndo = formatDateTimeIndo;
   testingApi.displayDateTimeWIB = displayDateTimeWIB;
+  testingApi.getHiddenVisitorMetrics = getVisitorMetricsSnapshot;
+  testingApi.initHiddenVisitorMetrics = initHiddenVisitorMetrics;
 }
 
 // Expose selected helpers for testing under Node/Jest without affecting browser usage
@@ -2932,5 +3188,7 @@ if (typeof module !== 'undefined' && module.exports) {
     displayDefaultPrices,
     formatDateTimeIndo,
     displayDateTimeWIB,
+    initHiddenVisitorMetrics,
+    getVisitorMetricsSnapshot,
   };
 }

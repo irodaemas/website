@@ -781,6 +781,66 @@ describe('main.js behaviours', () => {
     window.history.replaceState(null, '', originalUrl);
   });
 
+  test('hidden visitor metrics exist even when counter service fails', async () => {
+    global.fetch.mockImplementation(() => Promise.reject(new Error('network')));
+    await loadMain();
+    await flush();
+
+    expect(Object.prototype.hasOwnProperty.call(window, '__SE_PRIVATE_VISITORS__')).toBe(true);
+    const secret = window.__SE_PRIVATE_VISITORS__;
+    expect(secret).toBeDefined();
+    expect(secret.total).toBeNull();
+    expect(secret.online).toBeNull();
+    expect(typeof secret.snapshot).toBe('function');
+    expect(secret.snapshot().onlineRegistered).toBe(false);
+    expect(Object.keys(window)).not.toContain('__SE_PRIVATE_VISITORS__');
+  });
+
+  test('visitor metrics update and send keepalive on unload', async () => {
+    global.fetch.mockImplementation((url, options = {}) => {
+      let payload;
+      if (url.includes('/hit/')) {
+        payload = { value: 123 };
+      } else if (url.includes('amount=1')) {
+        payload = { value: 7 };
+      } else if (url.includes('amount=-1')) {
+        payload = { value: 6 };
+      } else if (url.includes('/get/')) {
+        payload = { value: 7 };
+      } else {
+        payload = { value: 0 };
+      }
+      return Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(payload),
+        url,
+        options,
+      });
+    });
+
+    sessionStorage.clear();
+    await loadMain();
+    await flush();
+    await flush();
+
+    const secret = window.__SE_PRIVATE_VISITORS__;
+    expect(secret.total).toBe(123);
+    expect(secret.online).toBe(7);
+    const snapshot = secret.snapshot();
+    expect(snapshot.onlineRegistered).toBe(true);
+    expect(sessionStorage.getItem('se_total_session_v1')).toBe('1');
+
+    window.dispatchEvent(new Event('pagehide'));
+    await flush();
+
+    const fetchCalls = global.fetch.mock.calls;
+    expect(fetchCalls.length).toBeGreaterThanOrEqual(3);
+    const lastCall = fetchCalls[fetchCalls.length - 1];
+    expect(lastCall[0]).toContain('/update/');
+    expect(lastCall[1]).toMatchObject({ keepalive: true });
+    expect(sessionStorage.getItem('se_online_session_v1')).toBeNull();
+  });
+
   test('service worker registration shows toast when waiting worker exists', async () => {
     await loadMain();
     const ready = Promise.resolve({ sync: { register: jest.fn(() => Promise.resolve()) } });
