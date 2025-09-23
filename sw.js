@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v7';
+const CACHE_NAME = 'sentralemas-v8';
 const FONT_CACHE = 'sentralemas-fonts-v1';
 
 // Core assets gunakan path relatif terhadap scope
