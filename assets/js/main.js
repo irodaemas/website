@@ -17,7 +17,7 @@ const SEARCH_INDEX = (function(){
       id: 'home',
       url: '/',
       title: 'Sentral Emas – Terima Jual Emas & Berlian COD',
-      description: 'Menerima jual emas, berlian, jam tangan mewah, batu mulia via buyback aman COD se‑Jabodetabek & sekitarnya, mengikuti harga pasar hari transaksi. Transparan, cepat, terpercaya.',
+      description: 'Menerima jual beli emas, berlian, jam tangan mewah, batu mulia via COD aman se-Jabodetabek. Ikuti harga pasar, proses cepat, transparan, terpercaya.',
       excerpt: 'Layanan buyback emas, berlian, jam tangan mewah, serta batu mulia dengan COD aman dan appraisal transparan.',
       type: 'Halaman',
       category: 'Layanan',
