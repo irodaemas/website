@@ -1,6 +1,6 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v10';
-const FONT_CACHE = 'sentralemas-fonts-v1';
+const CACHE_NAME = 'sentralemas-v11';
+const FONT_CACHE = 'sentralemas-fonts-v2';
 
 // Core assets gunakan path relatif terhadap scope
 const CORE_ASSETS = [
@@ -33,13 +33,174 @@ const CORE_ASSETS = [
     './offline.html'
 ];
 
+const IMMUTABLE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 tahun
+const IMMUTABLE_CACHE_CONTROL = `public, max-age=${IMMUTABLE_MAX_AGE_SECONDS}, immutable`;
+const IMMUTABLE_ASSET_PATTERN = /\.(?:css|js|mjs|cjs|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|ogg|ogv|mp3|wav|flac|webmanifest|json|map|txt|xml|xsl|pdf|wasm)$/i;
+const CACHEABLE_DESTINATIONS = new Set(['style', 'script', 'image', 'font', 'audio', 'video', 'manifest', 'worker', 'paintworklet']);
+const CACHE_EXCLUDE_PATHS = [/\/track\b/i];
+
+function isExcludedPath(pathname) {
+    return CACHE_EXCLUDE_PATHS.some((pattern) => pattern.test(pathname));
+}
+
+function shouldTreatAsImmutable(request, response) {
+    if (!request) return false;
+    const url = new URL(request.url, location.origin);
+    if (isExcludedPath(url.pathname)) return false;
+    if (url.pathname === '/' || url.pathname.endsWith('.html')) return false;
+    if (url.origin !== location.origin) return false;
+    if (response && response.type === 'opaque') return false;
+    if (IMMUTABLE_ASSET_PATTERN.test(url.pathname)) return true;
+    const destination = request.destination;
+    return destination ? CACHEABLE_DESTINATIONS.has(destination) : false;
+}
+
+function isCacheableAssetRequest(request) {
+    if (!request || request.method !== 'GET') return false;
+    const url = new URL(request.url, location.origin);
+    if (url.origin !== location.origin) return false;
+    if (isExcludedPath(url.pathname)) return false;
+    if (url.pathname === '/' || url.pathname.endsWith('.html')) return false;
+    if (url.pathname.endsWith('/sw.js') || url.pathname.endsWith('/service-worker.js')) return false;
+    if (request.mode === 'navigate' || request.destination === 'document') return false;
+    const destination = request.destination;
+    if (destination && destination.length) {
+        return CACHEABLE_DESTINATIONS.has(destination);
+    }
+    return IMMUTABLE_ASSET_PATTERN.test(url.pathname);
+}
+
+function buildImmutableHeaders(extraHeaders) {
+    const headers = {
+        'Cache-Control': IMMUTABLE_CACHE_CONTROL,
+        'Expires': new Date(Date.now() + IMMUTABLE_MAX_AGE_SECONDS * 1000).toUTCString()
+    };
+    if (extraHeaders && typeof extraHeaders === 'object') {
+        Object.keys(extraHeaders).forEach((key) => {
+            const value = extraHeaders[key];
+            if (value === null || typeof value === 'undefined') {
+                delete headers[key];
+            } else {
+                headers[key] = value;
+            }
+        });
+    }
+    return headers;
+}
+
+async function createResponseWithHeaders(response, overrides) {
+    const headers = new Headers(response.headers);
+    if (overrides && typeof overrides === 'object') {
+        Object.keys(overrides).forEach((key) => {
+            const value = overrides[key];
+            if (value === null || typeof value === 'undefined') {
+                headers.delete(key);
+            } else {
+                headers.set(key, value);
+            }
+        });
+    }
+    const body = await response.arrayBuffer();
+    return new Response(body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+    });
+}
+
+async function prepareAssetResponse(request, response, options = {}) {
+    if (!response) return null;
+    const isOpaque = response.type === 'opaque';
+    if (!isOpaque && !response.ok) return null;
+
+    const { forceImmutable = false, extraHeaders } = options;
+    const canOverride = !isOpaque;
+    const shouldImmutable = canOverride && (forceImmutable || shouldTreatAsImmutable(request, response));
+
+    let overrides = null;
+    if (shouldImmutable) {
+        overrides = buildImmutableHeaders(extraHeaders);
+    } else if (extraHeaders && canOverride) {
+        overrides = extraHeaders;
+    }
+
+    if (!overrides || Object.keys(overrides).length === 0) {
+        return response;
+    }
+
+    try {
+        return await createResponseWithHeaders(response, overrides);
+    } catch (err) {
+        console.warn('[SW] Gagal menerapkan header cache untuk', request.url, err);
+        return response;
+    }
+}
+
+async function cacheResponse(cache, request, response) {
+    if (!cache || !request || !response) return;
+    const isOpaque = response.type === 'opaque';
+    if (!isOpaque && !response.ok) return;
+    try {
+        await cache.put(request, response);
+    } catch (err) {
+        console.warn('[SW] cache.put gagal untuk', request.url, err);
+    }
+}
+
+async function precacheCoreAssets() {
+    const cache = await caches.open(CACHE_NAME);
+    await Promise.all(
+        CORE_ASSETS.map(async (asset) => {
+            try {
+                const request = new Request(asset, { cache: 'reload' });
+                const response = await fetch(request);
+                if (!response) return;
+                if (!response.ok && response.type !== 'opaque') return;
+                const prepared = await prepareAssetResponse(request, response.clone());
+                if (prepared) {
+                    await cacheResponse(cache, request, prepared);
+                }
+            } catch (err) {
+                console.warn('[SW] Precaching gagal untuk', asset, err);
+            }
+        })
+    );
+}
+
+async function refreshAsset(cache, request) {
+    try {
+        const response = await fetch(request, { cache: 'no-store' });
+        if (!response) return;
+        if (!response.ok && response.type !== 'opaque') return;
+        const prepared = await prepareAssetResponse(request, response.clone());
+        if (prepared) {
+            await cacheResponse(cache, request, prepared);
+        }
+    } catch (_) {}
+}
+
+async function refreshFont(cache, request) {
+    try {
+        const response = await fetch(request, { mode: 'cors', cache: 'no-store' });
+        if (!response) return;
+        if (!response.ok && response.type !== 'opaque') return;
+        const prepared = await prepareAssetResponse(request, response.clone(), { forceImmutable: true });
+        if (prepared) {
+            await cacheResponse(cache, request, prepared);
+        }
+    } catch (_) {}
+}
+
 // ===== Install: precache core assets
 self.addEventListener('install', (event) => {
-    event.waitUntil(
-        caches.open(CACHE_NAME)
-            .then((cache) => cache.addAll(CORE_ASSETS))
-            .then(() => self.skipWaiting())
-    );
+    event.waitUntil((async () => {
+        try {
+            await precacheCoreAssets();
+        } catch (err) {
+            console.warn('[SW] Precaching utama gagal', err);
+        }
+        await self.skipWaiting();
+    })());
 });
 
 // ===== Activate: cleanup lama
@@ -75,7 +236,7 @@ async function handleNavigate(request) {
         // Cache halaman yang valid untuk navigasi cepat berikutnya
         if (fresh && fresh.ok) {
             const cache = await caches.open(CACHE_NAME);
-            cache.put(request, fresh.clone());
+            await cacheResponse(cache, request, fresh.clone());
         }
         return fresh;
     } catch (e) {
@@ -98,62 +259,67 @@ async function handleAsset(event) {
     const cache = await caches.open(CACHE_NAME);
     const cached = await cache.match(request);
 
-    const networkPromise = fetch(request)
-        .then((response) => {
-            if (response && response.ok) {
-                cache.put(request, response.clone());
-            }
-            return response;
-        })
-        .catch(() => null);
-
     if (cached) {
-        // Update cache in the background without blocking the response
-        event.waitUntil(networkPromise);
+        event.waitUntil(refreshAsset(cache, request));
         return cached;
     }
 
-    const fresh = await networkPromise;
-    if (fresh) {
-        return fresh;
+    try {
+        const response = await fetch(request, { cache: 'no-store' });
+        if (!response) {
+            throw new Error('no-response');
+        }
+        if (!response.ok && response.type !== 'opaque') {
+            return response;
+        }
+        const prepared = await prepareAssetResponse(request, response.clone());
+        if (prepared) {
+            event.waitUntil(cacheResponse(cache, request, prepared.clone()));
+            return prepared;
+        }
+        return response;
+    } catch (err) {
+        if (cached) {
+            return cached;
+        }
+        return new Response('Offline', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
     }
-
-    return new Response('Offline', {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
 }
 
 async function handleFonts(event) {
     const { request } = event;
-    // Runtime cache untuk Google Fonts
     const cache = await caches.open(FONT_CACHE);
     const cached = await cache.match(request);
-    const networkPromise = fetch(request, { mode: 'cors' })
-        .then((res) => {
-            if (res && res.ok) {
-                cache.put(request, res.clone());
-            }
-            return res;
-        })
-        .catch(() => null);
-
     if (cached) {
-        event.waitUntil(networkPromise);
+        event.waitUntil(refreshFont(cache, request));
         return cached;
     }
 
-    const fresh = await networkPromise;
-    if (fresh) {
-        return fresh;
+    try {
+        const response = await fetch(request, { mode: 'cors', cache: 'no-store' });
+        if (!response) {
+            throw new Error('no-response');
+        }
+        if (!response.ok && response.type !== 'opaque') {
+            return response;
+        }
+        const prepared = await prepareAssetResponse(request, response.clone(), { forceImmutable: true });
+        if (prepared) {
+            event.waitUntil(cacheResponse(cache, request, prepared.clone()));
+            return prepared;
+        }
+        return response;
+    } catch (err) {
+        return new Response('Offline', {
+            status: 503,
+            statusText: 'Service Unavailable',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+        });
     }
-
-    return new Response('Offline', {
-        status: 503,
-        statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'text/plain; charset=utf-8' }
-    });
 }
 
 // ===== Fetch
@@ -175,7 +341,9 @@ self.addEventListener('fetch', (event) => {
             event.respondWith(handleNavigate(req));
             return;
         }
-        event.respondWith(handleAsset(event));
+        if (isCacheableAssetRequest(req)) {
+            event.respondWith(handleAsset(event));
+        }
     }
 });
 
