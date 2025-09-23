@@ -1726,7 +1726,12 @@ function displayDateTimeWIB() {
 }
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
-fetchGoldPrice();
+function shouldFetchGoldPrice(){
+  return !!(document.getElementById('goldPriceTable') || document.getElementById('lmBaruCurrent'));
+}
+if(shouldFetchGoldPrice()){
+  fetchGoldPrice();
+}
 
 window.addEventListener('resize', function(){
   if(!LM_BARU_SPARKLINE_META || !LM_BARU_SPARKLINE_META.hasSeries) return;
@@ -2881,7 +2886,7 @@ if ('serviceWorker' in navigator) {
 (function(){
   const THEME_KEY = 'sentral_emas_theme';
   const toggle = document.getElementById('darkModeToggle');
-  
+
   if (!toggle) return;
 
   function applyTheme(theme) {
@@ -2929,6 +2934,47 @@ if ('serviceWorker' in navigator) {
         applyTheme('auto');
       }
     });
+  }
+})();
+
+/* istanbul ignore next */
+(function(){
+  if (typeof window === 'undefined') return;
+
+  var hasScheduled = false;
+
+  function loadWebVitals(){
+    if (hasScheduled) return;
+    hasScheduled = true;
+
+    if (document.querySelector('script[data-web-vitals]')) return;
+
+    var script = document.createElement('script');
+    script.type = 'module';
+    script.src = '/assets/js/web-vitals.js';
+    script.setAttribute('data-web-vitals', 'true');
+
+    if ('fetchPriority' in script) {
+      script.fetchPriority = 'low';
+    } else {
+      script.setAttribute('fetchpriority', 'low');
+    }
+
+    document.head.appendChild(script);
+  }
+
+  function scheduleLoad(){
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(function(){ loadWebVitals(); });
+    } else {
+      setTimeout(loadWebVitals, 0);
+    }
+  }
+
+  if (document.readyState === 'complete') {
+    scheduleLoad();
+  } else {
+    window.addEventListener('load', scheduleLoad, { once: true });
   }
 })();
 
