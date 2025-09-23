@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v8';
+const CACHE_NAME = 'sentralemas-v9';
 const FONT_CACHE = 'sentralemas-fonts-v1';
 
 // Core assets gunakan path relatif terhadap scope
@@ -24,6 +24,12 @@ const CORE_ASSETS = [
     './blog/keuntungan-jual-emas-cod/index.html',
     './blog/panduan-menilai-keaslian-emas-sebelum-cod/',
     './blog/panduan-menilai-keaslian-emas-sebelum-cod/index.html',
+    './blog/panduan-buyback-berlian/',
+    './blog/panduan-buyback-berlian/index.html',
+    './blog/checklist-foto-emas-cod/',
+    './blog/checklist-foto-emas-cod/index.html',
+    './blog/panduan-jual-emas-tanpa-surat/',
+    './blog/panduan-jual-emas-tanpa-surat/index.html',
     './offline.html'
 ];
 
