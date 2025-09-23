@@ -1726,7 +1726,12 @@ function displayDateTimeWIB() {
 }
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
-fetchGoldPrice();
+function shouldFetchGoldPrice(){
+  return !!(document.getElementById('goldPriceTable') || document.getElementById('lmBaruCurrent'));
+}
+if(shouldFetchGoldPrice()){
+  fetchGoldPrice();
+}
 
 window.addEventListener('resize', function(){
   if(!LM_BARU_SPARKLINE_META || !LM_BARU_SPARKLINE_META.hasSeries) return;
