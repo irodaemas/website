@@ -970,6 +970,7 @@ p, li, a { overflow-wrap: anywhere; word-break: break-word; }
     }
 }
 
+[data-theme="dark"] .blog-article__header,
 [data-theme="dark"] .price-add-btn {
     background: rgba(212,175,55,.1);
     border-color: rgba(212,175,55,.3);
