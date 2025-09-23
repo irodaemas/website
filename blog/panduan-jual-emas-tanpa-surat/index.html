@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Panduan Jual Emas Tanpa Surat: Syarat, Risiko, dan Solusi Aman | Sentral Emas</title>
   <meta name="description" content="Pelajari cara jual emas tanpa surat resmi beserta syarat minimum, risiko yang perlu diwaspadai, dan solusi aman via COD Sentral Emas."/>
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
+  <meta name="author" content="Sentral Emas"/>
+  <meta name="publisher" content="Sentral Emas"/>
+  <meta name="language" content="id-ID"/>
   <link rel="canonical" href="https://sentralemas.com/blog/panduan-jual-emas-tanpa-surat/"/>
   <meta name="application-name" content="Sentral Emas"/>
   <meta name="apple-mobile-web-app-title" content="Sentral Emas"/>
@@ -239,5 +243,23 @@
     <div class="container copy">© <span id="yr"></span> Sentral Emas • Blog</div>
   </footer>
   <script src="/assets/js/main.js" defer></script>
+    <script type="module">
+      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
+
+      function sendToDataLayer({name, delta, id, attribution}) {
+        dataLayer.push({
+          event: 'web-vitals',
+          event_category: 'Web Vitals',
+          event_action: name,
+          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
+          event_label: id,
+          ...attribution,
+        });
+      }
+
+      onCLS(sendToDataLayer);
+      onFID(sendToDataLayer);
+      onLCP(sendToDataLayer);
+    </script>
 </body>
 </html>

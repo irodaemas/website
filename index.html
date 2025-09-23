@@ -35,6 +35,7 @@
     <meta name="application-name" content="Sentral Emas"/>
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
     <meta name="author" content="Sentral Emas"/>
+    <meta name="publisher" content="Sentral Emas"/>
     <meta name="language" content="id-ID"/>
     <meta name="keywords" content="jual emas COD, buyback emas Jabodetabek, jual berlian tanpa surat, harga emas COD, Sentral Emas"/>
     <meta name="geo.region" content="ID-JK"/>
@@ -160,7 +161,7 @@
           <div class="search-panel">
             <div class="search-header">
               <span class="chip search-chip">Pencarian</span>
-              <h1 class="h2">Hasil Pencarian</h1>
+              <h2 class="h2">Hasil Pencarian</h2>
               <p class="search-summary" data-search-summary role="status" aria-live="polite">Masukkan kata kunci untuk mulai mencari konten Sentral Emas.</p>
             </div>
             <form class="site-search site-search--wide" role="search" action="/" method="get" data-search-form>
@@ -1077,5 +1078,23 @@
       }
     </script>
     <script src="assets/js/main.js" defer></script>
+    <script type="module">
+      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
+
+      function sendToDataLayer({name, delta, id, attribution}) {
+        dataLayer.push({
+          event: 'web-vitals',
+          event_category: 'Web Vitals',
+          event_action: name,
+          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
+          event_label: id,
+          ...attribution,
+        });
+      }
+
+      onCLS(sendToDataLayer);
+      onFID(sendToDataLayer);
+      onLCP(sendToDataLayer);
+    </script>
   </body>
 </html>

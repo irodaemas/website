@@ -380,7 +380,7 @@ tbody tr:hover td{background:rgba(212,175,55,.14)}
 }
 .table-card{max-width:800px;margin:0 auto}
 .date-badge{font-size:20px;font-weight:700;color:var(--accent-green);background:rgba(212,175,55,.16);border:1px solid rgba(212,175,55,.45);padding:.2rem .5rem;border-radius:8px}
-.price-highlight{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--deep-2));color:var(--paper);padding:1.4rem;border:1px solid rgba(212,175,55,.2);border-radius:var(--radius);margin:0 auto;max-width:800px;display:flex;flex-direction:column;gap:.6rem;transition:transform .3s ease, box-shadow .3s ease}
+.price-highlight{position:relative;overflow:hidden;background:linear-gradient(135deg,var(--deep-2), var(--deep));color:var(--paper);padding:1.4rem;border:1px solid rgba(212,175,55,.2);border-radius:var(--radius);margin:0 auto;max-width:800px;display:flex;flex-direction:column;gap:.6rem;transition:transform .3s ease, box-shadow .3s ease}
 .price-highlight::after{content:"";position:absolute;inset:-40%;background:conic-gradient(from 120deg at 50% 50%,rgba(212,175,55,.12),rgba(1,61,57,0) 40%,rgba(212,175,55,.18) 60%,rgba(1,61,57,0) 85%);animation:priceHighlightShimmer 12s linear infinite;opacity:.6;pointer-events:none}
 .price-highlight > *{position:relative;z-index:1}
 .price-highlight.is-updated{animation:priceHighlightPop .7s cubic-bezier(.21,1.02,.73,1)}

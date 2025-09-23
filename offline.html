@@ -8,6 +8,7 @@
   <meta name="application-name" content="Sentral Emas">
   <meta name="apple-mobile-web-app-title" content="Sentral Emas">
   <meta name="theme-color" content="#013D39">
+  <meta name="publisher" content="Sentral Emas"/>
   <meta property="og:locale" content="id_ID">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Offline • Sentral Emas">
@@ -102,5 +103,23 @@
     </div>
   </div>
   <script src="/assets/js/main.js" defer></script>
+    <script type="module">
+      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
+
+      function sendToDataLayer({name, delta, id, attribution}) {
+        dataLayer.push({
+          event: 'web-vitals',
+          event_category: 'Web Vitals',
+          event_action: name,
+          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
+          event_label: id,
+          ...attribution,
+        });
+      }
+
+      onCLS(sendToDataLayer);
+      onFID(sendToDataLayer);
+      onLCP(sendToDataLayer);
+    </script>
 </body>
 </html>

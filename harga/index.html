@@ -26,6 +26,7 @@
     <meta name="description" content="Cek harga buyback emas, logam mulia, dan perhiasan terkini. Dilengkapi kalkulator estimasi dan kontak WhatsApp untuk update real-time."/>
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"/>
     <meta name="author" content="Sentral Emas"/>
+    <meta name="publisher" content="Sentral Emas"/>
     <meta name="language" content="id-ID"/>
     <link rel="canonical" href="https://sentralemas.com/harga/"/>
     <meta name="application-name" content="Sentral Emas"/>
@@ -426,5 +427,23 @@
       }
     </script>
     <script src="/assets/js/main.js" defer></script>
+    <script type="module">
+      import {onCLS, onFID, onLCP} from 'https://unpkg.com/web-vitals@3/dist/web-vitals.attribution.js?module';
+
+      function sendToDataLayer({name, delta, id, attribution}) {
+        dataLayer.push({
+          event: 'web-vitals',
+          event_category: 'Web Vitals',
+          event_action: name,
+          event_value: Math.round(name === 'CLS' ? delta * 1000 : delta),
+          event_label: id,
+          ...attribution,
+        });
+      }
+
+      onCLS(sendToDataLayer);
+      onFID(sendToDataLayer);
+      onLCP(sendToDataLayer);
+    </script>
   </body>
 </html>
