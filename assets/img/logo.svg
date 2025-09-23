@@ -1,0 +1,21 @@
+<svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="logoGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(24 20) scale(56)">
+      <stop offset="0" stop-color="#FDF6DD" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#FDF6DD" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="logoGold" x1="12" y1="12" x2="68" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8E7B5"/>
+      <stop offset="0.5" stop-color="#F2D16B"/>
+      <stop offset="1" stop-color="#D4AF37"/>
+    </linearGradient>
+  </defs>
+  <rect width="80" height="80" rx="24" fill="#013D39"/>
+  <circle cx="52" cy="24" r="22" fill="url(#logoGlow)"/>
+  <circle cx="40" cy="40" r="26" fill="url(#logoGold)"/>
+  <circle cx="40" cy="40" r="18" fill="#013D39" opacity="0.18"/>
+  <path d="M40 23l7 9.5-7 19-7-19L40 23z" fill="#013D39" fill-opacity="0.92"/>
+  <path d="M24.5 46.5c2.4 6.4 8.3 10.5 15.5 10.5s13.1-4.1 15.5-10.5" stroke="#013D39" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <circle cx="40" cy="36" r="3.8" fill="#FDF6DD"/>
+  <path d="M40 16l3.4 5.4h-6.8L40 16z" fill="#FDF6DD"/>
+</svg>

@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v11';
+const CACHE_NAME = 'sentralemas-v12';
 const FONT_CACHE = 'sentralemas-fonts-v2';
 
 // Core assets gunakan path relatif terhadap scope
@@ -13,8 +13,8 @@ const CORE_ASSETS = [
     './assets/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2',
     './assets/fonts/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2',
     './assets/js/main.js',
-    './assets/img/logo.webp?v=1',
-    './assets/img/asset1.webp',
+    './assets/img/logo.svg',
+    './assets/img/asset1.svg',
     './assets/img/wm.webp',
     './harga/',
     './harga/index.html',
