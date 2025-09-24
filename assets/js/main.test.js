@@ -29,7 +29,29 @@ describe('main.js behaviours', () => {
   const buildDom = () => {
     document.body.innerHTML = `
       <div class="scroll-progress"></div>
-      <div class="hero"></div>
+      <main id="main">
+        <section class="hero" id="hero-section"></section>
+        <section id="section-one"></section>
+        <section id="section-two"></section>
+        <section id="section-hidden" hidden></section>
+        <section id="section-three"></section>
+        <section id="section-display-none" style="display:none"></section>
+        <section id="section-four"></section>
+        <section id="searchResults" hidden>
+          <div data-search-summary></div>
+          <form data-search-form>
+            <input data-search-input name="s" />
+          </form>
+          <div data-search-suggestions>
+            <button type="button" data-search-suggestion="emas">emas</button>
+          </div>
+          <a data-search-reset></a>
+          <ul data-search-results></ul>
+          <div data-search-empty hidden>
+            <span data-search-empty-query></span>
+          </div>
+        </section>
+      </main>
       <a href="https://wa.me/123" id="wa-link" data-track="wa-main"></a>
       <div class="feature" id="feature-card"></div>
       <div class="t-card" id="t-card"></div>
@@ -38,27 +60,12 @@ describe('main.js behaviours', () => {
       <img id="lazy-img" data-src="real.jpg" />
       <img id="fallback-img" />
       <video id="hero-video"></video>
-      <section></section>
       <div class="feature"></div>
       <div class="card"></div>
       <div class="stat"></div>
       <div class="gallery"><img class="gallery-img"></div>
       <div id="currentDateTime"></div>
       <div id="typer"></div>
-      <section id="searchResults" hidden>
-        <div data-search-summary></div>
-        <form data-search-form>
-          <input data-search-input name="s" />
-        </form>
-        <div data-search-suggestions>
-          <button type="button" data-search-suggestion="emas">emas</button>
-        </div>
-        <a data-search-reset></a>
-        <ul data-search-results></ul>
-        <div data-search-empty hidden>
-          <span data-search-empty-query></span>
-        </div>
-      </section>
       <table><tbody id="goldPriceTable"></tbody></table>
       <div id="lmBaruHighlight" class="price-highlight">
         <div class="price-highlight-head">
@@ -235,6 +242,34 @@ describe('main.js behaviours', () => {
     document.dispatchEvent(new Event('prices:updated'));
     await flush(16);
     expect(Array.from(bar.classList)).toEqual(expect.arrayContaining(['sp-0']));
+  });
+
+  test('applies alternating backgrounds while skipping hidden sections', async () => {
+    await loadMain();
+    const heroSection = document.querySelector('main > section.hero');
+    const sectionOne = document.getElementById('section-one');
+    const sectionTwo = document.getElementById('section-two');
+    const sectionThree = document.getElementById('section-three');
+    const sectionFour = document.getElementById('section-four');
+    const hiddenSection = document.getElementById('section-hidden');
+    const displayNone = document.getElementById('section-display-none');
+
+    expect(heroSection.style.backgroundColor).toBe('');
+    expect(sectionOne.style.backgroundColor).toBe('var(--bg-secondary)');
+    expect(sectionTwo.style.backgroundColor).toBe('var(--bg-primary)');
+    expect(sectionThree.style.backgroundColor).toBe('var(--bg-secondary)');
+    expect(sectionFour.style.backgroundColor).toBe('var(--bg-primary)');
+    expect(hiddenSection.style.backgroundColor).toBe('');
+    expect(displayNone.style.backgroundColor).toBe('');
+
+    hiddenSection.hidden = false;
+    await flush();
+
+    expect(sectionOne.style.backgroundColor).toBe('var(--bg-secondary)');
+    expect(sectionTwo.style.backgroundColor).toBe('var(--bg-primary)');
+    expect(hiddenSection.style.backgroundColor).toBe('var(--bg-secondary)');
+    expect(sectionThree.style.backgroundColor).toBe('var(--bg-primary)');
+    expect(sectionFour.style.backgroundColor).toBe('var(--bg-secondary)');
   });
 
   test('wa link pulse toggles on click', async () => {

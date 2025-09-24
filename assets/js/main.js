@@ -11,6 +11,74 @@ function normalizeSearchText(value){
   return text.replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
+function applyAlternateSectionBackgrounds(doc){
+  var rootDoc = doc || (typeof document !== 'undefined' ? document : null);
+  if(!rootDoc) return [];
+  var mainEl = rootDoc.querySelector ? rootDoc.querySelector('main') : null;
+  if(!mainEl) return [];
+  var sections;
+  try {
+    sections = Array.prototype.slice.call(mainEl.querySelectorAll(':scope > section'));
+  } catch(_err) {
+    var childNodes = mainEl.children ? Array.prototype.slice.call(mainEl.children) : [];
+    sections = childNodes.filter(function(node){
+      return node && typeof node.tagName === 'string' && node.tagName.toLowerCase() === 'section';
+    });
+  }
+  var assignments = [];
+  var useSecondary = true;
+
+  sections.forEach(function(section){
+    if(!section || !section.style) return;
+    try {
+      section.style.backgroundColor = '';
+    } catch(_e) {}
+    if(section.classList && section.classList.contains('has-alt-background')){
+      section.classList.remove('has-alt-background');
+    }
+    if(section.dataset && section.dataset.altBgIndex){
+      try { delete section.dataset.altBgIndex; } catch(_err){}
+    }
+  });
+
+  var getStyle = null;
+  if(rootDoc && rootDoc.defaultView && typeof rootDoc.defaultView.getComputedStyle === 'function'){
+    getStyle = function(node){
+      try { return rootDoc.defaultView.getComputedStyle(node); }
+      catch(_err){ return null; }
+    };
+  } else if(typeof window !== 'undefined' && typeof window.getComputedStyle === 'function'){
+    getStyle = function(node){
+      try { return window.getComputedStyle(node); }
+      catch(_err){ return null; }
+    };
+  } else {
+    getStyle = function(){ return null; };
+  }
+
+  sections.forEach(function(section){
+    if(!section || !section.style || !section.classList) return;
+    if(section.classList.contains('hero')) return;
+    if(section.dataset && (section.dataset.altSkip === 'true' || section.dataset.skipAlt === 'true')) return;
+    if(section.hasAttribute && section.hasAttribute('data-alt-skip')) return;
+    if(section.hidden || (section.hasAttribute && section.hasAttribute('hidden'))) return;
+
+    var style = getStyle(section);
+    if(style && (style.display === 'none' || style.visibility === 'hidden')) return;
+
+    var color = useSecondary ? 'var(--bg-secondary)' : 'var(--bg-primary)';
+    try {
+      section.style.backgroundColor = color;
+      section.classList.add('has-alt-background');
+      if(section.dataset){ section.dataset.altBgIndex = useSecondary ? 'odd' : 'even'; }
+      assignments.push({ element: section, color: color });
+    } catch(_err){}
+    useSecondary = !useSecondary;
+  });
+
+  return assignments;
+}
+
 const SEARCH_INDEX = (function(){
   const entries = [
     {
@@ -239,6 +307,46 @@ if(typeof window !== 'undefined'){
       });
       card.addEventListener('mouseleave', function(){ card.style.transform = 'none'; });
     });
+  }
+})();
+
+/* istanbul ignore next */
+(function(){
+  if(typeof document === 'undefined') return;
+  var mainEl = document.querySelector('main');
+  if(!mainEl) return;
+
+  var apply = function(){
+    applyAlternateSectionBackgrounds(document);
+  };
+
+  apply();
+
+  if(typeof window !== 'undefined' && typeof window.addEventListener === 'function'){
+    window.addEventListener('DOMContentLoaded', apply);
+    window.addEventListener('load', apply, { once: true });
+  }
+
+  if(typeof window !== 'undefined' && typeof window.MutationObserver === 'function'){
+    try {
+      var observer = new MutationObserver(function(mutations){
+        for(var i=0;i<mutations.length;i++){
+          var mutation = mutations[i];
+          if(mutation.type !== 'attributes' || mutation.attributeName !== 'hidden') continue;
+          var target = mutation.target;
+          if(!target || typeof target.tagName !== 'string') continue;
+          if(target.tagName.toLowerCase() !== 'section') continue;
+          if(typeof target.closest === 'function' ? target.closest('main') !== mainEl : target.parentNode !== mainEl) continue;
+          apply();
+          break;
+        }
+      });
+      observer.observe(mainEl, { attributes: true, subtree: true, attributeFilter: ['hidden'] });
+    } catch(_err){}
+  }
+
+  if(typeof window !== 'undefined'){
+    window.SENTRAL_EMAS_APPLY_SECTION_BACKGROUNDS = apply;
   }
 })();
 
@@ -3031,6 +3139,7 @@ if (typeof window !== 'undefined') {
   testingApi.displayDefaultPrices = displayDefaultPrices;
   testingApi.formatDateTimeIndo = formatDateTimeIndo;
   testingApi.displayDateTimeWIB = displayDateTimeWIB;
+  testingApi.applyAlternateSectionBackgrounds = applyAlternateSectionBackgrounds;
 }
 
 // Expose selected helpers for testing under Node/Jest without affecting browser usage
@@ -3049,5 +3158,6 @@ if (typeof module !== 'undefined' && module.exports) {
     displayDefaultPrices,
     formatDateTimeIndo,
     displayDateTimeWIB,
+    applyAlternateSectionBackgrounds,
   };
 }
