@@ -36,9 +36,3 @@ out/
 
 # Misc
 *.local
-
-# Config files
-package-lock.json
-package.json
-jest.config.js
-jest.setup.js

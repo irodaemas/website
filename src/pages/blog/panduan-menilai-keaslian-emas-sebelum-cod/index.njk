@@ -64,62 +64,15 @@
   </script>
 </head>
 <body class="page-blog">
-  <header>
-    <div class="container nav">
-      <a class="brand" href="/">
-        <img src="/assets/img/logo.webp?v=1" alt="Logo Sentral Emas" width="32" height="32" decoding="async"/>
-        <strong>Sentral Emas</strong>
-      </a>
-      <nav class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">        
-        <a itemprop="url" href="/#fitur"><span itemprop="name">Fitur</span></a>
-        <a itemprop="url" href="/#diterima"><span itemprop="name">Yang Diterima</span></a>
-        <a itemprop="url" href="/#harga"><span itemprop="name">Harga Buyback</span></a>
-        <a itemprop="url" href="/blog/"><span itemprop="name">Blog</span></a>
-      </nav>
-      <div class="header-actions">
-        <button id="darkModeToggle" class="btn btn-gold btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
-          <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="5"/>
-            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
-          </svg>
-          <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
-          <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-        </button>
-        <div class="header-search" data-header-search>
-          <button class="btn btn-gold btn-icon site-search-toggle" type="button" aria-label="Buka pencarian" aria-expanded="false" aria-controls="headerSearchInput" data-search-toggle data-close-label="Tutup pencarian">
-            <svg class="site-search-toggle__icon site-search-toggle__icon--open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="7"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <svg class="site-search-toggle__icon site-search-toggle__icon--close" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="6" y1="6" x2="18" y2="18"/>
-              <line x1="18" y1="6" x2="6" y2="18"/>
-            </svg>
-          </button>
-          <form class="site-search" role="search" action="/" method="get" data-search-form>
-            <label class="sr-only" for="headerSearchInput">Cari di Sentral Emas</label>
-            <div class="site-search__field">
-              <input id="headerSearchInput" class="site-search__input" type="search" name="s" placeholder="Cari..." autocomplete="off" data-search-input />
-              <button class="site-search__submit" type="submit" aria-label="Kirim pencarian">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <circle cx="11" cy="11" r="7"/>
-                  <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                </svg>
-              </button>
-            </div>
-          </form>
-        </div>
-        <a class="btn btn-gold btn-icon hamb" href="/#kontak" aria-label="Hubungi Sentral Emas">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M22 16.92V21a1 1 0 0 1-1.09 1 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.86 19.86 0 0 1 3 3.09 1 1 0 0 1 4 2h3a1 1 0 0 1 1 .75l1 3a1 1 0 0 1-.27 1L7.91 9.91a16 16 0 0 0 6.18 6.18l3.16-1.82a1 1 0 0 1 1 .05l2.5 1.5A1 1 0 0 1 22 16.92z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </header>
+    {% include "components/header/home.njk" %}
+
   <main id="main-content" class="blog-main">
+    {% set breadcrumbs = [
+      { label: 'Beranda', url: '/' },
+      { label: 'Blog', url: '/blog/' },
+      { label: 'Panduan Menilai Keaslian Emas Sebelum COD' }
+    ] %}
+    {% include "components/breadcrumb.njk" %}
     <div class="container">
       <article class="blog-article">
         <header class="blog-article__header">
@@ -172,15 +125,13 @@
             <li>Konfirmasi alamat dan jadwal COD melalui WhatsApp.</li>
           </ul>
         </section>
-        <footer class="blog-article__footer">
-          <p>Masih ragu dengan hasil pengecekan? Konsultasikan ke tim Sentral Emas melalui <a href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">WhatsApp</a> atau jadwalkan kunjungan COD untuk analisa lengkap.</p>
-        </footer>
       </article>
     </div>
   </main>
-  <footer class="blog-footer">
-    <div class="container copy">© <span id="yr"></span> Sentral Emas • Blog</div>
-  </footer>
+
+  {% set footerCopy = 'Sentral Emas • Blog' %}
+  {% include "components/footer/home.njk" %}
+
   <script src="/assets/js/main.js" defer></script>
 </body>
 </html>

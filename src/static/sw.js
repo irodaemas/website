@@ -33,7 +33,8 @@ const CORE_ASSETS = [
     './offline.html'
 ];
 
-const IMMUTABLE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 tahun
+// const IMMUTABLE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 tahun
+const IMMUTABLE_MAX_AGE_SECONDS = 10 * 60; // 10 menit
 const IMMUTABLE_CACHE_CONTROL = `public, max-age=${IMMUTABLE_MAX_AGE_SECONDS}, immutable`;
 const IMMUTABLE_ASSET_PATTERN = /\.(?:css|js|mjs|cjs|woff2?|ttf|otf|eot|png|jpe?g|gif|svg|webp|avif|ico|mp4|webm|ogg|ogv|mp3|wav|flac|webmanifest|json|map|txt|xml|xsl|pdf|wasm)$/i;
 const CACHEABLE_DESTINATIONS = new Set(['style', 'script', 'image', 'font', 'audio', 'video', 'manifest', 'worker', 'paintworklet']);

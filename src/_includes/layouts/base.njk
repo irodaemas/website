@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ lang | default('id') }}">
+  <head>
+    {% block head %}{% endblock %}
+  </head>
+  {% set body_class = bodyClass or '' %}
+  <body class="{{ body_class }}">
+    {% block body_start %}
+      {% set gtm_value = gtmId | default('GTM-5D39RVL3', true) %}
+      {% if gtm_value %}
+        {% include "components/gtm-noscript.njk" with { gtmId: gtm_value } %}
+      {% endif %}
+    {% endblock %}
+
+    {% if not skipLinkDisabled %}
+      {% include "components/skip-link.njk" %}
+    {% endif %}
+
+    {% block header %}
+      {% if header %}
+        {% include "components/header/" + header + ".njk" %}
+      {% endif %}
+    {% endblock %}
+
+    {% block pre_main %}{% endblock %}
+
+    {% block content %}{% endblock %}
+
+    {% block afterContent %}{% endblock %}
+
+    {% block footer %}
+      {% if footer %}
+        {% include "components/footer/" + footer + ".njk" %}
+      {% endif %}
+    {% endblock %}
+
+    {% block body_end %}{% endblock %}
+  </body>
+</html>

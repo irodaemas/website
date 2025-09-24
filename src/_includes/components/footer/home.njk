@@ -1,0 +1,43 @@
+{% set isHome = page and (page.url == '/' or page.url == '') %}
+{% set diterimaHref = '#diterima' if isHome else '/#diterima' %}
+{% set kontakHref = '#kontak' if isHome else '/#kontak' %}
+<footer>
+  <div class="container foot">
+    <div>
+      <div class="brand mb-06">
+        <img src="/assets/img/logo.webp?v=1" alt="Logo Sentral Emas" loading="lazy" decoding="async" width="28" height="28"/>
+        <strong>Sentral Emas</strong>
+      </div>
+      <p class="my-02">Buyback aman via COD se‑Jabodetabek, mengikuti harga pasar hari transaksi. Transparan, cepat, dan terpercaya.</p>
+      <ul>
+        <li><span aria-label="Jam operasional">Jam Operasional: 08:00–22:00 WIB</span></li>
+      </ul>
+    </div>
+    <div>
+      <div class="h3">Kontak</div>
+      <div class="wa-badge glass" role="group" aria-label="Profil WhatsApp Sentral Emas">
+        <div class="wa-badge__avatar">
+          <img src="/assets/img/logo-wa.webp?v=1" alt="Logo Sentral Emas di WhatsApp" width="64" height="64" loading="lazy" decoding="async" />
+        </div>
+        <div class="wa-badge__identity">
+          <span class="wa-badge__title">Sentral Emas</span>
+          <span class="wa-badge__verified">
+            <span class="sr-only">Akun WhatsApp terverifikasi</span>
+            <img src="/assets/icons/whatsapp-verified.png" width="20" height="20" alt="" loading="lazy" decoding="async" aria-hidden="true" />
+          </span>
+        </div>
+        <a class="wa-badge__cta" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-badge">Lanjut ke Chat</a>
+      </div>
+    </div>
+    <div>
+      <div class="h3">Layanan</div>
+      <ul>
+        <li><a href="{{ diterimaHref }}">Perhiasan Emas</a></li>
+        <li><a href="{{ diterimaHref }}">Berlian & Batu Mulia</a></li>
+        <li><a href="{{ diterimaHref }}">Logam Mulia</a></li>
+        <li><a href="{{ diterimaHref }}">Jam Tangan Mewah</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="container copy">© <span id="yr"></span> {{ footerCopy | default('Sentral Emas • Jual Beli Emas & Berlian COD — Cepat, Transparan, Aman') }}</div>
+</footer>

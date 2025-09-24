@@ -63,9 +63,20 @@
     #darkModeToggle[data-theme-mode="dark"] .moon-icon{display:block}
     #darkModeToggle[data-theme-mode="auto"] .auto-icon{display:block}
     .offline-actions{position:fixed;top:1rem;right:1rem;display:flex;gap:.75rem;align-items:center;z-index:10}
+    .breadcrumb{margin:2.25rem auto .8rem auto;font-size:.72rem;color:var(--offline-muted);width:100%;max-width:720px;padding:0}
+    .breadcrumb__list{display:flex;gap:.3rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
+    .breadcrumb__item{display:flex;align-items:center;gap:.3rem;font-size:inherit}
+    .breadcrumb__item>a,
+    .breadcrumb__item>span{font-size:inherit}
+    .breadcrumb__item a{color:inherit;text-decoration:none}
+    .breadcrumb__item a:hover{text-decoration:underline}
+    .breadcrumb__item::after{content:'/';opacity:.6}
+    .breadcrumb__item:last-child{color:var(--offline-text);font-weight:700}
+    .breadcrumb__item:last-child::after{content:''}
     @media (max-width:600px){
       body{padding:1.5rem}
       .offline-actions{top:.75rem;right:.75rem}
+      .breadcrumb{margin:2rem auto .7rem auto;padding:0 1rem}
     }
   </style>
   <script>
@@ -94,6 +105,12 @@
       <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
     </button>
   </div>
+  <nav class="breadcrumb" aria-label="Breadcrumb">
+    <ol class="breadcrumb__list">
+      <li class="breadcrumb__item"><a href="/">Beranda</a></li>
+      <li class="breadcrumb__item" aria-current="page"><span>Offline</span></li>
+    </ol>
+  </nav>
   <div class="card" role="status" aria-live="polite">
     <h1>Anda sedang offline</h1>
     <p>Koneksi internet tidak tersedia. Beberapa fitur mungkin tidak dapat dimuat. Silakan coba lagi saat koneksi pulih.</p>
