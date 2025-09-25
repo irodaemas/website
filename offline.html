@@ -35,6 +35,8 @@
       --offline-ghost-border:rgba(1,61,57,.16);
       --offline-ghost-text:#0b1110;
     }
+    .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
+    .skip-link:focus{left:16px;top:16px;width:auto;height:auto;padding:.5rem .75rem;background:var(--offline-card-bg);color:var(--offline-deep);border-radius:8px;z-index:200;border:1px solid var(--offline-card-border)}
     [data-theme="dark"]{
       --offline-bg-start:#01332F;
       --offline-bg-end:#012A27;
@@ -93,6 +95,7 @@
   <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
 </head>
 <body>
+  <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
   <div class="offline-actions">
     <button id="darkModeToggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
       <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -111,14 +114,16 @@
       <li class="breadcrumb__item" aria-current="page"><span>Offline</span></li>
     </ol>
   </nav>
-  <div class="card" role="status" aria-live="polite">
-    <h1>Anda sedang offline</h1>
-    <p>Koneksi internet tidak tersedia. Beberapa fitur mungkin tidak dapat dimuat. Silakan coba lagi saat koneksi pulih.</p>
-    <div class="actions">
-      <a class="btn" href="/">Muat Ulang</a>
-      <a class="btn ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
+  <main id="main-content" tabindex="-1">
+    <div class="card" role="status" aria-live="polite">
+      <h1>Anda sedang offline</h1>
+      <p>Koneksi internet tidak tersedia. Beberapa fitur mungkin tidak dapat dimuat. Silakan coba lagi saat koneksi pulih.</p>
+      <div class="actions">
+        <a class="btn" href="/">Muat Ulang</a>
+        <a class="btn ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
+      </div>
     </div>
-  </div>
+  </main>
   <script src="/assets/js/main.js" defer></script>
 </body>
 </html>
