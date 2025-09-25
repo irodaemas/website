@@ -3829,13 +3829,14 @@ if ('serviceWorker' in navigator) {
   let deferredPrompt;
 
   window.addEventListener('beforeinstallprompt', (e) => {
+    const prompt = document.getElementById('pwaPrompt');
+    if (!prompt) {
+      return; // let browser handle prompt when custom UI is absent
+    }
     e.preventDefault();
     deferredPrompt = e;
-    const prompt = document.getElementById('pwaPrompt');
-    if (prompt) {
-      prompt.hidden = false;
-      prompt.setAttribute('data-state', 'install');
-    }
+    prompt.hidden = false;
+    prompt.setAttribute('data-state', 'install');
   });
 
   window.addEventListener('appinstalled', () => {
