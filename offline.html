@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +9,7 @@
   <meta name="application-name" content="Sentral Emas">
   <meta name="apple-mobile-web-app-title" content="Sentral Emas">
   <meta name="theme-color" content="#013D39">
-  <meta name="publisher" content="Sentral Emas"/>
+  <meta name="publisher" content="Sentral Emas" />
   <meta property="og:locale" content="id_ID">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Offline • Sentral Emas">
@@ -22,67 +23,240 @@
   <meta name="twitter:description" content="Anda sedang offline. Muat ulang situs Sentral Emas setelah kembali terhubung.">
   <meta name="twitter:image" content="https://sentralemas.com/assets/icons/android-chrome-512x512.png">
   <style>
-    :root{
-      --offline-gold:#D4AF37;
-      --offline-deep:#013D39;
-      --offline-bg-start:#f6fbfa;
-      --offline-bg-end:#e8f2f1;
-      --offline-text:#0b1110;
-      --offline-muted:#335e5a;
-      --offline-card-bg:#ffffff;
-      --offline-card-border:rgba(1,61,57,.12);
-      --offline-card-shadow:0 12px 30px rgba(1,61,57,.08);
-      --offline-ghost-border:rgba(1,61,57,.16);
-      --offline-ghost-text:#0b1110;
+    :root {
+      --offline-gold: #D4AF37;
+      --offline-deep: #013D39;
+      --offline-bg-start: #f6fbfa;
+      --offline-bg-end: #e8f2f1;
+      --offline-text: #0b1110;
+      --offline-muted: #335e5a;
+      --offline-card-bg: #ffffff;
+      --offline-card-border: rgba(1, 61, 57, .12);
+      --offline-card-shadow: 0 12px 30px rgba(1, 61, 57, .08);
+      --offline-ghost-border: rgba(1, 61, 57, .16);
+      --offline-ghost-text: #0b1110;
     }
-    .skip-link{position:absolute;left:-999px;top:auto;width:1px;height:1px;overflow:hidden}
-    .skip-link:focus{left:16px;top:16px;width:auto;height:auto;padding:.5rem .75rem;background:var(--offline-card-bg);color:var(--offline-deep);border-radius:8px;z-index:200;border:1px solid var(--offline-card-border)}
-    [data-theme="dark"]{
-      --offline-bg-start:#01332F;
-      --offline-bg-end:#012A27;
-      --offline-text:#eafffd;
-      --offline-muted:#cdecea;
-      --offline-card-bg:#083a37;
-      --offline-card-border:rgba(255,255,255,.14);
-      --offline-card-shadow:0 10px 30px rgba(0,0,0,.25);
-      --offline-ghost-border:rgba(255,255,255,.25);
-      --offline-ghost-text:#eafffd;
+
+    .skip-link {
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      overflow: hidden
     }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0}
-    body{display:grid;place-items:center;min-height:100%;background:linear-gradient(180deg,var(--offline-bg-start),var(--offline-bg-end));color:var(--offline-text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding:2rem}
-    .card{max-width:680px;margin:1rem;padding:1.25rem 1.25rem 1rem;background:var(--offline-card-bg);border:1px solid var(--offline-card-border);border-radius:14px;box-shadow:var(--offline-card-shadow)}
-    h1{margin:.2rem 0;font-size:1.6rem;color:var(--offline-text)}
-    p{margin:.4rem 0 0;color:var(--offline-muted);line-height:1.6}
-    .actions{display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap}
-    .btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1rem;border-radius:12px;border:1px solid transparent;font-weight:700;text-decoration:none;cursor:pointer;background:var(--offline-gold);color:var(--offline-deep);transition:filter .2s ease;}
-    .btn:hover{filter:brightness(1.05)}
-    .btn:focus-visible{outline:3px solid rgba(212,175,55,.4);outline-offset:2px}
-    .btn.ghost{background:transparent;color:var(--offline-ghost-text);border:1px solid var(--offline-ghost-border)}
-    .btn-icon{width:44px;height:44px;padding:0;justify-content:center;border-radius:50%}
-    #darkModeToggle .sun-icon,#darkModeToggle .moon-icon,#darkModeToggle .auto-icon{display:none}
-    #darkModeToggle[data-theme-mode="light"] .sun-icon{display:block}
-    #darkModeToggle[data-theme-mode="dark"] .moon-icon{display:block}
-    #darkModeToggle[data-theme-mode="auto"] .auto-icon{display:block}
-    .offline-actions{position:fixed;top:1rem;right:1rem;display:flex;gap:.75rem;align-items:center;z-index:10}
-    .breadcrumb{margin:2.25rem auto .8rem auto;font-size:.72rem;color:var(--offline-muted);width:100%;max-width:720px;padding:0}
-    .breadcrumb__list{display:flex;gap:.3rem;flex-wrap:wrap;list-style:none;margin:0;padding:0}
-    .breadcrumb__item{display:flex;align-items:center;gap:.3rem;font-size:inherit}
+
+    .skip-link:focus {
+      left: 16px;
+      top: 16px;
+      width: auto;
+      height: auto;
+      padding: .5rem .75rem;
+      background: var(--offline-card-bg);
+      color: var(--offline-deep);
+      border-radius: 8px;
+      z-index: 200;
+      border: 1px solid var(--offline-card-border)
+    }
+
+    [data-theme="dark"] {
+      --offline-bg-start: #01332F;
+      --offline-bg-end: #012A27;
+      --offline-text: #eafffd;
+      --offline-muted: #cdecea;
+      --offline-card-bg: #083a37;
+      --offline-card-border: rgba(255, 255, 255, .14);
+      --offline-card-shadow: 0 10px 30px rgba(0, 0, 0, .25);
+      --offline-ghost-border: rgba(255, 255, 255, .25);
+      --offline-ghost-text: #eafffd;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%;
+      margin: 0
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100%;
+      background: linear-gradient(180deg, var(--offline-bg-start), var(--offline-bg-end));
+      color: var(--offline-text);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      padding: 2rem
+    }
+
+    .card {
+      max-width: 680px;
+      margin: 1rem;
+      padding: 1.25rem 1.25rem 1rem;
+      background: var(--offline-card-bg);
+      border: 1px solid var(--offline-card-border);
+      border-radius: 14px;
+      box-shadow: var(--offline-card-shadow)
+    }
+
+    h1 {
+      margin: .2rem 0;
+      font-size: 1.6rem;
+      color: var(--offline-text)
+    }
+
+    p {
+      margin: .4rem 0 0;
+      color: var(--offline-muted);
+      line-height: 1.6
+    }
+
+    .actions {
+      display: flex;
+      gap: .6rem;
+      margin-top: 1rem;
+      flex-wrap: wrap
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      padding: .6rem 1rem;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      background: var(--offline-gold);
+      color: var(--offline-deep);
+      transition: filter .2s ease;
+    }
+
+    .btn:hover {
+      filter: brightness(1.05)
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid rgba(212, 175, 55, .4);
+      outline-offset: 2px
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--offline-ghost-text);
+      border: 1px solid var(--offline-ghost-border)
+    }
+
+    .btn-icon {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      justify-content: center;
+      border-radius: 50%
+    }
+
+    #darkModeToggle .sun-icon,
+    #darkModeToggle .moon-icon,
+    #darkModeToggle .auto-icon {
+      display: none
+    }
+
+    #darkModeToggle[data-theme-mode="light"] .sun-icon {
+      display: block
+    }
+
+    #darkModeToggle[data-theme-mode="dark"] .moon-icon {
+      display: block
+    }
+
+    #darkModeToggle[data-theme-mode="auto"] .auto-icon {
+      display: block
+    }
+
+    .offline-actions {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      z-index: 10
+    }
+
+    .breadcrumb {
+      margin: 2.25rem auto .8rem auto;
+      font-size: .72rem;
+      color: var(--offline-muted);
+      width: 100%;
+      max-width: 720px;
+      padding: 0
+    }
+
+    .breadcrumb__list {
+      display: flex;
+      gap: .3rem;
+      flex-wrap: wrap;
+      list-style: none;
+      margin: 0;
+      padding: 0
+    }
+
+    .breadcrumb__item {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      font-size: inherit
+    }
+
     .breadcrumb__item>a,
-    .breadcrumb__item>span{font-size:inherit}
-    .breadcrumb__item a{color:inherit;text-decoration:none}
-    .breadcrumb__item a:hover{text-decoration:underline}
-    .breadcrumb__item::after{content:'/';opacity:.6}
-    .breadcrumb__item:last-child{color:var(--offline-text);font-weight:700}
-    .breadcrumb__item:last-child::after{content:''}
-    @media (max-width:600px){
-      body{padding:1.5rem}
-      .offline-actions{top:.75rem;right:.75rem}
-      .breadcrumb{margin:2rem auto .7rem auto;padding:0 1rem}
+    .breadcrumb__item>span {
+      font-size: inherit
+    }
+
+    .breadcrumb__item a {
+      color: inherit;
+      text-decoration: none
+    }
+
+    .breadcrumb__item a:hover {
+      text-decoration: underline
+    }
+
+    .breadcrumb__item::after {
+      content: '/';
+      opacity: .6
+    }
+
+    .breadcrumb__item:last-child {
+      color: var(--offline-text);
+      font-weight: 700
+    }
+
+    .breadcrumb__item:last-child::after {
+      content: ''
+    }
+
+    @media (max-width:600px) {
+      body {
+        padding: 1.5rem
+      }
+
+      .offline-actions {
+        top: .75rem;
+        right: .75rem
+      }
+
+      .breadcrumb {
+        margin: 2rem auto .7rem auto;
+        padding: 0 1rem
+      }
     }
   </style>
   <script>
-    (function(){
+    (function() {
       try {
         var theme = localStorage.getItem('sentral_emas_theme') || 'auto';
         var prefersDark = theme === 'auto' && window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : null;
@@ -94,18 +268,23 @@
   <link rel="icon" href="/assets/icons/favicon.ico" sizes="32x32" type="image/x-icon">
   <link rel="shortcut icon" href="/assets/icons/favicon.ico" type="image/x-icon">
 </head>
+
 <body>
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
   <div class="offline-actions">
     <button id="darkModeToggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
       <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5"/>
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+        <circle cx="12" cy="12" r="5" />
+        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
       </svg>
       <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
       </svg>
-      <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+        <line x1="8" y1="21" x2="16" y2="21"></line>
+        <line x1="12" y1="17" x2="12" y2="21"></line>
+      </svg>
     </button>
   </div>
   <nav class="breadcrumb" aria-label="Breadcrumb">
@@ -126,4 +305,5 @@
   </main>
   <script src="/assets/js/main.js" defer></script>
 </body>
+
 </html>
