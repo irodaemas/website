@@ -310,7 +310,7 @@ body {
   padding: .35rem .7rem;
   border-radius: 999px;
   background: var(--gold);
-  color: var(--paper);
+  color: var(--text-on-accent);
   border: 1px solid var(--gold);
   font-weight: 600
 }
@@ -931,7 +931,7 @@ body.search-active .search-section {
 
 .search-chip {
   background: var(--gold);
-  color: var(--paper);
+  color: var(--text-on-accent);
   border: 1px solid var(--gold);
   box-shadow: none
 }
@@ -3152,7 +3152,7 @@ a {
 }
 
 .blog-chip {
-  color: var(--text-primary);
+  color: var(--text-on-accent);
   border: 1px solid rgba(1, 61, 57, .16);
   font-size: .85rem;
   text-transform: uppercase;
@@ -3167,6 +3167,14 @@ a {
   margin: 0;
   color: var(--text-secondary);
   max-width: 65ch
+}
+
+#insight .text-muted a {
+  color: var(--accent-green);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
 }
 
 .blog-grid {
