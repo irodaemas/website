@@ -252,6 +252,12 @@ if (typeof window !== 'undefined') {
   // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
   var bar = document.querySelector('.scroll-progress');
   var hero = document.querySelector('.hero');
+  var parallaxRoot = hero && hero.hasAttribute('data-parallax-root') ? hero : null;
+  var parallaxLayers = [];
+  var parallaxRefreshPending = false;
+  var reduceMotionQuery = null;
+  var prefersReducedMotion = false;
+  var heroRevealed = false;
   var root = document.scrollingElement || document.documentElement || document.body;
   var lastSP = -1,
     lastPar = -1,
@@ -301,13 +307,122 @@ if (typeof window !== 'undefined') {
       lastSP = sp;
     }
     // Parallax hero translate mapped to classes (no inline style)
-    var par = Math.max(0, Math.min(20, Math.round(Math.min(40, scrollTop * 0.04) / 2)));
+    var parallaxBase = Math.min(40, scrollTop * 0.04);
+    var par = Math.max(0, Math.min(20, Math.round(parallaxBase / 2)));
     if (hero && par !== lastPar) {
       if (lastPar >= 0) hero.classList.remove('par-' + lastPar);
       hero.classList.add('par-' + par);
       lastPar = par;
     }
+    applyParallaxShift(parallaxBase);
+    if (!heroRevealed && hero) {
+      try {
+        var viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0;
+        var rect = typeof hero.getBoundingClientRect === 'function' ? hero.getBoundingClientRect() : null;
+        if (!rect || typeof rect.top !== 'number' || viewportHeight === 0 || rect.top <= viewportHeight * 0.75) {
+          hero.classList.add('hero-ready');
+          heroRevealed = true;
+        }
+      } catch (_err) {
+        hero.classList.add('hero-ready');
+        heroRevealed = true;
+      }
+    }
     ticking = false;
+  }
+
+  function applyParallaxShift(amount) {
+    if (!parallaxLayers.length || prefersReducedMotion) return;
+    var viewportWidth = window.innerWidth || document.documentElement.clientWidth || 0;
+    var viewportFactor = 1;
+    if (viewportWidth && viewportWidth < 600) {
+      viewportFactor = 0.55;
+    } else if (viewportWidth && viewportWidth < 1024) {
+      viewportFactor = 0.75;
+    }
+    var effective = amount * viewportFactor;
+    parallaxLayers.forEach(function(layer) {
+      if (!layer || !layer.el) return;
+      var depth = layer.depth;
+      if (!depth) {
+        if (layer.current !== 0 && layer.el.style && layer.el.style.setProperty) {
+          layer.current = 0;
+          layer.el.style.setProperty('--parallax-shift', '0px');
+        }
+        return;
+      }
+      var shift = effective * depth * -1;
+      if (layer.max !== null && shift > layer.max) shift = layer.max;
+      if (layer.min !== null && shift < layer.min) shift = layer.min;
+      if (shift > 80) shift = 80;
+      if (shift < -80) shift = -80;
+      if (Math.abs(shift - layer.current) < 0.1) return;
+      layer.current = shift;
+      if (layer.el.style && layer.el.style.setProperty) {
+        layer.el.style.setProperty('--parallax-shift', shift.toFixed(2) + 'px');
+      }
+    });
+  }
+
+  function disableParallax() {
+    if (!parallaxRoot) return;
+    parallaxRoot.classList.add('is-parallax-disabled');
+    var nodes = parallaxRoot.querySelectorAll('[data-parallax-layer]');
+    nodes.forEach(function(node) {
+      if (node && node.style && node.style.removeProperty) {
+        node.style.removeProperty('--parallax-shift');
+      }
+    });
+    parallaxLayers = [];
+  }
+
+  function refreshParallaxLayers() {
+    if (!parallaxRoot) return;
+    if (prefersReducedMotion) {
+      disableParallax();
+      return;
+    }
+    parallaxRoot.classList.remove('is-parallax-disabled');
+    var nodes;
+    try {
+      nodes = Array.prototype.slice.call(parallaxRoot.querySelectorAll('[data-parallax-layer]'));
+    } catch (_err) {
+      nodes = [];
+    }
+    parallaxLayers = nodes.map(function(node) {
+      var depthAttr = node ? (node.getAttribute('data-parallax-depth') || (node.dataset && node.dataset.parallaxDepth)) : 0;
+      var maxAttr = node ? (node.getAttribute('data-parallax-max') || (node.dataset && node.dataset.parallaxMax)) : null;
+      var minAttr = node ? (node.getAttribute('data-parallax-min') || (node.dataset && node.dataset.parallaxMin)) : null;
+      var depth = parseFloat(depthAttr);
+      if (!isFinite(depth)) depth = 0;
+      var max = parseFloat(maxAttr);
+      if (!isFinite(max)) max = null;
+      var min = parseFloat(minAttr);
+      if (!isFinite(min)) min = null;
+      if (node && node.style && node.style.setProperty) {
+        node.style.setProperty('--parallax-shift', '0px');
+      }
+      return {
+        el: node,
+        depth: depth,
+        max: max,
+        min: min,
+        current: 0
+      };
+    });
+  }
+
+  function queueParallaxRefresh() {
+    if (!parallaxRoot || prefersReducedMotion) return;
+    if (parallaxRefreshPending) return;
+    parallaxRefreshPending = true;
+    schedule(function() {
+      parallaxRefreshPending = false;
+      refreshParallaxLayers();
+      if (!prefersReducedMotion) {
+        onScroll();
+      }
+    });
   }
 
   function onScroll() {
@@ -321,6 +436,9 @@ if (typeof window !== 'undefined') {
   window.addEventListener('resize', scheduleMaxScroll, {
     passive: true
   });
+  window.addEventListener('resize', queueParallaxRefresh, {
+    passive: true
+  });
   document.addEventListener('prices:updated', scheduleMaxScroll);
   if ('ResizeObserver' in window) {
     try {
@@ -332,8 +450,42 @@ if (typeof window !== 'undefined') {
       }
     } catch (e) {}
   }
+  if ('ResizeObserver' in window && parallaxRoot) {
+    try {
+      var parallaxObserver = new ResizeObserver(queueParallaxRefresh);
+      parallaxObserver.observe(parallaxRoot);
+    } catch (_err) {}
+  }
   scheduleMaxScroll();
   onScroll();
+
+  if (window.matchMedia) {
+    try {
+      reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+      prefersReducedMotion = !!reduceMotionQuery.matches;
+      var handleMotionPreference = function(event) {
+        prefersReducedMotion = !!(event && event.matches);
+        if (prefersReducedMotion) {
+          disableParallax();
+        } else {
+          queueParallaxRefresh();
+        }
+      };
+      if (typeof reduceMotionQuery.addEventListener === 'function') {
+        reduceMotionQuery.addEventListener('change', handleMotionPreference);
+      } else if (typeof reduceMotionQuery.addListener === 'function') {
+        reduceMotionQuery.addListener(handleMotionPreference);
+      }
+    } catch (_err) {}
+  }
+
+  if (parallaxRoot) {
+    if (prefersReducedMotion) {
+      disableParallax();
+    } else {
+      queueParallaxRefresh();
+    }
+  }
 
   // ---- WA click pulse (no inline styles) ----
   document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function(el) {
