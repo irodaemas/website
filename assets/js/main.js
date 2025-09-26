@@ -3823,6 +3823,57 @@ if ('serviceWorker' in navigator) {
   apply();
 })();
 
+// Scroll reveal for sections
+/* istanbul ignore next */
+(function() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  function revealSections() {
+    if (!document.body) return;
+    document.body.classList.add('js-enabled');
+
+    var sections = Array.prototype.slice.call(document.querySelectorAll('[data-scroll-section]'));
+    if (!sections.length) return;
+
+    if (!('IntersectionObserver' in window)) {
+      sections.forEach(function(section) {
+        section.classList.add('is-visible');
+      });
+      return;
+    }
+
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        var target = entry.target;
+        if (!target) return;
+
+        if (entry.isIntersecting) {
+          target.classList.add('is-visible');
+          return;
+        }
+        target.classList.remove('is-visible');
+      });
+    }, {
+      threshold: 0.2,
+      rootMargin: '0px 0px -10% 0px'
+    });
+
+    sections.forEach(function(section) {
+      if (!section.classList.contains('is-visible')) {
+        observer.observe(section);
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', revealSections, {
+      once: true
+    });
+  } else {
+    revealSections();
+  }
+})();
+
 // PWA Install Prompt
 /* istanbul ignore next */
 (function() {

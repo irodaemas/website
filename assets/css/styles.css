@@ -9,6 +9,26 @@
   overflow: hidden
 }
 
+/* --- Scroll reveal animation --- */
+body.js-enabled [data-scroll-section] {
+  opacity: 0;
+  transform: translate3d(0, 40px, 0);
+  transition: opacity .6s ease-out, transform .6s ease-out;
+  will-change: opacity, transform;
+}
+
+body.js-enabled [data-scroll-section].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.js-enabled [data-scroll-section] {
+    transition: none;
+    transform: none;
+  }
+}
+
 .skip-link:focus {
   left: 16px;
   top: 16px;
