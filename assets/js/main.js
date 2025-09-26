@@ -1493,11 +1493,11 @@ function findLmBaruSeriesPair(series, currentBase) {
     for (var j = currentIndex - 1; j >= 0; j--) {
       var previousCandidate = points[j];
       if (!previousCandidate) continue;
-      if (typeof previousCandidate.base === 'number' && typeof result.current.base === 'number') {
-        if (Math.abs(previousCandidate.base - result.current.base) < 0.5) {
-          continue;
-        }
+      var shareSameTimestamp = false;
+      if (previousCandidate.time instanceof Date && result.current.time instanceof Date) {
+        shareSameTimestamp = previousCandidate.time.getTime() === result.current.time.getTime();
       }
+      if (shareSameTimestamp) continue;
       result.previous = previousCandidate;
       break;
     }
