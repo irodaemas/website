@@ -1305,6 +1305,10 @@ body.search-active .scroll-progress {
   .hero-orb {
     display: none !important
   }
+
+  .footer-orb {
+    animation: none !important
+  }
 }
 
 .hero {
@@ -1544,6 +1548,11 @@ footer .wa-badge {
 
   .hero-orb {
     opacity: .22
+  }
+
+  .footer-orb {
+    opacity: .28;
+    filter: blur(.4px)
   }
 }
 
@@ -2627,7 +2636,66 @@ tbody tr:hover td {
 footer {
   background: #012A27;
   color: #c9e9e6;
-  border-top: 1px solid rgba(255, 255, 255, .08)
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  position: relative;
+  overflow: hidden
+}
+
+.footer-ornaments {
+  position: absolute;
+  inset: -20% 0 -35% 0;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(.25px);
+  opacity: .9;
+  mix-blend-mode: screen
+}
+
+.footer-orb {
+  position: absolute;
+  width: clamp(160px, 15vw + 80px, 300px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: radial-gradient(circle at 35% 35%, rgba(255, 255, 255, .35) 0%, rgba(0, 114, 101, .45) 38%, rgba(1, 42, 39, 0) 72%);
+  opacity: .4;
+  animation: footerOrbFloat 14s ease-in-out infinite alternate;
+  transform-origin: center
+}
+
+.footer-orb.orb-a {
+  top: 8%;
+  left: max(-12%, -120px);
+  animation-delay: -2.5s
+}
+
+.footer-orb.orb-b {
+  bottom: clamp(-12%, -14vw, -4%);
+  right: clamp(8%, 6vw, 16%);
+  width: clamp(200px, 18vw + 90px, 340px);
+  animation-delay: -6s
+}
+
+.footer-orb.orb-c {
+  top: clamp(28%, 24vw, 44%);
+  left: clamp(30%, 32vw, 52%);
+  width: clamp(120px, 12vw + 60px, 220px);
+  animation-duration: 18s;
+  animation-delay: -9s;
+  opacity: .32
+}
+
+@keyframes footerOrbFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1)
+  }
+
+  50% {
+    transform: translate3d(0, -16px, 0) scale(1.04)
+  }
+
+  100% {
+    transform: translate3d(0, 0, 0) scale(1)
+  }
 }
 
 .foot {
@@ -2635,6 +2703,12 @@ footer {
   grid-template-columns: 2fr 1fr 1fr;
   gap: 1.6rem;
   padding: 2.2rem 0
+}
+
+.foot,
+.copy {
+  position: relative;
+  z-index: 1
 }
 
 .foot a {
