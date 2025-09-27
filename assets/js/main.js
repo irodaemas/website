@@ -1,34 +1,5 @@
 // Extracted from inline scripts in index.html
 
-(function adjustThemeColor() {
-  if (typeof document === 'undefined') return;
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (!meta) return;
-  var brandColor = '#013D39';
-  var standalone = false;
-
-  try {
-    if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
-      var queries = ['(display-mode: standalone)', '(display-mode: fullscreen)', '(display-mode: minimal-ui)'];
-      standalone = queries.some(function(query) {
-        try {
-          return window.matchMedia(query).matches;
-        } catch (_err) {
-          return false;
-        }
-      });
-    }
-  } catch (_err) {}
-
-  if (!standalone && typeof navigator !== 'undefined' && typeof navigator.standalone === 'boolean') {
-    standalone = navigator.standalone;
-  }
-
-  if (!standalone) {
-    meta.setAttribute('content', brandColor);
-  }
-})();
-
 function normalizeSearchText(value) {
   if (!value && value !== 0) return '';
   var text = String(value);
