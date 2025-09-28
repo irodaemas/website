@@ -104,12 +104,28 @@
         <img src="assets/img/logo.webp?v=1" alt="Logo Sentral Emas" width="32" height="32" decoding="async" />
         <strong>Sentral Emas</strong>
       </a>
-      <nav class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">
-        <a itemprop="url" href="#fitur"><span itemprop="name">Fitur</span></a>
-        <a itemprop="url" href="#diterima"><span itemprop="name">Yang Diterima</span></a>
-        <a itemprop="url" href="#harga"><span itemprop="name">Harga Buyback</span></a>
-        <a itemprop="url" href="#kontak"><span itemprop="name">Kontak</span></a>
-      </nav>
+      <button class="nav-toggle" type="button" aria-label="Buka navigasi" aria-expanded="false" aria-controls="primaryNav" data-mobile-nav-toggle data-open-label="Buka navigasi" data-close-label="Tutup navigasi">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </button>
+      <div class="mobile-nav" id="primaryNav" data-mobile-nav data-state="closed" aria-hidden="true">
+        <div class="mobile-nav__backdrop" data-mobile-nav-dismiss></div>
+        <div class="mobile-nav__dialog" role="dialog" aria-modal="true" aria-labelledby="mobileNavTitle">
+          <div class="mobile-nav__header">
+            <p id="mobileNavTitle" class="mobile-nav__title">Menu</p>
+            <button class="mobile-nav__close" type="button" aria-label="Tutup navigasi" data-mobile-nav-dismiss>
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <nav class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">
+            <a itemprop="url" href="#fitur"><span itemprop="name">Fitur</span></a>
+            <a itemprop="url" href="#diterima"><span itemprop="name">Yang Diterima</span></a>
+            <a itemprop="url" href="#harga"><span itemprop="name">Harga Buyback</span></a>
+            <a itemprop="url" href="#kontak"><span itemprop="name">Kontak</span></a>
+          </nav>
+        </div>
+      </div>
       <div class="header-actions">
         <button id="darkModeToggle" class="btn btn-gold btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
           <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -563,23 +579,43 @@
       <div class="container">
         <div class="accent-title">Dokumentasi</div>
         <h2 class="h2">Galeri</h2>
-        <div class="grid gallery">
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #1" data-src="assets/img/asset2.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #2" data-src="assets/img/asset3.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #3" data-src="assets/img/asset4.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #4" data-src="assets/img/asset5.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #5" data-src="assets/img/asset6.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #6" data-src="assets/img/asset8.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <img alt="Contoh perhiasan emas yang diterima Sentral Emas #7" data-src="assets/img/asset12.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
-          <video src="assets/video/asset15.mp4" muted loop playsinline preload="none" loading="lazy">
-            <track kind="captions" src="assets/video/asset15.vtt" srclang="id" label="Bahasa Indonesia">
-          </video>
-          <video src="assets/video/asset16.mp4" muted loop playsinline preload="none" loading="lazy">
-            <track kind="captions" src="assets/video/asset16.vtt" srclang="id" label="Bahasa Indonesia">
-          </video>
-          <video src="assets/video/asset17.mp4" muted loop playsinline preload="none" loading="lazy">
-            <track kind="captions" src="assets/video/asset17.vtt" srclang="id" label="Bahasa Indonesia">
-          </video>
+        <div class="grid gallery" data-gallery>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset2.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #1" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #1" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #1" data-src="assets/img/asset2.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset3.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #2" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #2" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #2" data-src="assets/img/asset3.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset4.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #3" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #3" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #3" data-src="assets/img/asset4.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset5.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #4" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #4" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #4" data-src="assets/img/asset5.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset6.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #5" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #5" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #5" data-src="assets/img/asset6.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset8.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #6" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #6" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #6" data-src="assets/img/asset8.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="image" data-gallery-src="assets/img/asset12.jpeg" data-gallery-alt="Contoh perhiasan emas yang diterima Sentral Emas #7" aria-label="Lihat Contoh perhiasan emas yang diterima Sentral Emas #7" aria-haspopup="dialog">
+            <img alt="Contoh perhiasan emas yang diterima Sentral Emas #7" data-src="assets/img/asset12.jpeg" loading="lazy" decoding="async" width="400" height="180" class="lqip" />
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="video" data-gallery-src="assets/video/asset15.mp4" data-gallery-track="assets/video/asset15.vtt" data-gallery-track-label="Bahasa Indonesia" data-gallery-track-lang="id" aria-label="Putar video dokumentasi Sentral Emas 1" aria-haspopup="dialog">
+            <video src="assets/video/asset15.mp4" muted loop playsinline preload="none" loading="lazy" tabindex="-1">
+              <track kind="captions" src="assets/video/asset15.vtt" srclang="id" label="Bahasa Indonesia">
+            </video>
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="video" data-gallery-src="assets/video/asset16.mp4" data-gallery-track="assets/video/asset16.vtt" data-gallery-track-label="Bahasa Indonesia" data-gallery-track-lang="id" aria-label="Putar video dokumentasi Sentral Emas 2" aria-haspopup="dialog">
+            <video src="assets/video/asset16.mp4" muted loop playsinline preload="none" loading="lazy" tabindex="-1">
+              <track kind="captions" src="assets/video/asset16.vtt" srclang="id" label="Bahasa Indonesia">
+            </video>
+          </button>
+          <button type="button" class="gallery-item" data-gallery-item data-gallery-type="video" data-gallery-src="assets/video/asset17.mp4" data-gallery-track="assets/video/asset17.vtt" data-gallery-track-label="Bahasa Indonesia" data-gallery-track-lang="id" aria-label="Putar video dokumentasi Sentral Emas 3" aria-haspopup="dialog">
+            <video src="assets/video/asset17.mp4" muted loop playsinline preload="none" loading="lazy" tabindex="-1">
+              <track kind="captions" src="assets/video/asset17.vtt" srclang="id" label="Bahasa Indonesia">
+            </video>
+          </button>
         </div>
       </div>
     </section>
@@ -790,6 +826,28 @@
       </div>
     </section>
   </main>
+
+  <div class="lightbox" id="galleryLightbox" data-gallery-modal hidden aria-hidden="true">
+    <div class="lightbox__backdrop" data-gallery-close></div>
+    <div class="lightbox__dialog" role="dialog" aria-modal="true" aria-labelledby="galleryLightboxTitle">
+      <div class="lightbox__chrome">
+        <h2 id="galleryLightboxTitle" class="sr-only">Pratinjau galeri</h2>
+        <button class="lightbox__close" type="button" data-gallery-close aria-label="Tutup galeri">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <button class="lightbox__control lightbox__control--prev" type="button" data-gallery-prev aria-label="Media sebelumnya">
+          <span aria-hidden="true">&#10094;</span>
+        </button>
+        <button class="lightbox__control lightbox__control--next" type="button" data-gallery-next aria-label="Media selanjutnya">
+          <span aria-hidden="true">&#10095;</span>
+        </button>
+      </div>
+      <div class="lightbox__body">
+        <div class="lightbox__media" data-gallery-media role="group" aria-labelledby="galleryLightboxTitle"></div>
+        <p class="lightbox__caption" data-gallery-caption></p>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal detail kadar emas -->
   <div id="goldInfoModal" class="modal-overlay" hidden>

@@ -2439,6 +2439,202 @@ function displayFromBasePrice(basePrice, options) {
   bindHighlightAddButton();
 }
 
+// Tooltip interaksi harga
+/* istanbul ignore next */
+(function() {
+  if (typeof document === 'undefined') return;
+  var SELECTOR = '.tooltip[data-tooltip]';
+  var measureEl = document.createElement('div');
+  measureEl.className = 'tooltip-measure';
+  measureEl.setAttribute('aria-hidden', 'true');
+  var accessibleEl = document.createElement('div');
+  accessibleEl.className = 'sr-only';
+  accessibleEl.id = 'tooltipAccessible';
+  accessibleEl.setAttribute('role', 'tooltip');
+  accessibleEl.setAttribute('aria-hidden', 'true');
+  var activeEl = null;
+  var hideTimer = null;
+
+  function ensureHelpers() {
+    if (!document.body) return false;
+    if (!measureEl.parentNode) {
+      document.body.appendChild(measureEl);
+    }
+    if (!accessibleEl.parentNode) {
+      document.body.appendChild(accessibleEl);
+    }
+    return true;
+  }
+
+  function updateAccessible(el) {
+    if (!el) return;
+    var text = el.getAttribute('data-tooltip') || '';
+    accessibleEl.textContent = text;
+    accessibleEl.setAttribute('aria-hidden', text ? 'false' : 'true');
+    if (text) {
+      el.setAttribute('aria-describedby', accessibleEl.id);
+    }
+  }
+
+  function clearAccessible(el) {
+    if (el && el.getAttribute('aria-describedby') === accessibleEl.id) {
+      el.removeAttribute('aria-describedby');
+    }
+    accessibleEl.textContent = '';
+    accessibleEl.setAttribute('aria-hidden', 'true');
+  }
+
+  function updatePosition(el) {
+    if (!el || !ensureHelpers()) return;
+    var text = el.getAttribute('data-tooltip') || '';
+    measureEl.textContent = text;
+    var tooltipWidth = measureEl.offsetWidth || 0;
+    var tooltipHeight = measureEl.offsetHeight || 0;
+    var rect = el.getBoundingClientRect();
+    var viewportWidth = document.documentElement ? document.documentElement.clientWidth : window.innerWidth || 0;
+    var viewportHeight = document.documentElement ? document.documentElement.clientHeight : window.innerHeight || 0;
+    var margin = 16;
+    var offsetX = 0;
+    var centerX = rect.left + rect.width / 2;
+    var leftEdge = centerX - tooltipWidth / 2;
+    var rightEdge = centerX + tooltipWidth / 2;
+    if (leftEdge < margin) {
+      offsetX = margin - leftEdge;
+    } else if (rightEdge > viewportWidth - margin) {
+      offsetX = (viewportWidth - margin) - rightEdge;
+    }
+    el.style.setProperty('--tooltip-offset-x', offsetX + 'px');
+
+    var needFlip = false;
+    if (tooltipHeight) {
+      var availableTop = rect.top;
+      var availableBottom = viewportHeight - rect.bottom;
+      if (availableTop < tooltipHeight + margin && availableBottom > availableTop) {
+        needFlip = true;
+      }
+    }
+    if (needFlip) {
+      el.classList.add('is-tooltip-flip');
+    } else {
+      el.classList.remove('is-tooltip-flip');
+    }
+  }
+
+  function hideTooltip(el) {
+    if (!el) return;
+    el.classList.remove('is-tooltip-visible');
+    el.classList.remove('is-tooltip-flip');
+    el.style.removeProperty('--tooltip-offset-x');
+    if (activeEl === el) {
+      activeEl = null;
+    }
+    clearAccessible(el);
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+  }
+
+  function showTooltip(el, options) {
+    if (!el || !el.getAttribute('data-tooltip')) return;
+    if (!ensureHelpers()) return;
+    if (activeEl && activeEl !== el) {
+      hideTooltip(activeEl);
+    }
+    activeEl = el;
+    el.classList.add('is-tooltip-visible');
+    updatePosition(el);
+    updateAccessible(el);
+    if (options && options.touch) {
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(function() {
+        if (activeEl === el) {
+          hideTooltip(el);
+        }
+      }, 2500);
+    }
+  }
+
+  function handleMouseEnter() {
+    showTooltip(this);
+  }
+
+  function handleMouseLeave() {
+    hideTooltip(this);
+  }
+
+  function handleFocus() {
+    showTooltip(this);
+  }
+
+  function handleBlur() {
+    hideTooltip(this);
+  }
+
+  function handleTouchStart() {
+    showTooltip(this, {
+      touch: true
+    });
+  }
+
+  function handleKeyDown(ev) {
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      hideTooltip(this);
+      if (typeof this.blur === 'function') {
+        this.blur();
+      }
+    }
+  }
+
+  function bindTooltip(el) {
+    if (!el || el.__tooltipBound) return;
+    el.__tooltipBound = true;
+    el.addEventListener('mouseenter', handleMouseEnter);
+    el.addEventListener('mouseleave', handleMouseLeave);
+    el.addEventListener('focus', handleFocus);
+    el.addEventListener('blur', handleBlur);
+    el.addEventListener('keydown', handleKeyDown);
+    el.addEventListener('touchstart', handleTouchStart, {
+      passive: true
+    });
+  }
+
+  function initTooltips() {
+    if (!ensureHelpers()) return;
+    var nodes = document.querySelectorAll(SELECTOR);
+    nodes.forEach(bindTooltip);
+  }
+
+  document.addEventListener('DOMContentLoaded', initTooltips);
+  document.addEventListener('prices:updated', function() {
+    requestAnimationFrame(initTooltips);
+  });
+
+  if (document.readyState !== 'loading') {
+    initTooltips();
+  }
+
+  window.addEventListener('resize', function() {
+    if (activeEl) updatePosition(activeEl);
+  }, {
+    passive: true
+  });
+
+  window.addEventListener('scroll', function() {
+    if (activeEl) updatePosition(activeEl);
+  }, {
+    passive: true
+  });
+
+  document.addEventListener('pointerdown', function(ev) {
+    if (!activeEl) return;
+    if (!activeEl.contains(ev.target)) {
+      hideTooltip(activeEl);
+    }
+  });
+})();
+
 function handleGoldPriceFallback(summarySuffix, fallbackSummary) {
   var last = readLastBasePrice();
   /* istanbul ignore next */
@@ -2588,6 +2784,419 @@ window.addEventListener('resize', function() {
 }, {
   passive: true
 });
+
+// Mobile navigation drawer
+/* istanbul ignore next */
+(function() {
+  if (typeof document === 'undefined') return;
+  var nav = document.querySelector('[data-mobile-nav]');
+  var toggle = document.querySelector('[data-mobile-nav-toggle]');
+  if (!nav || !toggle) return;
+
+  var dialog = nav.querySelector('.mobile-nav__dialog') || nav;
+  if (dialog && !dialog.hasAttribute('tabindex')) {
+    dialog.setAttribute('tabindex', '-1');
+  }
+
+  var body = document.body;
+  var closeTargets = nav.querySelectorAll('[data-mobile-nav-dismiss]');
+  var menuLinks = nav.querySelectorAll('.menu a[href]');
+  var lastFocus = null;
+  var openClass = 'is-nav-open';
+  var OPEN_STATE = 'opened';
+  var CLOSED_STATE = 'closed';
+  var openLabel = toggle.getAttribute('data-open-label') || 'Buka navigasi';
+  var closeLabel = toggle.getAttribute('data-close-label') || 'Tutup navigasi';
+  var mq = window.matchMedia ? window.matchMedia('(min-width: 861px)') : null;
+
+  function getFocusable() {
+    var scope = dialog;
+    try {
+      return Array.prototype.slice.call(scope.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'))
+        .filter(function(el) {
+          return el && el.offsetParent !== null;
+        });
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function trapFocus(ev) {
+    if (nav.dataset.state !== OPEN_STATE) return;
+    if (ev.key !== 'Tab') return;
+    var focusable = getFocusable();
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (ev.shiftKey && document.activeElement === first) {
+      ev.preventDefault();
+      last.focus();
+    } else if (!ev.shiftKey && document.activeElement === last) {
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+
+  function setAriaHidden(value) {
+    if (!nav) return;
+    if (value) {
+      nav.setAttribute('aria-hidden', 'true');
+    } else {
+      nav.setAttribute('aria-hidden', 'false');
+    }
+  }
+
+  function openNav() {
+    if (nav.dataset.state === OPEN_STATE) return;
+    lastFocus = document.activeElement;
+    nav.dataset.state = OPEN_STATE;
+    setAriaHidden(false);
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.classList.add('is-active');
+    toggle.setAttribute('aria-label', closeLabel);
+    body.classList.add(openClass);
+    var focusTarget = nav.querySelector('.menu a[href]') || dialog;
+    if (focusTarget && typeof focusTarget.focus === 'function') {
+      focusTarget.focus();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    dialog.addEventListener('keydown', trapFocus);
+  }
+
+  function closeNav(restoreFocus) {
+    if (nav.dataset.state !== OPEN_STATE) {
+      setAriaHidden(mq && mq.matches ? false : true);
+      return;
+    }
+    nav.dataset.state = CLOSED_STATE;
+    setAriaHidden(!(mq && mq.matches));
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.classList.remove('is-active');
+    toggle.setAttribute('aria-label', openLabel);
+    body.classList.remove(openClass);
+    document.removeEventListener('keydown', handleKeyDown);
+    dialog.removeEventListener('keydown', trapFocus);
+    if (restoreFocus !== false && lastFocus && typeof lastFocus.focus === 'function') {
+      requestAnimationFrame(function() {
+        lastFocus.focus();
+      });
+    }
+  }
+
+  function handleKeyDown(ev) {
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      closeNav(true);
+    }
+  }
+
+  function syncForViewport() {
+    if (mq && mq.matches) {
+      if (nav.dataset.state === OPEN_STATE) {
+        closeNav(false);
+      }
+      nav.dataset.state = CLOSED_STATE;
+      setAriaHidden(false);
+      body.classList.remove(openClass);
+      toggle.classList.remove('is-active');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', openLabel);
+    } else if (nav.dataset.state !== OPEN_STATE) {
+      setAriaHidden(true);
+    }
+  }
+
+  function handleToggleClick() {
+    if (nav.dataset.state === OPEN_STATE) {
+      closeNav(true);
+    } else {
+      openNav();
+    }
+  }
+
+  toggle.addEventListener('click', handleToggleClick);
+  closeTargets.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeNav(true);
+    });
+  });
+
+  nav.addEventListener('click', function(ev) {
+    if (nav.dataset.state !== OPEN_STATE) return;
+    var target = ev.target;
+    if (target && target.closest('[data-mobile-nav-dismiss]')) {
+      return;
+    }
+    if (target && target.closest('a[href]')) {
+      closeNav(false);
+    }
+  });
+
+  if (mq && typeof mq.addEventListener === 'function') {
+    mq.addEventListener('change', syncForViewport);
+  } else if (mq && typeof mq.addListener === 'function') {
+    mq.addListener(syncForViewport);
+  }
+
+  syncForViewport();
+
+  if (menuLinks.length) {
+    menuLinks.forEach(function(link) {
+      link.addEventListener('keydown', function(ev) {
+        if (nav.dataset.state !== OPEN_STATE) return;
+        if (ev.key === 'Escape') {
+          ev.preventDefault();
+          closeNav(true);
+        }
+      });
+    });
+  }
+})();
+
+// Galeri lightbox
+/* istanbul ignore next */
+(function() {
+  if (typeof document === 'undefined') return;
+  var modal = document.querySelector('[data-gallery-modal]');
+  var items = Array.prototype.slice.call(document.querySelectorAll('[data-gallery-item]'));
+  if (!modal || !items.length) return;
+
+  var mediaWrap = modal.querySelector('[data-gallery-media]');
+  var captionEl = modal.querySelector('[data-gallery-caption]');
+  var prevBtn = modal.querySelector('[data-gallery-prev]');
+  var nextBtn = modal.querySelector('[data-gallery-next]');
+  var closeEls = modal.querySelectorAll('[data-gallery-close]');
+  var dialog = modal.querySelector('.lightbox__dialog') || modal;
+  var body = document.body;
+  var currentIndex = -1;
+  var lastFocus = null;
+  var activeMedia = null;
+  var galleryData = items.map(function(item, index) {
+    var type = item.getAttribute('data-gallery-type') || 'image';
+    var src = item.getAttribute('data-gallery-src') || '';
+    var alt = item.getAttribute('data-gallery-alt') || item.getAttribute('aria-label') || '';
+    var track = item.getAttribute('data-gallery-track') || '';
+    var trackLabel = item.getAttribute('data-gallery-track-label') || '';
+    var trackLang = item.getAttribute('data-gallery-track-lang') || '';
+    var trackKind = item.getAttribute('data-gallery-track-kind') || 'captions';
+    item.setAttribute('data-gallery-index', String(index));
+    return {
+      element: item,
+      type: type,
+      src: src,
+      alt: alt,
+      track: track,
+      trackLabel: trackLabel,
+      trackLang: trackLang,
+      trackKind: trackKind
+    };
+  });
+
+  if (dialog && !dialog.hasAttribute('tabindex')) {
+    dialog.setAttribute('tabindex', '-1');
+  }
+
+  function getFocusable() {
+    var scope = dialog || modal;
+    try {
+      return Array.prototype.slice.call(scope.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'))
+        .filter(function(el) {
+          return el && el.offsetParent !== null;
+        });
+    } catch (err) {
+      return [];
+    }
+  }
+
+  function trapFocus(ev) {
+    if (!modal.classList.contains('is-visible')) return;
+    if (ev.key !== 'Tab') return;
+    var focusable = getFocusable();
+    if (!focusable.length) return;
+    var first = focusable[0];
+    var last = focusable[focusable.length - 1];
+    if (ev.shiftKey && document.activeElement === first) {
+      ev.preventDefault();
+      last.focus();
+    } else if (!ev.shiftKey && document.activeElement === last) {
+      ev.preventDefault();
+      first.focus();
+    }
+  }
+
+  function cleanupMedia() {
+    if (activeMedia && activeMedia.tagName === 'VIDEO') {
+      try {
+        activeMedia.pause();
+      } catch (_err) {}
+      activeMedia.removeAttribute('src');
+      var children = Array.prototype.slice.call(activeMedia.querySelectorAll('source'));
+      children.forEach(function(child) {
+        child.removeAttribute('src');
+      });
+    }
+    if (mediaWrap) {
+      mediaWrap.innerHTML = '';
+    }
+    activeMedia = null;
+  }
+
+  function updateControls() {
+    if (!prevBtn || !nextBtn) return;
+    var disable = galleryData.length <= 1;
+    prevBtn.disabled = disable;
+    nextBtn.disabled = disable;
+  }
+
+  function render(index) {
+    var entry = galleryData[index];
+    if (!entry || !mediaWrap) return;
+    cleanupMedia();
+    var node;
+    if (entry.type === 'video') {
+      node = document.createElement('video');
+      node.setAttribute('controls', '');
+      node.setAttribute('playsinline', '');
+      node.setAttribute('preload', 'auto');
+      node.autoplay = true;
+      node.controls = true;
+      node.playsInline = true;
+      node.muted = true;
+      node.setAttribute('muted', '');
+      node.src = entry.src;
+      if (entry.alt) {
+        node.setAttribute('aria-label', entry.alt);
+      }
+      if (entry.track) {
+        var trackEl = document.createElement('track');
+        trackEl.kind = entry.trackKind || 'captions';
+        trackEl.src = entry.track;
+        if (entry.trackLabel) trackEl.label = entry.trackLabel;
+        if (entry.trackLang) trackEl.srclang = entry.trackLang;
+        node.appendChild(trackEl);
+      }
+      try {
+        node.load();
+      } catch (_err) {}
+      setTimeout(function() {
+        if (node && typeof node.play === 'function') {
+          node.play().catch(function() {});
+        }
+      }, 0);
+    } else {
+      node = document.createElement('img');
+      node.src = entry.src;
+      node.alt = entry.alt || '';
+      node.loading = 'lazy';
+      try {
+        node.decoding = 'async';
+      } catch (_err) {}
+    }
+    activeMedia = node;
+    mediaWrap.appendChild(node);
+    if (captionEl) {
+      captionEl.textContent = entry.alt || '';
+      captionEl.style.display = entry.alt ? '' : 'none';
+    }
+    updateControls();
+  }
+
+  function goTo(index) {
+    if (!galleryData.length) return;
+    var total = galleryData.length;
+    var nextIndex = index;
+    if (nextIndex < 0) {
+      nextIndex = (total + (nextIndex % total)) % total;
+    } else {
+      nextIndex = nextIndex % total;
+    }
+    currentIndex = nextIndex;
+    render(currentIndex);
+  }
+
+  function openModal(index, trigger) {
+    currentIndex = index;
+    lastFocus = trigger || document.activeElement || null;
+    modal.hidden = false;
+    modal.classList.add('is-visible');
+    modal.setAttribute('aria-hidden', 'false');
+    body.classList.add('is-lightbox-open');
+    goTo(index);
+    document.addEventListener('keydown', handleKeyDown);
+    dialog.addEventListener('keydown', trapFocus);
+    var focusTarget = closeEls && closeEls.length ? closeEls[0] : (prevBtn || nextBtn || dialog);
+    if (focusTarget && typeof focusTarget.focus === 'function') {
+      focusTarget.focus();
+    }
+  }
+
+  function closeModal(restoreFocus) {
+    if (!modal.classList.contains('is-visible')) return;
+    modal.classList.remove('is-visible');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.hidden = true;
+    body.classList.remove('is-lightbox-open');
+    document.removeEventListener('keydown', handleKeyDown);
+    dialog.removeEventListener('keydown', trapFocus);
+    cleanupMedia();
+    if (restoreFocus !== false && lastFocus && typeof lastFocus.focus === 'function') {
+      requestAnimationFrame(function() {
+        lastFocus.focus();
+      });
+    }
+  }
+
+  function handleKeyDown(ev) {
+    if (!modal.classList.contains('is-visible')) return;
+    if (ev.key === 'Escape') {
+      ev.preventDefault();
+      closeModal(true);
+    } else if (ev.key === 'ArrowRight') {
+      ev.preventDefault();
+      goTo(currentIndex + 1);
+    } else if (ev.key === 'ArrowLeft') {
+      ev.preventDefault();
+      goTo(currentIndex - 1);
+    }
+  }
+
+  items.forEach(function(item, index) {
+    item.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      openModal(index, item);
+    });
+  });
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      goTo(currentIndex - 1);
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      goTo(currentIndex + 1);
+    });
+  }
+
+  closeEls.forEach(function(btn) {
+    btn.addEventListener('click', function(ev) {
+      ev.preventDefault();
+      closeModal(true);
+    });
+  });
+
+  modal.addEventListener('click', function(ev) {
+    if (!modal.classList.contains('is-visible')) return;
+    if (ev.target === modal) {
+      closeModal(true);
+    }
+  });
+
+  updateControls();
+})();
 
 // Modal detail kadar emas dari tabel harga
 /* istanbul ignore next */
