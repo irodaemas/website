@@ -2000,7 +2000,7 @@ tbody tr:hover td {
   max-width: 800px;
   display: flex;
   flex-direction: column;
-  gap: .6rem;
+  gap: .9rem;
   transition: transform .3s ease, box-shadow .3s ease
 }
 
@@ -2025,44 +2025,117 @@ tbody tr:hover td {
 
 .price-highlight-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: .8rem
+}
+
+.price-highlight-headline {
+  display: flex;
+  flex-direction: column;
+  gap: .35rem
 }
 
 .price-highlight-label {
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: .1em;
   font-weight: 700;
   font-size: .82rem;
-  color: var(--paper)
+  color: rgba(239, 255, 252, .92)
+}
+
+.price-highlight-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .6rem;
+  flex-wrap: wrap;
+  margin-left: auto
+}
+
+.price-range-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+  padding: .25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .02));
+  box-shadow: 0 12px 26px rgba(1, 25, 23, .24);
+  backdrop-filter: blur(8px)
+}
+
+.price-range-btn {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  padding: .35rem .85rem;
+  font-weight: 600;
+  font-size: .78rem;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  background: transparent;
+  color: rgba(224, 248, 244, .78);
+  cursor: pointer;
+  transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease
+}
+
+.price-range-btn:hover {
+  color: rgba(255, 255, 255, .92)
+}
+
+.price-range-btn.is-active,
+.price-range-btn[aria-pressed="true"] {
+  background: linear-gradient(135deg, rgba(88, 255, 169, .85), rgba(18, 163, 134, .72));
+  color: #012c24;
+  box-shadow: 0 14px 28px rgba(12, 143, 100, .34);
+  transform: translateY(-1px)
+}
+
+.price-range-btn:focus-visible {
+  outline: 2px solid rgba(212, 175, 55, .65);
+  outline-offset: 2px
 }
 
 .price-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: .2rem .6rem;
+  padding: .3rem .9rem;
   border-radius: 999px;
   font-weight: 700;
   font-size: .78rem;
-  min-width: 96px
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  min-width: 0;
+  border: 1px solid rgba(255, 255, 255, .28);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .06));
+  color: var(--paper);
+  box-shadow: 0 16px 32px rgba(1, 25, 23, .3);
+  white-space: nowrap;
+  transition: transform .2s ease, box-shadow .2s ease
 }
 
 .price-badge.price-up {
-  background: rgba(14, 156, 90, .2);
-  color: #58ffa9
+  background: linear-gradient(135deg, rgba(88, 255, 169, .62), rgba(16, 130, 101, .78));
+  color: #012e24;
+  border-color: rgba(88, 255, 169, .64);
+  box-shadow: 0 18px 32px rgba(11, 110, 87, .35)
 }
 
 .price-badge.price-down {
-  background: rgba(212, 80, 64, .18);
-  color: #ff9f94
+  background: linear-gradient(135deg, rgba(255, 179, 164, .52), rgba(214, 72, 58, .68));
+  color: #fff4f1;
+  border-color: rgba(255, 179, 164, .6);
+  box-shadow: 0 18px 32px rgba(142, 24, 16, .35)
 }
 
 .price-badge.price-neutral {
-  background: rgba(255, 255, 255, .16);
-  color: var(--paper)
+  background: linear-gradient(135deg, rgba(255, 255, 255, .2), rgba(255, 255, 255, .05));
+  color: var(--paper);
+  border-color: rgba(255, 255, 255, .26)
 }
 
 .price-highlight-main {
@@ -2206,14 +2279,53 @@ tbody tr:hover td {
   color: var(--paper)
 }
 
+
+.price-highlight-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: .75rem;
+  margin: .1rem 0 .3rem
+}
+
+.price-highlight-insight {
+  padding: .7rem .9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, .14);
+  background: linear-gradient(140deg, rgba(255, 255, 255, .1), rgba(1, 31, 29, .18));
+  box-shadow: 0 16px 30px rgba(1, 25, 23, .22);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  gap: .2rem
+}
+
+.price-highlight-insight-label {
+  font-size: .68rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: rgba(225, 250, 246, .76)
+}
+
+.price-highlight-insight-value {
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--paper)
+}
+
 .price-highlight-delta {
   display: flex;
   align-items: center;
-  gap: .6rem;
+  gap: .75rem;
+  flex-wrap: wrap;
   font-weight: 600;
   font-size: .95rem;
   color: var(--paper);
-  transition: transform .3s ease
+  transition: transform .3s ease;
+  padding: .7rem .9rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .1);
+  box-shadow: 0 18px 34px rgba(1, 25, 23, .22)
 }
 
 .price-highlight-delta.delta-flash {
@@ -2221,17 +2333,18 @@ tbody tr:hover td {
 }
 
 .price-highlight-delta .delta-icon {
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .2);
   color: var(--paper);
   position: relative;
   overflow: hidden;
-  font-size: 0
+  font-size: 0;
+  box-shadow: 0 12px 22px rgba(0, 0, 0, .28)
 }
 
 .price-highlight-delta .delta-icon::before,
@@ -2311,29 +2424,37 @@ tbody tr:hover td {
 }
 
 .price-highlight-delta.trend-up {
-  color: #58ffa9
+  color: #58ffa9;
+  background: linear-gradient(135deg, rgba(88, 255, 169, .2), rgba(16, 130, 101, .18));
+  border-color: rgba(88, 255, 169, .32)
 }
 
 .price-highlight-delta.trend-up .delta-icon {
-  background: rgba(14, 156, 90, .24);
-  color: #58ffa9
+  background: linear-gradient(135deg, rgba(88, 255, 169, .78), rgba(16, 130, 101, .64));
+  color: #012d23;
+  box-shadow: 0 14px 26px rgba(11, 110, 87, .35)
 }
 
 .price-highlight-delta.trend-down {
-  color: #ff9f94
+  color: #ffb3a8;
+  background: linear-gradient(135deg, rgba(255, 179, 164, .24), rgba(214, 72, 58, .16));
+  border-color: rgba(255, 179, 164, .3)
 }
 
 .price-highlight-delta.trend-down .delta-icon {
-  background: rgba(212, 80, 64, .26);
-  color: #ff9f94
+  background: linear-gradient(135deg, rgba(255, 179, 164, .68), rgba(214, 72, 58, .62));
+  color: #5c0b02;
+  box-shadow: 0 14px 26px rgba(142, 24, 16, .32)
 }
 
 .price-highlight-delta.trend-flat {
-  color: var(--paper)
+  color: var(--paper);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .08));
+  border-color: rgba(255, 255, 255, .16)
 }
 
 .price-highlight-delta.trend-flat .delta-icon {
-  background: rgba(255, 255, 255, .18);
+  background: rgba(255, 255, 255, .2);
   color: var(--paper)
 }
 
@@ -2363,6 +2484,21 @@ tbody tr:hover td {
 
   .price-badge {
     min-width: 0
+  }
+
+  .price-highlight-controls {
+    width: 100%;
+    margin-left: 0;
+    justify-content: space-between
+  }
+
+  .price-range-toggle {
+    width: 100%;
+    justify-content: space-between
+  }
+
+  .price-range-btn {
+    flex: 1
   }
 }
 
@@ -4552,7 +4688,9 @@ a {
 #lmBaruHighlight[aria-busy="true"] .price-highlight-head,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-main,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-chart,
-#lmBaruHighlight[aria-busy="true"] .price-highlight-delta {
+#lmBaruHighlight[aria-busy="true"] .price-highlight-insights,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-delta,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-actions {
   visibility: hidden;
 }
 

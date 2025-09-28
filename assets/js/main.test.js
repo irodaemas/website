@@ -67,14 +67,44 @@ describe('main.js behaviours', () => {
       <div id="currentDateTime"></div>
       <div id="typer"></div>
       <table><tbody id="goldPriceTable"></tbody></table>
-      <div id="lmBaruHighlight" class="price-highlight">
+      <div id="lmBaruHighlight" class="price-highlight" aria-busy="true" aria-describedby="lmBaruDeltaText lmBaruTrendSummary">
         <div class="price-highlight-head">
-          <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
-          <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+          <div class="price-highlight-headline">
+            <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
+          </div>
+          <div class="price-highlight-controls">
+            <div id="lmBaruRangeToggle" class="price-range-toggle" role="group" aria-label="Rentang riwayat harga">
+              <button type="button" class="price-range-btn is-active" data-range="7" aria-pressed="true">7 Hari</button>
+              <button type="button" class="price-range-btn" data-range="30" aria-pressed="false">30 Hari</button>
+            </div>
+            <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+          </div>
         </div>
         <div class="price-highlight-main">
           <span id="lmBaruCurrent" class="price-highlight-value">Rp —</span>
           <span class="price-highlight-unit">/gram</span>
+        </div>
+        <div class="price-highlight-chart">
+          <canvas id="lmBaruSparkline" height="60"></canvas>
+          <div id="lmBaruSparklineMarker" class="sparkline-marker"></div>
+          <div id="lmBaruSparklineTooltip" class="sparkline-tooltip"></div>
+          <div id="lmBaruChartFallback" class="chart-fallback is-visible">Grafik menunggu data riwayat harga.</div>
+        </div>
+        <p id="lmBaruTrendSummary" class="sr-only">Ringkasan tren: menunggu data riwayat harga.</p>
+        <p id="lmBaruSparklinePointSummary" class="sr-only" aria-live="polite"></p>
+        <div class="price-highlight-insights">
+          <div class="price-highlight-insight">
+            <span class="price-highlight-insight-label">Rentang</span>
+            <span id="lmBaruRangeValue" class="price-highlight-insight-value">7 Hari Terakhir</span>
+          </div>
+          <div class="price-highlight-insight">
+            <span class="price-highlight-insight-label">Terendah</span>
+            <span id="lmBaruRangeLow" class="price-highlight-insight-value">Rp —</span>
+          </div>
+          <div class="price-highlight-insight">
+            <span class="price-highlight-insight-label">Tertinggi</span>
+            <span id="lmBaruRangeHigh" class="price-highlight-insight-value">Rp —</span>
+          </div>
         </div>
         <div id="lmBaruDelta" class="price-highlight-delta">
           <span class="delta-icon" data-trend="pending"></span>

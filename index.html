@@ -256,10 +256,19 @@
             </div>
             <div class="skeleton skeleton-price" style="height: 2.4rem; width: 200px; margin-top: .2rem;"></div>
             <div class="skeleton skeleton-delta" style="width: 240px;"></div>
+            <div class="skeleton skeleton-line" style="width: 100%; height: 52px; margin-top: .8rem;"></div>
           </div>
           <div class="price-highlight-head">
-            <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
-            <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+            <div class="price-highlight-headline">
+              <p class="price-highlight-label">Logam Mulia (LM) Baru</p>
+            </div>
+            <div class="price-highlight-controls">
+              <div id="lmBaruRangeToggle" class="price-range-toggle" role="group" aria-label="Rentang riwayat harga">
+                <button type="button" class="price-range-btn is-active" data-range="7" aria-pressed="true">7 Hari</button>
+                <button type="button" class="price-range-btn" data-range="30" aria-pressed="false">30 Hari</button>
+              </div>
+              <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
+            </div>
           </div>
           <div class="price-highlight-main">
             <span id="lmBaruCurrent" class="price-highlight-value">Rp —</span>
@@ -271,11 +280,31 @@
             <div id="lmBaruSparklineTooltip" class="sparkline-tooltip" role="tooltip" aria-hidden="true"></div>
             <div id="lmBaruChartFallback" class="chart-fallback is-visible" role="note">Grafik menunggu data riwayat harga.</div>
           </div>
-          <p id="lmBaruTrendSummary" class="sr-only">Ringkasan tren 7 hari: menunggu data riwayat harga.</p>
+          <p id="lmBaruTrendSummary" class="sr-only">Ringkasan tren: menunggu data riwayat harga.</p>
           <p id="lmBaruSparklinePointSummary" class="sr-only" aria-live="polite"></p>
+          <div class="price-highlight-insights" aria-live="polite">
+            <div class="price-highlight-insight">
+              <span class="price-highlight-insight-label">Rentang</span>
+              <span id="lmBaruRangeValue" class="price-highlight-insight-value">7 Hari Terakhir</span>
+            </div>
+            <div class="price-highlight-insight">
+              <span class="price-highlight-insight-label">Terendah</span>
+              <span id="lmBaruRangeLow" class="price-highlight-insight-value">Rp —</span>
+            </div>
+            <div class="price-highlight-insight">
+              <span class="price-highlight-insight-label">Tertinggi</span>
+              <span id="lmBaruRangeHigh" class="price-highlight-insight-value">Rp —</span>
+            </div>
+          </div>
           <div class="price-highlight-delta" id="lmBaruDelta">
             <span class="delta-icon" aria-hidden="true">-</span>
             <span id="lmBaruDeltaText">Selisih menunggu data</span>
+          </div>
+          <div class="price-highlight-actions">
+            <button id="highlight-add" type="button" class="price-highlight-add" data-add-cat="lm_baru" data-add-kadar="24">
+              <span class="price-add-icon" aria-hidden="true">+</span>
+              <span>Masukkan ke Kalkulator</span>
+            </button>
           </div>
         </div>
       </div>

@@ -849,7 +849,27 @@ if (typeof window !== 'undefined') {
 // Harga emas: fetch + fallback + waktu W.I.B
 const PRICE_ADJUST_IDR = +50000;
 const PRICE_TIMEOUT_MS = 5000;
-const LM_HISTORY_DAYS_LIMIT = 7;
+const LM_HISTORY_RANGE_CONFIG = {
+  '7': {
+    key: '7',
+    days: 7,
+    label: '7 hari terakhir',
+    displayLabel: '7 Hari Terakhir'
+  },
+  '30': {
+    key: '30',
+    days: 30,
+    label: '30 hari terakhir',
+    displayLabel: '30 Hari Terakhir'
+  }
+};
+const LM_HISTORY_DEFAULT_RANGE_KEY = '7';
+const LM_HISTORY_RANGE_KEYS = Object.keys(LM_HISTORY_RANGE_CONFIG);
+const LM_HISTORY_DAYS_LIMIT = LM_HISTORY_RANGE_KEYS.reduce(function(max, key) {
+  var config = LM_HISTORY_RANGE_CONFIG[key];
+  var days = config && typeof config.days === 'number' ? config.days : 0;
+  return days > max ? days : max;
+}, 0);
 const ENTRY_TIME_FIELDS = [
   'priceDate',
   'time',
@@ -1323,7 +1343,12 @@ function readLastSparklineSeries() {
   }
 }
 let LM_BARU_PRICE_SERIES = readLastSparklineSeries();
-const DEFAULT_SPARKLINE_PERIOD = `${LM_HISTORY_DAYS_LIMIT} hari terakhir`;
+let LM_BARU_ACTIVE_RANGE = LM_HISTORY_DEFAULT_RANGE_KEY;
+let LM_BARU_SERIES_BY_RANGE = LM_HISTORY_RANGE_KEYS.reduce(function(acc, key) {
+  acc[key] = [];
+  return acc;
+}, {});
+const DEFAULT_SPARKLINE_PERIOD = (LM_HISTORY_RANGE_CONFIG[LM_BARU_ACTIVE_RANGE] && LM_HISTORY_RANGE_CONFIG[LM_BARU_ACTIVE_RANGE].label) || '7 hari terakhir';
 let LM_BARU_SPARKLINE_META = {
   periodLabel: DEFAULT_SPARKLINE_PERIOD,
   hasSeries: false
@@ -1333,6 +1358,13 @@ let LM_BARU_SPARKLINE_POINTS = [];
 let LM_BARU_SPARKLINE_ACTIVE_INDEX = -1;
 let LM_BARU_SPARKLINE_TOOLTIP_LOCKED = false;
 let LM_BARU_SPARKLINE_EVENTS_BOUND = false;
+
+if (Array.isArray(LM_BARU_PRICE_SERIES) && LM_BARU_PRICE_SERIES.length) {
+  resetRangeSeriesCache(LM_BARU_PRICE_SERIES);
+  LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE].slice();
+} else {
+  LM_BARU_PRICE_SERIES = [];
+}
 
 function updatePriceSchema(items) {
   try {
@@ -1521,6 +1553,108 @@ function updateLmBaruHighlight(currentPrice, options) {
       highlightCard.classList.add('is-updated');
     });
   }
+}
+
+function getRangeConfig(rangeKey) {
+  var key = rangeKey == null ? '' : String(rangeKey).trim();
+  if (key && Object.prototype.hasOwnProperty.call(LM_HISTORY_RANGE_CONFIG, key)) {
+    return LM_HISTORY_RANGE_CONFIG[key];
+  }
+  return LM_HISTORY_RANGE_CONFIG[LM_HISTORY_DEFAULT_RANGE_KEY] || null;
+}
+
+function deriveSeriesForRange(series, config) {
+  if (!Array.isArray(series)) return [];
+  var sanitized = series.filter(function(point) {
+    return point && typeof point.price === 'number' && isFinite(point.price);
+  });
+  if (!sanitized.length) return [];
+  var limit = config && typeof config.days === 'number' && config.days > 0 ? config.days : sanitized.length;
+  if (sanitized.length > limit) {
+    return sanitized.slice(sanitized.length - limit);
+  }
+  return sanitized.slice();
+}
+
+function resetRangeSeriesCache(series) {
+  var normalized = Array.isArray(series) ? series.slice() : [];
+  LM_HISTORY_RANGE_KEYS.forEach(function(key) {
+    var rangeConfig = getRangeConfig(key);
+    LM_BARU_SERIES_BY_RANGE[key] = deriveSeriesForRange(normalized, rangeConfig);
+  });
+}
+
+function updateRangeToggleState(activeKey) {
+  var toggle = document.getElementById('lmBaruRangeToggle');
+  if (!toggle) return;
+  var buttons = toggle.querySelectorAll('button[data-range]');
+  Array.prototype.forEach.call(buttons, function(button) {
+    var key = (button.getAttribute('data-range') || '').trim();
+    var isActive = key === String(activeKey || '');
+    if (isActive) {
+      button.classList.add('is-active');
+      button.setAttribute('aria-pressed', 'true');
+    } else {
+      button.classList.remove('is-active');
+      button.setAttribute('aria-pressed', 'false');
+    }
+  });
+}
+
+function refreshRangeMetrics(series, meta) {
+  meta = meta || {};
+  var activeKey = meta.rangeKey || LM_BARU_ACTIVE_RANGE;
+  var config = meta.rangeConfig || getRangeConfig(activeKey);
+  var highlightCard = document.getElementById('lmBaruHighlight');
+  if (highlightCard && config && config.key) {
+    highlightCard.setAttribute('data-active-range', config.key);
+  }
+  var rangeLabel = document.getElementById('lmBaruRangeValue');
+  var displayLabel = meta.displayLabel || (config && (config.displayLabel || config.label)) || DEFAULT_SPARKLINE_PERIOD;
+  if (rangeLabel) rangeLabel.textContent = displayLabel;
+  var values = Array.isArray(series) ? series.map(function(point) {
+    return point && typeof point.price === 'number' && isFinite(point.price) ? Math.round(point.price) : null;
+  }).filter(function(value) {
+    return value !== null;
+  }) : [];
+  var lowEl = document.getElementById('lmBaruRangeLow');
+  var highEl = document.getElementById('lmBaruRangeHigh');
+  var min = values.length ? Math.min.apply(null, values) : null;
+  var max = values.length ? Math.max.apply(null, values) : null;
+  if (lowEl) lowEl.textContent = min !== null ? 'Rp ' + formatCurrencyIDR(min) : 'Rp —';
+  if (highEl) highEl.textContent = max !== null ? 'Rp ' + formatCurrencyIDR(max) : 'Rp —';
+  updateRangeToggleState(activeKey);
+}
+
+function setActiveSparklineRange(rangeKey, metaOptions) {
+  var config = getRangeConfig(rangeKey);
+  var key = config && config.key ? config.key : LM_HISTORY_DEFAULT_RANGE_KEY;
+  LM_BARU_ACTIVE_RANGE = key;
+  if (!Array.isArray(LM_BARU_SERIES_BY_RANGE[key])) {
+    LM_BARU_SERIES_BY_RANGE[key] = [];
+  }
+  LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[key].slice();
+  var options = Object.assign({}, metaOptions || {}, {
+    periodLabel: config && config.label ? config.label : DEFAULT_SPARKLINE_PERIOD,
+    displayLabel: config && config.displayLabel ? config.displayLabel : undefined,
+    rangeKey: key,
+    rangeConfig: config
+  });
+  updateLmBaruSparkline(LM_BARU_PRICE_SERIES, options);
+}
+
+function setupHighlightRangeControls() {
+  var toggle = document.getElementById('lmBaruRangeToggle');
+  if (!toggle || toggle.dataset.bound === 'true') return;
+  toggle.dataset.bound = 'true';
+  toggle.addEventListener('click', function(ev) {
+    var button = ev.target.closest('button[data-range]');
+    if (!button) return;
+    var rangeKey = button.getAttribute('data-range');
+    if (!rangeKey || rangeKey === LM_BARU_ACTIVE_RANGE) return;
+    setActiveSparklineRange(rangeKey);
+  });
+  updateRangeToggleState(LM_BARU_ACTIVE_RANGE);
 }
 
 function prepareLmBaruHistorySeries(source, currentBase, limit) {
@@ -2004,24 +2138,35 @@ function attachSparklineInteractions() {
 
 function getSparklineReuseOptions() {
   if (!LM_BARU_SPARKLINE_META) return {
-    periodLabel: DEFAULT_SPARKLINE_PERIOD
+    periodLabel: DEFAULT_SPARKLINE_PERIOD,
+    rangeKey: LM_BARU_ACTIVE_RANGE,
+    displayLabel: (getRangeConfig(LM_BARU_ACTIVE_RANGE) && getRangeConfig(LM_BARU_ACTIVE_RANGE).displayLabel) || DEFAULT_SPARKLINE_PERIOD
   };
   return {
     periodLabel: LM_BARU_SPARKLINE_META.periodLabel || DEFAULT_SPARKLINE_PERIOD,
     summaryText: typeof LM_BARU_SPARKLINE_META.summaryText === 'string' ? LM_BARU_SPARKLINE_META.summaryText : undefined,
     summarySuffix: typeof LM_BARU_SPARKLINE_META.summarySuffix === 'string' ? LM_BARU_SPARKLINE_META.summarySuffix : undefined,
-    fallbackText: typeof LM_BARU_SPARKLINE_META.fallbackText === 'string' ? LM_BARU_SPARKLINE_META.fallbackText : undefined
+    fallbackText: typeof LM_BARU_SPARKLINE_META.fallbackText === 'string' ? LM_BARU_SPARKLINE_META.fallbackText : undefined,
+    rangeKey: LM_BARU_SPARKLINE_META.rangeKey || LM_BARU_ACTIVE_RANGE,
+    displayLabel: LM_BARU_SPARKLINE_META.displayLabel || (getRangeConfig(LM_BARU_SPARKLINE_META.rangeKey || LM_BARU_ACTIVE_RANGE) && getRangeConfig(LM_BARU_SPARKLINE_META.rangeKey || LM_BARU_ACTIVE_RANGE).displayLabel) || DEFAULT_SPARKLINE_PERIOD
   };
 }
 
 function updateLmBaruSparkline(series, options) {
   options = options || {};
   var previousLabel = (LM_BARU_SPARKLINE_META && typeof LM_BARU_SPARKLINE_META.periodLabel === 'string') ? LM_BARU_SPARKLINE_META.periodLabel : DEFAULT_SPARKLINE_PERIOD;
+  var previousRangeKey = (LM_BARU_SPARKLINE_META && typeof LM_BARU_SPARKLINE_META.rangeKey === 'string') ? LM_BARU_SPARKLINE_META.rangeKey : LM_BARU_ACTIVE_RANGE;
+  var requestedRangeKey = typeof options.rangeKey === 'string' && options.rangeKey.trim() ? options.rangeKey.trim() : '';
+  var activeRangeKey = requestedRangeKey || previousRangeKey;
+  var rangeConfig = options.rangeConfig && options.rangeConfig.key ? options.rangeConfig : getRangeConfig(activeRangeKey);
+  var displayLabelCandidate = typeof options.displayLabel === 'string' && options.displayLabel.trim() ? options.displayLabel.trim() : null;
   var renderOptions = {
     periodLabel: typeof options.periodLabel === 'string' && options.periodLabel.trim() ? options.periodLabel : previousLabel,
     summaryText: typeof options.summaryText === 'string' ? options.summaryText : undefined,
     summarySuffix: typeof options.summarySuffix === 'string' ? options.summarySuffix : undefined,
-    fallbackText: typeof options.fallbackText === 'string' ? options.fallbackText : undefined
+    fallbackText: typeof options.fallbackText === 'string' ? options.fallbackText : undefined,
+    rangeKey: activeRangeKey,
+    displayLabel: displayLabelCandidate || (LM_BARU_SPARKLINE_META && LM_BARU_SPARKLINE_META.displayLabel) || (rangeConfig && (rangeConfig.displayLabel || rangeConfig.label)) || DEFAULT_SPARKLINE_PERIOD
   };
   var highlightCard = document.getElementById('lmBaruHighlight');
   var canvas = document.getElementById('lmBaruSparkline');
@@ -2029,6 +2174,13 @@ function updateLmBaruSparkline(series, options) {
   var summaryEl = document.getElementById('lmBaruTrendSummary');
   var hasSeries = Array.isArray(series) && series.length >= 2 && series.every(function(point) {
     return point && typeof point.price === 'number' && isFinite(point.price);
+  });
+
+  refreshRangeMetrics(series, {
+    rangeKey: activeRangeKey,
+    rangeConfig: rangeConfig,
+    periodLabel: renderOptions.periodLabel,
+    displayLabel: renderOptions.displayLabel
   });
 
   if (!hasSeries) {
@@ -2184,22 +2336,27 @@ function updateLmBaruSparkline(series, options) {
 }
 
 function applySparklineFromCache(summarySuffix, fallbackText) {
-  if (!Array.isArray(LM_BARU_PRICE_SERIES) || LM_BARU_PRICE_SERIES.length < 2) {
+  var activeSeries = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE];
+  if (!Array.isArray(activeSeries) || activeSeries.length < 2) {
     var storedSeries = readLastSparklineSeries();
-    if (Array.isArray(storedSeries) && storedSeries.length >= 2) {
-      LM_BARU_PRICE_SERIES = storedSeries;
+    if (Array.isArray(storedSeries) && storedSeries.length) {
+      resetRangeSeriesCache(storedSeries);
+      activeSeries = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE];
     }
   }
-  if (Array.isArray(LM_BARU_PRICE_SERIES) && LM_BARU_PRICE_SERIES.length >= 2) {
-    updateLmBaruSparkline(LM_BARU_PRICE_SERIES, {
-      periodLabel: (LM_BARU_SPARKLINE_META && LM_BARU_SPARKLINE_META.periodLabel) || DEFAULT_SPARKLINE_PERIOD,
+  if (Array.isArray(activeSeries) && activeSeries.length >= 2) {
+    setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, {
       summarySuffix: summarySuffix
     });
   } else {
+    resetRangeSeriesCache(activeSeries || []);
+    LM_BARU_PRICE_SERIES = Array.isArray(activeSeries) ? activeSeries.slice() : [];
     var message = typeof fallbackText === 'string' ? fallbackText : (typeof summarySuffix === 'string' ? summarySuffix : 'Grafik riwayat tidak tersedia.');
     updateLmBaruSparkline(null, {
       fallbackText: message,
-      summaryText: message
+      summaryText: message,
+      rangeKey: LM_BARU_ACTIVE_RANGE,
+      displayLabel: (getRangeConfig(LM_BARU_ACTIVE_RANGE) && getRangeConfig(LM_BARU_ACTIVE_RANGE).displayLabel) || DEFAULT_SPARKLINE_PERIOD
     });
   }
 }
@@ -2484,23 +2641,25 @@ async function fetchGoldPrice() {
         REI_LAST_BASE_P = currentBase;
         saveLastBasePrice(currentBase);
         if (Array.isArray(historySeries)) {
-          LM_BARU_PRICE_SERIES = historySeries.slice();
+          resetRangeSeriesCache(historySeries);
           if (historySeries.length >= 2) {
             saveLastSparklineSeries(historySeries);
           }
         } else {
-          LM_BARU_PRICE_SERIES = [];
+          resetRangeSeriesCache([]);
         }
+        LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE].slice();
         const displayOptions = {
           updatedAt: updatedAt
         };
         if (Number.isFinite(previousBase)) displayOptions.previousBase = previousBase;
         if (Number.isFinite(previousPrice)) displayOptions.previousPrice = Math.round(previousPrice);
         displayFromBasePrice(currentBase, displayOptions);
-        updateLmBaruSparkline(historySeries, {
-          periodLabel: DEFAULT_SPARKLINE_PERIOD,
-          fallbackText: 'Riwayat harga belum tersedia dari penyedia data.'
-        });
+        var sparklineOptions = {};
+        if (!Array.isArray(historySeries) || historySeries.length < 2) {
+          sparklineOptions.fallbackText = 'Riwayat harga belum tersedia dari penyedia data.';
+        }
+        setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, sparklineOptions);
         return;
       }
     }
@@ -2519,6 +2678,7 @@ function displayDefaultPrices() {
   REI_LAST_BASE_P = approxBase;
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) highlightCard.setAttribute('aria-busy', 'false');
+  resetRangeSeriesCache([]);
   LM_BARU_PRICE_SERIES = [];
   displayFromBasePrice(approxBase, {
     previousPrice: null,
@@ -2571,6 +2731,7 @@ setInterval(displayDateTimeWIB, 60000);
 function shouldFetchGoldPrice() {
   return !!(document.getElementById('goldPriceTable') || document.getElementById('lmBaruCurrent'));
 }
+setupHighlightRangeControls();
 if (shouldFetchGoldPrice()) {
   fetchGoldPrice();
 }
