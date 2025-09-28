@@ -1641,10 +1641,7 @@ function refreshRangeMetrics(series, meta) {
     }
   }
 
-  var compareLabelText = 'Harga Awal Rentang';
-  if (config && typeof config.days === 'number' && config.days > 0) {
-    compareLabelText = 'Harga ' + config.days + ' Hari Lalu';
-  }
+  var compareLabelText = 'Delta';
   if (compareLabelEl) compareLabelEl.textContent = compareLabelText;
   if (compareValueEl) {
     compareValueEl.textContent = firstPrice !== null ? 'Rp ' + formatCurrencyIDR(firstPrice) : 'Rp —';
