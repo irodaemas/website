@@ -4114,6 +4114,38 @@ a {
   box-shadow: 0 10px 26px rgba(1, 61, 57, .06)
 }
 
+.calc-steps {
+  display: inline-flex;
+  align-items: center;
+  gap: .6rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  color: var(--text-muted);
+  font-size: .85rem;
+  margin-bottom: 1.2rem
+}
+
+.calc-step {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-weight: 600
+}
+
+.calc-step__number {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-green);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700
+}
+
 .calc-current {
   display: flex;
   flex-direction: column;
@@ -4138,7 +4170,29 @@ a {
   padding: var(--space-md);
   border: 1px solid var(--border-subtle);
   border-radius: 12px;
-  background: var(--paper)
+  background: var(--paper);
+  position: relative
+}
+
+.calc-summary__head {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: .2rem
+}
+
+.calc-summary__title {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font-weight: 700;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent-green);
+  background: rgba(1, 61, 57, .08);
+  padding: .35rem .75rem;
+  border-radius: 999px
 }
 
 .calc-label {
@@ -4329,6 +4383,17 @@ a {
 
   .calc-summary .btn {
     width: 100%;
+    text-align: center
+  }
+
+  .calc-summary__head {
+    justify-content: flex-start;
+    margin-bottom: .4rem
+  }
+
+  .calc-steps {
+    flex-wrap: wrap;
+    justify-content: center;
     text-align: center
   }
 }

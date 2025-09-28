@@ -240,6 +240,11 @@
         <div class="accent-title">Kalkulator Emas</div>
         <h2 class="h2">Estimasi Buyback Hari Ini</h2>
         <div class="card pad-1">
+          <div class="calc-steps" aria-hidden="true">
+            <span class="calc-step"><span class="calc-step__number">1</span> Kategori</span>
+            <span class="calc-step"><span class="calc-step__number">2</span> Kadar</span>
+            <span class="calc-step"><span class="calc-step__number">3</span> Berat</span>
+          </div>
           <div class="calc-grid">
             <div class="calc-field">
               <label for="cal-cat" class="h3">Kategori</label>
@@ -304,6 +309,9 @@
               </div>
             </div>
             <div class="calc-summary">
+              <div class="calc-summary__head">
+                <span class="calc-summary__title">Ringkasan</span>
+              </div>
               <div class="calc-info">
                 <div class="calc-label">Perkiraan total</div>
                 <div id="cal-count" class="calc-count">0 barang</div>
