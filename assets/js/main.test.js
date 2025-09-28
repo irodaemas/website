@@ -105,6 +105,13 @@ describe('main.js behaviours', () => {
             <span class="price-highlight-insight-label">Tertinggi</span>
             <span id="lmBaruRangeHigh" class="price-highlight-insight-value">Rp —</span>
           </div>
+          <div class="price-highlight-insight price-highlight-insight--compare" id="lmBaruRangeCompare" data-trend="pending">
+            <span id="lmBaruRangeCompareLabel" class="price-highlight-insight-label">Harga 7 Hari Lalu</span>
+            <div class="price-highlight-insight-value price-highlight-insight-value--stack">
+              <span id="lmBaruRangeCompareValue">Rp —</span>
+              <span id="lmBaruRangeCompareDelta" class="price-highlight-compare-delta" data-trend="pending">Menunggu data rentang</span>
+            </div>
+          </div>
         </div>
         <div id="lmBaruDelta" class="price-highlight-delta">
           <span class="delta-icon" data-trend="pending"></span>
@@ -532,6 +539,32 @@ describe('main.js behaviours', () => {
     highlightAdd.click();
     expect(calcSpy).toHaveBeenCalledWith(expect.objectContaining({ cat: 'lm_baru', kadar: '24' }));
     calcSpy.mockRestore();
+  });
+
+  test('refreshRangeMetrics updates comparison insight for active range', async () => {
+    await loadMain();
+    const highlight = document.getElementById('lmBaruHighlight');
+    const series = [{ price: 2000000 }, { price: 2100000 }];
+
+    window.testing.refreshRangeMetrics(series, {
+      rangeKey: '7',
+      rangeConfig: {
+        key: '7',
+        days: 7,
+        label: '7 hari terakhir',
+        displayLabel: '7 Hari Terakhir'
+      }
+    });
+
+    const compareLabel = document.getElementById('lmBaruRangeCompareLabel');
+    const compareValue = document.getElementById('lmBaruRangeCompareValue');
+    const compareDelta = document.getElementById('lmBaruRangeCompareDelta');
+
+    expect(compareLabel.textContent).toBe('Harga 7 Hari Lalu');
+    expect(compareValue.textContent).toBe('Rp 2.000.000');
+    expect(compareDelta.textContent).toContain('Naik Rp 100.000');
+    expect(compareDelta.getAttribute('data-trend')).toBe('up');
+    expect(highlight.getAttribute('data-range-compare-trend')).toBe('up');
   });
 
   test('displayFromBasePrice survives toLocaleString failures', async () => {

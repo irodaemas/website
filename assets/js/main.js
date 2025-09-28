@@ -1623,6 +1623,59 @@ function refreshRangeMetrics(series, meta) {
   var max = values.length ? Math.max.apply(null, values) : null;
   if (lowEl) lowEl.textContent = min !== null ? 'Rp ' + formatCurrencyIDR(min) : 'Rp —';
   if (highEl) highEl.textContent = max !== null ? 'Rp ' + formatCurrencyIDR(max) : 'Rp —';
+
+  var compareLabelEl = document.getElementById('lmBaruRangeCompareLabel');
+  var compareValueEl = document.getElementById('lmBaruRangeCompareValue');
+  var compareDeltaEl = document.getElementById('lmBaruRangeCompareDelta');
+  var compareWrap = document.getElementById('lmBaruRangeCompare');
+  var firstPrice = null;
+  var lastPrice = null;
+
+  if (Array.isArray(series)) {
+    for (var idx = 0; idx < series.length; idx++) {
+      var candidate = series[idx];
+      if (!candidate || typeof candidate.price !== 'number' || !isFinite(candidate.price)) continue;
+      var rounded = Math.round(candidate.price);
+      if (firstPrice === null) firstPrice = rounded;
+      lastPrice = rounded;
+    }
+  }
+
+  var compareLabelText = 'Harga Awal Rentang';
+  if (config && typeof config.days === 'number' && config.days > 0) {
+    compareLabelText = 'Harga ' + config.days + ' Hari Lalu';
+  }
+  if (compareLabelEl) compareLabelEl.textContent = compareLabelText;
+  if (compareValueEl) {
+    compareValueEl.textContent = firstPrice !== null ? 'Rp ' + formatCurrencyIDR(firstPrice) : 'Rp —';
+  }
+
+  var deltaState = 'pending';
+  var deltaText = 'Menunggu data rentang';
+  if (firstPrice !== null && lastPrice !== null) {
+    var diff = lastPrice - firstPrice;
+    var absDiff = Math.abs(diff);
+    if (diff > 0) {
+      deltaState = 'up';
+      deltaText = 'Naik Rp ' + formatCurrencyIDR(absDiff) + ' dibanding awal rentang';
+    } else if (diff < 0) {
+      deltaState = 'down';
+      deltaText = 'Turun Rp ' + formatCurrencyIDR(absDiff) + ' dibanding awal rentang';
+    } else {
+      deltaState = 'flat';
+      deltaText = 'Stabil dibanding awal rentang';
+    }
+  }
+  if (compareDeltaEl) {
+    compareDeltaEl.textContent = deltaText;
+    compareDeltaEl.setAttribute('data-trend', deltaState);
+  }
+  if (compareWrap) {
+    compareWrap.setAttribute('data-trend', deltaState);
+  }
+  if (highlightCard) {
+    highlightCard.setAttribute('data-range-compare-trend', deltaState);
+  }
   updateRangeToggleState(activeKey);
 }
 
@@ -4341,6 +4394,7 @@ if (typeof window !== 'undefined') {
   testingApi.saveLastBasePrice = saveLastBasePrice;
   testingApi.readLastBasePrice = readLastBasePrice;
   testingApi.updatePriceSchema = updatePriceSchema;
+  testingApi.refreshRangeMetrics = refreshRangeMetrics;
   testingApi.displayFromBasePrice = displayFromBasePrice;
   testingApi.fetchGoldPrice = fetchGoldPrice;
   testingApi.displayDefaultPrices = displayDefaultPrices;
@@ -4360,6 +4414,7 @@ if (typeof module !== 'undefined' && module.exports) {
     saveLastBasePrice,
     readLastBasePrice,
     updatePriceSchema,
+    refreshRangeMetrics,
     displayFromBasePrice,
     fetchGoldPrice,
     displayDefaultPrices,
