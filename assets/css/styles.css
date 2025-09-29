@@ -1603,7 +1603,7 @@ footer .wa-badge {
 }
 
 /* ---------- sections ---------- */
-section {
+section:not(.hero) {
   padding: clamp(2.5rem, 3.5vw + 1rem, 4rem) 0
 }
 
