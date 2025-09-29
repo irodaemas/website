@@ -114,19 +114,66 @@
     </div>
   </nav>
 
-  <main id="main-content" class="container" tabindex="-1">
-    <section class="card nf-card">
-      <div class="chip">Error 404</div>
-      <h1 class="h2">Halaman Tidak Ditemukan</h1>
-      <p class="lead">
-        Maaf, URL yang Anda buka tidak tersedia atau sudah dipindahkan.
-      </p>
-      <div class="btn-wrap">
-        <a class="btn btn-gold" href="/">Kembali ke Beranda</a>
-        <a class="btn btn-ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
-      </div>
-      <div class="subnote">
-        <code id="path" class="path-badge"></code>
+  <main id="main-content" tabindex="-1">
+    <section class="nf-hero" aria-labelledby="nfTitle">
+      <div class="container nf-grid">
+        <div class="nf-copy">
+          <span class="chip nf-chip">Kode 404</span>
+          <span class="nf-code" aria-hidden="true">404</span>
+          <h1 id="nfTitle" class="h1 nf-title">Halaman tidak ditemukan</h1>
+          <p class="lead nf-lead">Maaf, URL yang Anda buka tidak tersedia atau sudah dipindahkan. Kami siapkan beberapa pintasan agar Anda bisa kembali melanjutkan proses dengan cepat.</p>
+          <div class="btn-row nf-actions">
+            <a class="btn btn-gold" href="/">Kembali ke Beranda</a>
+            <a class="btn btn-ghost" href="/harga/">Lihat Harga Buyback</a>
+          </div>
+          <dl class="nf-meta">
+            <div class="nf-meta__item">
+              <dt>URL diminta</dt>
+              <dd><code id="path" class="path-badge"></code></dd>
+            </div>
+            <div class="nf-meta__item">
+              <dt>Saran</dt>
+              <dd>Periksa kembali ejaan tautan atau gunakan pilihan populer di samping.</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="nf-side">
+          <article class="nf-card nf-card--links" aria-labelledby="nfLinksTitle">
+            <h2 id="nfLinksTitle" class="nf-card__title">Halaman populer</h2>
+            <p class="nf-card__intro">Mulai dari sini untuk melanjutkan transaksi Anda.</p>
+            <ul class="nf-card__list">
+              <li class="nf-card__item">
+                <div>
+                  <p class="nf-card__label">Harga buyback emas hari ini</p>
+                  <p class="nf-card__description">Pantau tabel harga terkini dan gunakan kalkulator estimasi buyback.</p>
+                </div>
+                <a class="nf-card__link" href="/harga/">Buka /harga</a>
+              </li>
+              <li class="nf-card__item">
+                <div>
+                  <p class="nf-card__label">Panduan &amp; tips Sentral Emas</p>
+                  <p class="nf-card__description">Insight terbaru seputar jual beli emas, berlian, dan checklist COD.</p>
+                </div>
+                <a class="nf-card__link" href="/blog/">Baca blog</a>
+              </li>
+              <li class="nf-card__item">
+                <div>
+                  <p class="nf-card__label">Kontak tim appraisal</p>
+                  <p class="nf-card__description">Atur jadwal COD atau konsultasi cepat melalui WhatsApp dan telepon.</p>
+                </div>
+                <a class="nf-card__link" href="/#kontak">Lihat kontak</a>
+              </li>
+            </ul>
+          </article>
+          <article class="nf-card nf-card--contact" aria-labelledby="nfContactTitle">
+            <h2 id="nfContactTitle" class="nf-card__title">Butuh bantuan langsung?</h2>
+            <p class="nf-card__intro">Tim Sentral Emas siap membantu setiap hari pukul 08.00–22.00 WIB.</p>
+            <div class="nf-card__actions">
+              <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer">Chat WhatsApp</a>
+              <a class="btn btn-ghost" href="tel:+6285591088503">Telepon Kami</a>
+            </div>
+          </article>
+        </div>
       </div>
     </section>
   </main>
