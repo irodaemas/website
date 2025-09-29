@@ -4070,40 +4070,46 @@ window.addEventListener('resize', function() {
 // SW register + Update Toast
 /* istanbul ignore next */
 if ('serviceWorker' in navigator) {
-  function showUpdateToast() {
-    var t = document.getElementById('sw-toast');
-    if (!t) {
-      t = document.createElement('div');
-      t.id = 'sw-toast';
-      t.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);bottom:16px;background:#013D39;color:#fff;border:1px solid rgba(255,255,255,.18);box-shadow:0 8px 24px rgba(0,0,0,.25);border-radius:999px;padding:.6rem .9rem;display:flex;align-items:center;gap:.8rem;z-index:200;';
-      t.innerHTML = '<span>Versi baru tersedia</span>';
-      var b = document.createElement('button');
-      b.className = 'btn btn-gold';
-      b.style.cssText = 'padding:.4rem .7rem;font-size:.95rem';
-      b.textContent = 'Refresh';
-      b.onclick = function() {
-        location.reload();
-      };
-      t.appendChild(b);
-      document.body.appendChild(t);
-    } else {
-      t.style.display = 'flex';
-    }
-  }
+  var hadController = !!navigator.serviceWorker.controller;
+  var isReloadingAfterUpdate = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    if (!hadController || isReloadingAfterUpdate) return;
+    isReloadingAfterUpdate = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/sw.js', {
         scope: '/'
       })
       .then(function(reg) {
+        if (!hadController) return;
         if (reg.waiting) {
-          showUpdateToast();
+          if (typeof reg.waiting.postMessage === 'function') {
+            try {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            } catch (_) {}
+          }
+          if (!isReloadingAfterUpdate) {
+            isReloadingAfterUpdate = true;
+            window.location.reload();
+          }
         }
         reg.addEventListener('updatefound', function() {
           var nw = reg.installing;
           if (nw) {
             nw.addEventListener('statechange', function() {
               if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                showUpdateToast();
+                if (typeof nw.postMessage === 'function') {
+                  try {
+                    nw.postMessage({ type: 'SKIP_WAITING' });
+                  } catch (_) {}
+                }
+                if (!isReloadingAfterUpdate) {
+                  isReloadingAfterUpdate = true;
+                  window.location.reload();
+                }
               }
             });
           }
