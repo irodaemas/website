@@ -496,7 +496,9 @@ describe('main.js behaviours', () => {
     expect(deltaWrap.classList.contains('trend-up')).toBe(true);
     expect(deltaWrap.classList.contains('delta-flash')).toBe(true);
     expect(icon.getAttribute('data-trend')).toBe('up');
-    expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Naik Rp 82.000');
+    const deltaTextUp = document.getElementById('lmBaruDeltaText').textContent;
+    expect(deltaTextUp).toContain('Naik Rp 82.000');
+    expect(deltaTextUp).not.toContain('%');
     expect(current.classList.contains('value-flash')).toBe(true);
     expect(highlight.classList.contains('is-updated')).toBe(true);
     const infoText = document.getElementById('lastUpdatedInfo').textContent;
@@ -513,7 +515,9 @@ describe('main.js behaviours', () => {
     expect(badge.classList.contains('price-down')).toBe(true);
     expect(deltaWrap.classList.contains('trend-down')).toBe(true);
     expect(icon.getAttribute('data-trend')).toBe('down');
-    expect(document.getElementById('lmBaruDeltaText').textContent).toContain('Turun Rp');
+    const deltaTextDown = document.getElementById('lmBaruDeltaText').textContent;
+    expect(deltaTextDown).toContain('Turun Rp');
+    expect(deltaTextDown).not.toContain('%');
 
     window.testing.displayFromBasePrice(850000, {
       previousPrice: 0
@@ -563,6 +567,7 @@ describe('main.js behaviours', () => {
     expect(compareLabel.textContent).toBe('Harga 7 Hari Lalu');
     expect(compareValue.textContent).toBe('Rp 2.000.000');
     expect(compareDelta.textContent).toContain('Naik Rp 100.000');
+    expect(compareDelta.textContent).toContain('(+5,00%)');
     expect(compareDelta.getAttribute('data-trend')).toBe('up');
     expect(highlight.getAttribute('data-range-compare-trend')).toBe('up');
   });

@@ -1462,6 +1462,27 @@ function formatCurrencyIDR(value) {
   }
 }
 
+function formatPercentID(value, fractionDigits) {
+  var digits = typeof fractionDigits === 'number' && fractionDigits >= 0 ? fractionDigits : 2;
+  try {
+    return Number(value || 0).toLocaleString('id-ID', {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    });
+  } catch (_) {
+    return String(value || 0);
+  }
+}
+
+function formatSignedPercentID(value, fractionDigits) {
+  if (typeof value !== 'number' || !isFinite(value)) return null;
+  var normalized = value === 0 ? 0 : value;
+  var formatted = formatPercentID(Math.abs(normalized), fractionDigits);
+  if (normalized > 0) return '+' + formatted + '%';
+  if (normalized < 0) return '-' + formatted + '%';
+  return formatted + '%';
+}
+
 function escapeAttr(value) {
   return String(value == null ? '' : value).replace(/"/g, '&quot;');
 }
@@ -1649,18 +1670,23 @@ function refreshRangeMetrics(series, meta) {
 
   var deltaState = 'pending';
   var deltaText = 'Menunggu data rentang';
+  var percentDeltaValue = null;
   if (firstPrice !== null && lastPrice !== null) {
     var diff = lastPrice - firstPrice;
     var absDiff = Math.abs(diff);
+    if (firstPrice !== 0) {
+      percentDeltaValue = (diff / firstPrice) * 100;
+    }
+    var percentSuffix = percentDeltaValue !== null ? ' (' + formatSignedPercentID(percentDeltaValue, 2) + ')' : '';
     if (diff > 0) {
       deltaState = 'up';
-      deltaText = 'Naik Rp ' + formatCurrencyIDR(absDiff) + ' dibanding awal rentang';
+      deltaText = 'Naik Rp ' + formatCurrencyIDR(absDiff) + percentSuffix + ' dibanding awal rentang';
     } else if (diff < 0) {
       deltaState = 'down';
-      deltaText = 'Turun Rp ' + formatCurrencyIDR(absDiff) + ' dibanding awal rentang';
+      deltaText = 'Turun Rp ' + formatCurrencyIDR(absDiff) + percentSuffix + ' dibanding awal rentang';
     } else {
       deltaState = 'flat';
-      deltaText = 'Stabil dibanding awal rentang';
+      deltaText = 'Stabil dibanding awal rentang' + (percentSuffix ? percentSuffix : '');
     }
   }
   if (compareDeltaEl) {
