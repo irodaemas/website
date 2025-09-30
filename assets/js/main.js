@@ -885,6 +885,7 @@ const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
 const FACTOR_LM_BARU = 0.932;
 const FACTOR_LM_LAMA = 0.917;
+const PRICE_ADJUST_LM_IDR = +20000;
 const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
@@ -1414,11 +1415,11 @@ function roundUpPrice(n, step) {
 }
 
 function computeLmBaruPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_LM_IDR);
 }
 
 function computeLmLamaPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_LM_IDR);
 }
 
 function safeNumber(v) {
@@ -2750,7 +2751,7 @@ async function fetchGoldPrice() {
 }
 
 function displayDefaultPrices() {
-  var approxBase = (DEFAULT_PRICE_TABLE.lmBaru - PRICE_ADJUST_IDR) / FACTOR_LM_BARU;
+  var approxBase = (DEFAULT_PRICE_TABLE.lmBaru - PRICE_ADJUST_LM_IDR) / FACTOR_LM_BARU;
   REI_LAST_BASE_P = approxBase;
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) highlightCard.setAttribute('aria-busy', 'false');
@@ -4438,6 +4439,7 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     SEARCH_INDEX,
     normalizeSearchText,
+    PRICE_ADJUST_LM_IDR,
     PRICE_ADJUST_IDR,
     PRICE_TIMEOUT_MS,
     saveLastBasePrice,

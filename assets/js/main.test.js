@@ -490,14 +490,14 @@ describe('main.js behaviours', () => {
       metaSuffix: ' • Uji'
     });
     await flush(20);
-    expect(current.textContent).toBe('Rp 982.000');
+    expect(current.textContent).toBe('Rp 952.000');
     expect(badge.textContent).toBe('Naik');
     expect(badge.classList.contains('price-up')).toBe(true);
     expect(deltaWrap.classList.contains('trend-up')).toBe(true);
     expect(deltaWrap.classList.contains('delta-flash')).toBe(true);
     expect(icon.getAttribute('data-trend')).toBe('up');
     const deltaTextUp = document.getElementById('lmBaruDeltaText').textContent;
-    expect(deltaTextUp).toContain('Naik Rp 82.000');
+    expect(deltaTextUp).toContain('Naik Rp 52.000');
     expect(deltaTextUp).not.toContain('%');
     expect(current.classList.contains('value-flash')).toBe(true);
     expect(highlight.classList.contains('is-updated')).toBe(true);
@@ -588,7 +588,7 @@ describe('main.js behaviours', () => {
     try {
       window.testing.displayFromBasePrice(1000000);
       await flush(20);
-      expect(document.getElementById('lmBaruCurrent').textContent).toBe('Rp 982000');
+      expect(document.getElementById('lmBaruCurrent').textContent).toBe('Rp 952000');
     } finally {
       Number.prototype.toLocaleString = originalToLocaleString;
       document.dispatchEvent = originalDispatch;
