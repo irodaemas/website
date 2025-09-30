@@ -2500,7 +2500,8 @@ function extractPreviousBase(data, currentBase) {
 function buildPerhiasanPricesFromBase(basePrice) {
   return GOLD_KARAT_SERIES.map(function(entry) {
     var factor = entry.karat === 24 ? FACTOR_PERHIASAN_24K : FACTOR_PERHIASAN_SUB;
-    var harga = roundUpPrice(basePrice * entry.purity * factor + PRICE_ADJUST_IDR);
+    var adjustment = entry.karat === 24 ? PRICE_ADJUST_LM_IDR : PRICE_ADJUST_IDR;
+    var harga = roundUpPrice(basePrice * entry.purity * factor + adjustment);
     return {
       karat: entry.karat,
       price: harga,
@@ -3052,19 +3053,20 @@ window.addEventListener('resize', function() {
     var FACTOR_LM_LAMA = 0.917;
     var FACTOR_24K = 0.862;
     var FACTOR_SUB = 0.786;
-    var ADJ = 50000;
+    var ADJ_LM = PRICE_ADJUST_LM_IDR;
+    var ADJ_PERHIASAN = PRICE_ADJUST_IDR;
     var perGram;
     if (c === 'lm_baru') {
-      perGram = ceilStep(base * FACTOR_LM_BARU + ADJ);
+      perGram = ceilStep(base * FACTOR_LM_BARU + ADJ_LM);
       k = 24;
     } else if (c === 'lm_lama') {
-      perGram = ceilStep(base * FACTOR_LM_LAMA + ADJ);
+      perGram = ceilStep(base * FACTOR_LM_LAMA + ADJ_LM);
       k = 24;
     } else if (c === 'perhiasan_24') {
-      perGram = ceilStep(base * FACTOR_24K + ADJ);
+      perGram = ceilStep(base * FACTOR_24K + ADJ_LM);
       k = 24;
     } else {
-      perGram = ceilStep(base * FACTOR_SUB * purityFromK(k) + ADJ);
+      perGram = ceilStep(base * FACTOR_SUB * purityFromK(k) + ADJ_PERHIASAN);
     }
     var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
     return {
