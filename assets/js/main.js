@@ -2550,6 +2550,48 @@ function renderPriceTable(rows) {
 }
 var HIGHLIGHT_ADD_BOUND = false;
 
+var SHARE_LOGO_PROMISE = null;
+
+function loadShareLogo() {
+  if (SHARE_LOGO_PROMISE) return SHARE_LOGO_PROMISE;
+  SHARE_LOGO_PROMISE = new Promise(function(resolve) {
+    try {
+      var img = new Image();
+      img.decoding = 'async';
+      img.crossOrigin = 'anonymous';
+      img.onload = function() {
+        resolve(img);
+      };
+      img.onerror = function() {
+        resolve(null);
+      };
+      img.src = '/assets/icons/logo-192.png';
+    } catch (_) {
+      resolve(null);
+    }
+  });
+  return SHARE_LOGO_PROMISE;
+}
+
+async function copyImageBlob(blob) {
+  if (!blob) return false;
+  if (typeof navigator === 'undefined') return false;
+  var clipboard = navigator.clipboard;
+  if (typeof window === 'undefined') return false;
+  if (!clipboard || typeof clipboard.write !== 'function' || typeof window.ClipboardItem !== 'function') {
+    return false;
+  }
+  try {
+    var item = new ClipboardItem({
+      'image/png': blob
+    });
+    await clipboard.write([item]);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function buildCalcSelectionOptionsFromButton(addBtn) {
   if (!addBtn) return null;
   var options = {};
@@ -2580,6 +2622,560 @@ function bindHighlightAddButton() {
     triggerCalculatorSelection(highlightAdd);
   });
   HIGHLIGHT_ADD_BOUND = true;
+}
+
+function collectSharePriceRows() {
+  var tbody = document.getElementById('goldPriceTable');
+  if (!tbody) return [];
+  var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.price-row'));
+  return rows.map(function(row) {
+    var labelEl = row.querySelector('.price-label');
+    var priceEl = row.querySelector('.price-amount .num');
+    var label = labelEl ? labelEl.textContent.trim() : '';
+    var valueAttr = priceEl ? priceEl.getAttribute('data-to') : null;
+    var parsedValue = Number(valueAttr);
+    if (!Number.isFinite(parsedValue) && priceEl) {
+      var digits = priceEl.textContent.replace(/[^0-9]/g, '');
+      parsedValue = Number(digits);
+    }
+    if (!label || !Number.isFinite(parsedValue)) return null;
+    return {
+      label: label,
+      value: parsedValue,
+      priceText: 'Rp ' + formatCurrencyIDR(parsedValue)
+    };
+  }).filter(Boolean);
+}
+
+function buildShareMetaInfo() {
+  var now = new Date();
+  var cached = null;
+  try {
+    cached = readLastBasePrice();
+  } catch (_) {}
+  if (cached && typeof cached.t === 'number') {
+    var cachedDate = new Date(cached.t);
+    if (!isNaN(cachedDate.getTime())) {
+      now = cachedDate;
+    }
+  }
+  var dateLabel = formatDateTimeIndo(now);
+  var dateBadge = document.getElementById('currentDateTime');
+  var badgeText = dateBadge && dateBadge.textContent ? dateBadge.textContent.trim() : '';
+  if (badgeText && badgeText !== '—') {
+    dateLabel = badgeText;
+  }
+  var infoEl = document.getElementById('lastUpdatedInfo');
+  var noteText = infoEl && infoEl.textContent ? infoEl.textContent.trim() : '';
+  if (noteText && noteText.charAt(0) === '*') {
+    noteText = noteText.substring(1).trim();
+  }
+  if (noteText && noteText.toLowerCase().indexOf('terakhir diperbarui') !== -1) {
+    noteText = '';
+  }
+  var iso = now.toISOString();
+  var fileStamp = iso.slice(0, 10).replace(/-/g, '') + '-' + iso.slice(11, 16).replace(/:/g, '');
+  return {
+    title: 'Harga Buyback Emas',
+    subtitle: 'Sentral Emas',
+    updatedLabel: 'Update: ' + dateLabel,
+    updatedFooter: 'Terakhir diperbarui: ' + dateLabel,
+    updatedAt: now,
+    note: noteText,
+    shareTitle: 'Harga Buyback Emas - Sentral Emas',
+    shareText: 'Update harga buyback emas Sentral Emas per ' + formatDateTimeIndo(now) + '.',
+    footer: 'sentralemas.com/harga',
+    fileName: 'sentral-emas-harga-' + fileStamp + '.png'
+  };
+}
+
+function drawRoundedRect(ctx, x, y, width, height, radius, mode) {
+  var r = Math.max(0, Math.min(radius, Math.min(width, height) / 2));
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + width - r, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
+  ctx.lineTo(x + width, y + height - r);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
+  ctx.lineTo(x + r, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+  if (mode === 'stroke') ctx.stroke();
+  else if (mode === 'fill-stroke') {
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.fill();
+  }
+}
+
+function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
+  if (!text) return y;
+  var words = text.split(/\s+/).filter(Boolean);
+  if (!words.length) return y;
+  var line = '';
+  var cursorY = y;
+  for (var i = 0; i < words.length; i++) {
+    var testLine = line ? line + ' ' + words[i] : words[i];
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      ctx.fillText(line, x, cursorY);
+      cursorY += lineHeight;
+      line = words[i];
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) {
+    ctx.fillText(line, x, cursorY);
+    cursorY += lineHeight;
+  }
+  return cursorY;
+}
+
+function measureWrappedText(ctx, text, maxWidth, lineHeight) {
+  if (!text) return 0;
+  var words = text.split(/\s+/).filter(Boolean);
+  if (!words.length) return 0;
+  var line = '';
+  var lines = 0;
+  for (var i = 0; i < words.length; i++) {
+    var testLine = line ? line + ' ' + words[i] : words[i];
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      lines++;
+      line = words[i];
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) lines++;
+  return lines * lineHeight;
+}
+
+function truncateTextToWidth(ctx, text, maxWidth) {
+  if (!ctx || !text) return '';
+  var ellipsis = '...';
+  var content = text.trim();
+  if (!content) return '';
+  if (ctx.measureText(content).width <= maxWidth) return content;
+  while (content.length > 1 && ctx.measureText(content + ellipsis).width > maxWidth) {
+    content = content.slice(0, -1).trim();
+  }
+  return content.length ? content + ellipsis : ellipsis;
+}
+
+function wrapTextLinesLimited(ctx, text, maxWidth, maxLines) {
+  if (!ctx || !text) return [];
+  var words = text.split(/\s+/).filter(Boolean);
+  if (!words.length) return [];
+  var limit = typeof maxLines === 'number' && maxLines > 0 ? maxLines : 1;
+  var lines = [];
+  var index = 0;
+  while (index < words.length && lines.length < limit) {
+    var line = words[index];
+    index++;
+    while (index < words.length) {
+      var candidate = line + ' ' + words[index];
+      if (ctx.measureText(candidate).width <= maxWidth) {
+        line = candidate;
+        index++;
+      } else {
+        break;
+      }
+    }
+    lines.push(line);
+  }
+  if (index < words.length && lines.length) {
+    var remainder = lines.pop() + ' ' + words.slice(index).join(' ');
+    lines.push(truncateTextToWidth(ctx, remainder, maxWidth));
+  }
+  return lines;
+}
+
+function drawPriceShareCanvas(rows, meta, logoImage) {
+  if (!Array.isArray(rows) || !rows.length) return null;
+  var width = 1080;
+  var headerHeight = 260;
+  var footerHeight = 132;
+  var cardOffsetTop = 56;
+  var cardPaddingX = 90;
+  var cardPaddingY = 72;
+  var rowHeight = 108;
+  var rowGap = 12;
+  var noteLineHeight = 34;
+  var infoSpacingTop = 26;
+  var infoSpacingBottom = 34;
+  var noteGap = 12;
+  var labelPadding = 24;
+  var minPriceSpace = 320;
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+
+  var tableWidth = width - 128 - cardPaddingX * 2;
+  var tableHeight = rows.length * rowHeight + Math.max(0, rows.length - 1) * rowGap;
+  ctx.font = '400 28px "Inter", "Helvetica Neue", Arial, sans-serif';
+  var noteLinesForHeight = meta.note ? wrapTextLinesLimited(ctx, meta.note, tableWidth, 4) : [];
+  var noteHeight = noteLinesForHeight.length ? noteLinesForHeight.length * noteLineHeight : 0;
+  var infoBlockHeight = 0;
+  if (meta.updatedFooter) infoBlockHeight += noteLineHeight;
+  if (noteLinesForHeight.length) infoBlockHeight += noteGap + noteHeight;
+  var cardHeight = cardPaddingY * 2 + tableHeight + (infoBlockHeight ? infoSpacingTop + infoBlockHeight + infoSpacingBottom : 20);
+  var canvasHeight = headerHeight + cardOffsetTop + cardHeight + footerHeight;
+  canvas.width = width;
+  canvas.height = canvasHeight;
+
+  // Background
+  ctx.fillStyle = '#F4ECE0';
+  ctx.fillRect(0, 0, width, canvasHeight);
+
+  // Header gradient
+  var gradient = ctx.createLinearGradient(0, 0, 0, headerHeight + 120);
+  gradient.addColorStop(0, '#02413C');
+  gradient.addColorStop(1, '#0F6E66');
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, headerHeight);
+
+  // Decorative glow
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.18)';
+  ctx.beginPath();
+  ctx.ellipse(width / 2, headerHeight - 12, width * 0.6, 120, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Card base with shadow
+  var cardX = 64;
+  var cardY = headerHeight - 40 + cardOffsetTop;
+  ctx.fillStyle = '#FFFFFF';
+  ctx.save();
+  ctx.shadowColor = 'rgba(10, 60, 52, 0.28)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 26;
+  drawRoundedRect(ctx, cardX, cardY, width - cardX * 2, cardHeight, 38);
+  ctx.restore();
+
+  // Card fill
+  ctx.fillStyle = '#FFFFFF';
+  drawRoundedRect(ctx, cardX, cardY, width - cardX * 2, cardHeight, 38);
+
+  // Card border
+  ctx.strokeStyle = '#F0E7D8';
+  ctx.lineWidth = 2;
+  drawRoundedRect(ctx, cardX + 1, cardY + 1, width - cardX * 2 - 2, cardHeight - 2, 36, 'stroke');
+
+  // Header texts
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.font = '700 64px "Inter", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText(meta.title, 80, 78);
+  ctx.font = '500 38px "Inter", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText(meta.subtitle, 80, 146);
+  ctx.font = '400 32px "Inter", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillText(meta.updatedLabel, 80, 202);
+
+  if (logoImage) {
+    var logoSize = 118;
+    var logoX = width - cardX - logoSize - 40;
+    var logoY = 82;
+    var logoCenterX = logoX + logoSize / 2;
+    var logoCenterY = logoY + logoSize / 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(logoCenterX, logoCenterY, logoSize / 2 + 14, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.fill();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(logoCenterX, logoCenterY, logoSize / 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+    ctx.clip();
+    ctx.drawImage(logoImage, logoX, logoY, logoSize, logoSize);
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(logoCenterX, logoCenterY, logoSize / 2, 0, Math.PI * 2);
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = 'rgba(13, 106, 99, 0.45)';
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  var tableX = cardX + cardPaddingX;
+  var tableY = cardY + cardPaddingY;
+  ctx.textBaseline = 'middle';
+  var rowBodyRadius = 30;
+  var rowBodyPadX = 28;
+  var rowBodyPadY = 10;
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    var rowTop = tableY + i * (rowHeight + rowGap);
+    var rowBg = '#FFFFFF';
+    if (i === 0) rowBg = '#E3F3F0';
+    else if (i === 1) rowBg = '#F4EEE2';
+    else if (i % 2 === 0) rowBg = '#FCF7EE';
+    ctx.fillStyle = rowBg;
+    drawRoundedRect(ctx, tableX - rowBodyPadX, rowTop + rowBodyPadY, tableWidth + rowBodyPadX * 2, rowHeight - rowBodyPadY * 2, rowBodyRadius);
+
+    var textY = rowTop + rowHeight / 2;
+    var highlightRow = i <= 1;
+    var priceFont = highlightRow ? '700 52px "Inter", "Helvetica Neue", Arial, sans-serif' : '700 50px "Inter", "Helvetica Neue", Arial, sans-serif';
+
+    ctx.font = priceFont;
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#0D6A63';
+    var priceX = tableX + tableWidth - labelPadding;
+    var priceWidth = ctx.measureText(row.priceText).width;
+    var priceSpace = Math.max(minPriceSpace, priceWidth + labelPadding * 2);
+    var priceStart = priceX - priceSpace + labelPadding;
+    if (priceStart < tableX + labelPadding * 2) {
+      priceStart = tableX + labelPadding * 2;
+      priceSpace = priceX - priceStart + labelPadding;
+    }
+    ctx.fillText(row.priceText, priceX, textY);
+
+    var labelMaxWidth = Math.max(140, priceStart - (tableX + labelPadding));
+    var labelFontSingle = highlightRow ? '600 44px "Inter", "Helvetica Neue", Arial, sans-serif' : '500 42px "Inter", "Helvetica Neue", Arial, sans-serif';
+    var labelFontMulti = highlightRow ? '600 40px "Inter", "Helvetica Neue", Arial, sans-serif' : '500 38px "Inter", "Helvetica Neue", Arial, sans-serif';
+    ctx.font = labelFontSingle;
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#1F2E2A';
+
+    var forcedLines = null;
+    if (highlightRow && /\(LM\)/.test(row.label)) {
+      var split = row.label.split(/\(LM\)/);
+      var firstPart = (split[0] || '').trim();
+      var remainder = split.slice(1).join('(LM)').trim();
+      if (firstPart) {
+        forcedLines = [(firstPart + ' (LM)').trim()];
+        if (remainder) forcedLines.push(remainder);
+      }
+    }
+
+    var labelLines;
+    if (forcedLines) {
+      ctx.font = labelFontMulti;
+      labelLines = forcedLines.map(function(line) {
+        return truncateTextToWidth(ctx, line, labelMaxWidth);
+      }).filter(Boolean);
+    } else {
+      labelLines = wrapTextLinesLimited(ctx, row.label, labelMaxWidth, 2);
+      if (labelLines.length > 1) {
+        ctx.font = labelFontMulti;
+        labelLines = wrapTextLinesLimited(ctx, row.label, labelMaxWidth, 2);
+      }
+      if (!labelLines.length) {
+        labelLines = [truncateTextToWidth(ctx, row.label, labelMaxWidth)];
+      }
+    }
+    var isMultiLine = labelLines.length > 1;
+    var lineGap = isMultiLine ? (highlightRow ? 42 : 36) : 0;
+    var labelBlockHeight = (labelLines.length - 1) * lineGap;
+    var labelBaseY = textY - labelBlockHeight / 2;
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(tableX + labelPadding, rowTop + rowBodyPadY, labelMaxWidth, rowHeight - rowBodyPadY * 2);
+    ctx.clip();
+    for (var lineIndex = 0; lineIndex < labelLines.length; lineIndex++) {
+      ctx.fillText(labelLines[lineIndex], tableX + labelPadding, labelBaseY + lineIndex * lineGap);
+    }
+    ctx.restore();
+
+    if (i < rows.length - 1) {
+      var dividerY = rowTop + rowHeight - rowBodyPadY + rowGap / 2;
+      ctx.beginPath();
+      ctx.moveTo(tableX - rowBodyPadX + 16, dividerY);
+      ctx.lineTo(tableX + tableWidth + rowBodyPadX - 16, dividerY);
+      ctx.strokeStyle = '#E4D9C3';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  if (infoBlockHeight) {
+    var infoY = tableY + tableHeight + infoSpacingTop;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    var noteLines = noteLinesForHeight;
+    if (meta.updatedFooter) {
+      ctx.font = '500 30px "Inter", "Helvetica Neue", Arial, sans-serif';
+      ctx.fillStyle = '#415749';
+      ctx.fillText(meta.updatedFooter, tableX, infoY);
+      infoY += noteLineHeight;
+    }
+    if (noteLines.length) {
+      if (meta.updatedFooter) infoY += noteGap;
+      ctx.font = '400 28px "Inter", "Helvetica Neue", Arial, sans-serif';
+      ctx.fillStyle = '#6A5C3E';
+      noteLines.forEach(function(line, idx) {
+        ctx.fillText(line, tableX, infoY + idx * noteLineHeight);
+      });
+    }
+  }
+
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '500 34px "Inter", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = '#615335';
+  ctx.fillText('Sentral Emas • ' + meta.footer, width / 2, canvasHeight - footerHeight / 2);
+
+  return canvas;
+}
+
+function canvasToBlob(canvas) {
+  return new Promise(function(resolve, reject) {
+    if (!canvas) {
+      reject(new Error('Canvas tidak tersedia'));
+      return;
+    }
+    if (typeof canvas.toBlob === 'function') {
+      canvas.toBlob(function(blob) {
+        if (blob) resolve(blob);
+        else reject(new Error('Gagal membuat blob')); // coverage
+      }, 'image/png', 0.95);
+      return;
+    }
+    try {
+      var dataUrl = canvas.toDataURL('image/png');
+      var parts = dataUrl.split(',');
+      var base64 = parts[1] || '';
+      var binary = atob(base64);
+      var len = binary.length;
+      var buffer = new Uint8Array(len);
+      for (var i = 0; i < len; i++) {
+        buffer[i] = binary.charCodeAt(i);
+      }
+      resolve(new Blob([buffer], {
+        type: 'image/png'
+      }));
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
+
+function triggerDownload(blob, filename) {
+  var link = document.createElement('a');
+  var url = URL.createObjectURL(blob);
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  setTimeout(function() {
+    URL.revokeObjectURL(url);
+    document.body.removeChild(link);
+  }, 0);
+}
+
+function toggleShareFallbackMessage(visible, message) {
+  var fallbackEl = document.getElementById('sharePriceFallback');
+  if (!fallbackEl) return;
+  if (message) {
+    fallbackEl.textContent = message;
+  } else if (fallbackEl.dataset && fallbackEl.dataset.default) {
+    fallbackEl.textContent = fallbackEl.dataset.default;
+  }
+  if (visible) {
+    fallbackEl.removeAttribute('hidden');
+  } else {
+    fallbackEl.setAttribute('hidden', '');
+  }
+}
+
+async function sharePriceTable(button) {
+  var rows = collectSharePriceRows();
+  if (!rows.length) {
+    toggleShareFallbackMessage(true, 'Data harga belum siap. Mohon coba lagi setelah tabel termuat.');
+    return;
+  }
+  var originalLabel = button.textContent;
+  button.disabled = true;
+  button.setAttribute('aria-busy', 'true');
+  button.textContent = 'Menyiapkan...';
+  try {
+    var meta = buildShareMetaInfo();
+    var logoImage = await loadShareLogo().catch(function() {
+      return null;
+    });
+    var canvas = drawPriceShareCanvas(rows, meta, logoImage);
+    if (!canvas) throw new Error('Canvas tidak dapat dibuat');
+    var blob = await canvasToBlob(canvas);
+    var fileName = meta.fileName;
+    var shareData = null;
+    var canUseShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+    if (canUseShare && typeof File === 'function') {
+      try {
+        var shareFile = new File([blob], fileName, {
+          type: 'image/png'
+        });
+        shareData = {
+          files: [shareFile]
+        };
+        if (navigator.canShare && !navigator.canShare({
+            files: shareData.files
+          })) {
+          shareData = null;
+        }
+      } catch (_) {
+        shareData = null;
+      }
+    }
+    if (shareData) {
+      try {
+        await navigator.share(shareData);
+        toggleShareFallbackMessage(false);
+        return;
+      } catch (shareErr) {
+        var name = shareErr && shareErr.name;
+        if (name === 'AbortError' || name === 'NotAllowedError' || name === 'SecurityError') {
+          toggleShareFallbackMessage(false);
+          return;
+        }
+        console.error(shareErr); // eslint-disable-line no-console
+      }
+    }
+    var copied = await copyImageBlob(blob);
+    if (copied) {
+      toggleShareFallbackMessage(true, 'Gambar harga sudah disalin. Tempel langsung di aplikasi tujuan.');
+      return;
+    }
+    triggerDownload(blob, fileName);
+    toggleShareFallbackMessage(true);
+  } catch (err) {
+    toggleShareFallbackMessage(true, 'Gagal menyiapkan gambar bagikan. Silakan coba lagi.');
+    console.error(err); // eslint-disable-line no-console
+  } finally {
+    button.disabled = false;
+    button.removeAttribute('aria-busy');
+    button.textContent = originalLabel;
+  }
+}
+
+function setupSharePriceButton() {
+  var button = document.getElementById('sharePriceTable');
+  if (!button) return;
+  var fallbackEl = document.getElementById('sharePriceFallback');
+  if (fallbackEl && fallbackEl.dataset && !fallbackEl.dataset.default) {
+    fallbackEl.dataset.default = fallbackEl.textContent.trim();
+  }
+  var updateAvailability = function() {
+    var hasData = collectSharePriceRows().length > 0;
+    button.disabled = !hasData;
+    if (hasData) {
+      button.removeAttribute('aria-disabled');
+    } else {
+      button.setAttribute('aria-disabled', 'true');
+    }
+  };
+  updateAvailability();
+  document.addEventListener('prices:updated', updateAvailability);
+  button.addEventListener('click', function() {
+    sharePriceTable(button);
+  });
 }
 
 function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
@@ -2805,6 +3401,7 @@ function displayDateTimeWIB() {
 }
 displayDateTimeWIB();
 setInterval(displayDateTimeWIB, 60000);
+setupSharePriceButton();
 
 function shouldFetchGoldPrice() {
   return !!(document.getElementById('goldPriceTable') || document.getElementById('lmBaruCurrent'));

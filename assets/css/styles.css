@@ -329,6 +329,21 @@ body {
   background: rgba(255, 255, 255, .08)
 }
 
+.table-actions .btn-ghost {
+  background: rgba(12, 88, 79, .08);
+  border-color: rgba(12, 88, 79, .28);
+  color: var(--text-primary);
+  box-shadow: 0 8px 20px rgba(3, 66, 60, .08);
+}
+
+.table-actions .btn-ghost:hover,
+.table-actions .btn-ghost:focus-visible {
+  background: rgba(12, 88, 79, .16);
+  border-color: rgba(12, 88, 79, .4);
+  outline: 2px solid rgba(12, 88, 79, .35);
+  outline-offset: 2px;
+}
+
 .hero .btn-ghost,
 #kontak .btn-ghost,
 #cta-harga .btn-ghost {

@@ -393,7 +393,11 @@
           </table>
         </div>
         <p id="lastUpdatedInfo" class="text-note mt-10" role="status" aria-live="polite">*Angka di atas bisa berubah setiap waktu. Klik tombol WhatsApp untuk harga terbaru hari ini.</p>
-        <div class="mt-10"><a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a></div>
+        <div class="btn-row mt-10 table-actions" role="group" aria-label="Aksi tabel harga">
+          <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-harga">Cek Harga Hari Ini</a>
+          <button type="button" id="sharePriceTable" class="btn btn-ghost" data-track="share-harga">Bagikan Tabel</button>
+        </div>
+        <p id="sharePriceFallback" class="text-note mt-06" hidden>Peramban Anda belum mendukung fitur bagi gambar otomatis. Setelah tombol ditekan, sistem akan mengunduh gambar yang bisa Anda bagikan manual.</p>
       </div>
     </section>
 
