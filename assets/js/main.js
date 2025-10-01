@@ -2592,6 +2592,18 @@ async function copyImageBlob(blob) {
   }
 }
 
+async function copyTextToClipboard(text) {
+  if (!text || typeof navigator === 'undefined') return false;
+  var clipboard = navigator.clipboard;
+  if (!clipboard || typeof clipboard.writeText !== 'function') return false;
+  try {
+    await clipboard.writeText(text);
+    return true;
+  } catch (_) {
+    return false;
+  }
+}
+
 function buildCalcSelectionOptionsFromButton(addBtn) {
   if (!addBtn) return null;
   var options = {};
@@ -3105,31 +3117,51 @@ async function sharePriceTable(button) {
     var blob = await canvasToBlob(canvas);
     var fileName = meta.fileName;
     var shareData = null;
+    var copiedCaptionForFallback = false;
     var canUseShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
     if (canUseShare && typeof File === 'function') {
       try {
         var shareFile = new File([blob], fileName, {
           type: 'image/png'
         });
-        shareData = {
+        var basePayload = {
           files: [shareFile]
         };
-        if (navigator.canShare && !navigator.canShare({
-            files: shareData.files
-          })) {
-          shareData = null;
+        var payloadWithText = Object.assign({}, basePayload);
+        if (meta.shareText) payloadWithText.text = meta.shareText;
+        if (meta.shareTitle) payloadWithText.title = meta.shareTitle;
+        var canShareWithText = true;
+        if (navigator.canShare && !navigator.canShare(payloadWithText)) {
+          canShareWithText = false;
+        }
+        if (canShareWithText) {
+          shareData = payloadWithText;
+        } else {
+          var canShareBase = true;
+          if (navigator.canShare && !navigator.canShare(basePayload)) {
+            canShareBase = false;
+          }
+          if (canShareBase) {
+            shareData = basePayload;
+            if (meta.shareText) {
+              copiedCaptionForFallback = await copyTextToClipboard(meta.shareText);
+            }
+          } else {
+            shareData = null;
+          }
         }
       } catch (_) {
         shareData = null;
       }
     }
     if (shareData) {
-      if (meta.shareText) {
-        shareData.text = meta.shareText;
-      }
       try {
         await navigator.share(shareData);
-        toggleShareFallbackMessage(false);
+        if (copiedCaptionForFallback) {
+          toggleShareFallbackMessage(true, 'Caption sudah disalin. Tempel manual setelah kirim gambar.');
+        } else {
+          toggleShareFallbackMessage(false);
+        }
         return;
       } catch (shareErr) {
         var name = shareErr && shareErr.name;
