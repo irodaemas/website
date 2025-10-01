@@ -847,7 +847,7 @@ if (typeof window !== 'undefined') {
 })();
 
 // Harga emas: fetch + fallback + waktu W.I.B
-const PRICE_ADJUST_IDR = +50000;
+const PRICE_ADJUST_IDR = -20000;
 const PRICE_TIMEOUT_MS = 5000;
 const LM_HISTORY_RANGE_CONFIG = {
   '7': {
@@ -885,7 +885,7 @@ const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
 const FACTOR_LM_BARU = 0.932;
 const FACTOR_LM_LAMA = 0.917;
-const PRICE_ADJUST_LM_IDR = +20000;
+const PRICE_ADJUST_LM_IDR = -240000;
 const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
