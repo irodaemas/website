@@ -791,17 +791,21 @@ if (typeof window !== 'undefined') {
   // Scroll reveal
   const revealables = Array.from(document.querySelectorAll('section, .feature, .card, .stat, .gallery img, .gallery video'));
   revealables.forEach(el => el.classList.add('reveal'));
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        io.unobserve(e.target);
-      }
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, {
+      threshold: .12
     });
-  }, {
-    threshold: .12
-  });
-  revealables.forEach(el => io.observe(el));
+    revealables.forEach(el => io.observe(el));
+  } else {
+    revealables.forEach(el => el.classList.add('visible'));
+  }
   // Date badge minute tick glow
   const badge = document.getElementById('currentDateTime');
   if (badge) {
@@ -4874,13 +4878,9 @@ if ('serviceWorker' in navigator) {
     var observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
         var target = entry.target;
-        if (!target) return;
-
-        if (entry.isIntersecting) {
-          target.classList.add('is-visible');
-          return;
-        }
-        target.classList.remove('is-visible');
+        if (!target || !entry.isIntersecting) return;
+        target.classList.add('is-visible');
+        observer.unobserve(target);
       });
     }, {
       threshold: 0.2,
