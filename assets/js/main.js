@@ -2675,6 +2675,7 @@ function buildShareMetaInfo() {
   }
   var iso = now.toISOString();
   var fileStamp = iso.slice(0, 10).replace(/-/g, '') + '-' + iso.slice(11, 16).replace(/:/g, '');
+  var shareCaption = 'Cek info lengkap di https://sentralemas.com/#harga';
   return {
     title: 'Harga Buyback Emas',
     subtitle: 'Sentral Emas',
@@ -2683,8 +2684,8 @@ function buildShareMetaInfo() {
     updatedAt: now,
     note: noteText,
     shareTitle: 'Harga Buyback Emas - Sentral Emas',
-    shareText: 'Update harga buyback emas Sentral Emas per ' + formatDateTimeIndo(now) + '.',
-    footer: 'sentralemas.com/harga',
+    shareText: 'Update harga buyback emas Sentral Emas per ' + formatDateTimeIndo(now) + '.\n' + shareCaption,
+    footer: 'sentralemas.com/#harga',
     fileName: 'sentral-emas-harga-' + fileStamp + '.png'
   };
 }
@@ -2871,8 +2872,6 @@ function drawPriceShareCanvas(rows, meta, logoImage) {
   ctx.fillText(meta.title, 80, 78);
   ctx.font = '500 38px "Inter", "Helvetica Neue", Arial, sans-serif';
   ctx.fillText(meta.subtitle, 80, 146);
-  ctx.font = '400 32px "Inter", "Helvetica Neue", Arial, sans-serif';
-  ctx.fillText(meta.updatedLabel, 80, 202);
 
   if (logoImage) {
     var logoSize = 118;
@@ -3125,6 +3124,9 @@ async function sharePriceTable(button) {
       }
     }
     if (shareData) {
+      if (meta.shareText) {
+        shareData.text = meta.shareText;
+      }
       try {
         await navigator.share(shareData);
         toggleShareFallbackMessage(false);
