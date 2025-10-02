@@ -894,6 +894,29 @@ const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
+
+function getGmtPlus7DateString() {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+  const gmt7Time = new Date(utc + (3600000 * 7));
+  const year = gmt7Time.getUTCFullYear();
+  const month = String(gmt7Time.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(gmt7Time.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getGlobalGoldEndpoints(dateStr) {
+  const date = dateStr || getGmtPlus7DateString();
+  return [
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/xau.json`,
+    `https://${date}.currency-api.pages.dev/v1/currencies/xau.json`,
+    'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/xau.json',
+    'https://latest.currency-api.pages.dev/v1/currencies/xau.json'
+  ];
+}
+const TROY_OUNCE_IN_GRAMS = 31.1034768;
+let GLOBAL_GOLD_SPOT_CACHE = null;
+let GLOBAL_GOLD_SPOT_PROMISE = null;
 const GOLD_KARAT_SERIES = [{
     karat: 24,
     purity: 1
@@ -2552,6 +2575,185 @@ function renderPriceTable(rows) {
   updatePriceSchema(priceEntries);
   document.dispatchEvent(new CustomEvent('prices:updated'));
 }
+
+function getGlobalGoldElements() {
+  if (typeof document === 'undefined') return {};
+  return {
+    card: document.getElementById('globalGoldPriceCard'),
+    perGram: document.getElementById('globalGoldPricePerGram'),
+    date: document.getElementById('globalGoldPriceDate'),
+    note: document.getElementById('globalGoldPriceNote'),
+    tableBody: document.getElementById('globalGoldPriceTable'),
+    tableNote: document.getElementById('globalGoldPriceTableNote')
+  };
+}
+
+function setGlobalGoldBusy(elements, busy) {
+  var target = elements || getGlobalGoldElements();
+  var value = busy ? 'true' : 'false';
+  if (target.card) target.card.setAttribute('aria-busy', value);
+  if (target.tableBody) target.tableBody.setAttribute('aria-busy', value);
+}
+
+function setGlobalNoteText(noteEl, message) {
+  if (!noteEl) return;
+  var currentText = noteEl.textContent || '';
+  if (noteEl.dataset) {
+    if (!noteEl.dataset.defaultText) {
+      noteEl.dataset.defaultText = currentText.trim();
+    }
+    if (typeof message === 'string' && message.length) {
+      noteEl.textContent = message;
+    } else {
+      noteEl.textContent = noteEl.dataset.defaultText || currentText;
+    }
+  } else {
+    var stored = noteEl.getAttribute('data-default-text');
+    if (!stored) {
+      noteEl.setAttribute('data-default-text', currentText.trim());
+      stored = noteEl.getAttribute('data-default-text');
+    }
+    if (typeof message === 'string' && message.length) {
+      noteEl.textContent = message;
+    } else {
+      noteEl.textContent = stored || currentText;
+    }
+  }
+}
+
+function normalizeGlobalGoldPayload(payload) {
+  if (!payload || typeof payload !== 'object') {
+    throw new Error('Payload harga dunia kosong');
+  }
+  var rates = payload.xau || {};
+  var idrValue = typeof rates.idr === 'number' ? rates.idr : Number(rates.idr);
+  if (!isFinite(idrValue) || idrValue <= 0) {
+    throw new Error('Nilai XAU → IDR tidak valid');
+  }
+  var date = resolveDate(payload.date);
+  var dateLabel = '';
+  if (date) {
+    dateLabel = formatDateOnlyIndo(date);
+  } else if (typeof payload.date === 'string' && payload.date.trim()) {
+    dateLabel = payload.date.trim();
+  }
+  return {
+    perOunce: idrValue,
+    perGram: idrValue / TROY_OUNCE_IN_GRAMS,
+    date: date || null,
+    dateLabel: dateLabel
+  };
+}
+
+function renderGlobalGoldSpot(data, targetElements) {
+  var elements = targetElements || getGlobalGoldElements();
+  if (!elements.card && !elements.tableBody) return;
+  if (elements.card) elements.card.removeAttribute('data-state');
+  if (elements.tableBody) elements.tableBody.removeAttribute('data-state');
+
+  var perGramValue = (typeof data.perGram === 'number' && isFinite(data.perGram)) ? Math.round(data.perGram) : null;
+  var perOunceValue = (typeof data.perOunce === 'number' && isFinite(data.perOunce)) ? Math.round(data.perOunce) : null;
+  var dateLabel = data.dateLabel || (data.date ? formatDateOnlyIndo(data.date) : '');
+
+  if (elements.perGram) {
+    elements.perGram.textContent = perGramValue !== null ? 'Rp ' + formatCurrencyIDR(perGramValue) : 'Rp —';
+  }
+  if (elements.date) {
+    elements.date.textContent = dateLabel || '—';
+  }
+
+  setGlobalNoteText(elements.note, null);
+  setGlobalNoteText(elements.tableNote, null);
+
+  if (elements.tableBody) {
+    var rows = [];
+    if (perOunceValue !== null) {
+      rows.push('<tr><td>Per Troy Ounce (31,103 gram)</td><td align="right">Rp ' + formatCurrencyIDR(perOunceValue) + '</td></tr>');
+    }
+    if (perGramValue !== null) {
+      rows.push('<tr><td>Per Gram</td><td align="right">Rp ' + formatCurrencyIDR(perGramValue) + '</td></tr>');
+    }
+    if (!rows.length) {
+      rows.push('<tr><td colspan="2" class="text-note">Data harga emas dunia belum tersedia.</td></tr>');
+    }
+    elements.tableBody.innerHTML = rows.join('');
+  }
+}
+
+function renderGlobalGoldError(message, targetElements) {
+  var elements = targetElements || getGlobalGoldElements();
+  if (!elements.card && !elements.tableBody) return;
+  var fallback = typeof message === 'string' && message.length ? message : 'Harga emas dunia belum tersedia.';
+
+  if (elements.perGram) {
+    elements.perGram.textContent = 'Rp —';
+  }
+  if (elements.date) {
+    elements.date.textContent = '—';
+  }
+
+  setGlobalNoteText(elements.note, fallback);
+  setGlobalNoteText(elements.tableNote, fallback);
+
+  if (elements.tableBody) {
+    elements.tableBody.innerHTML = '<tr><td colspan="2" class="text-note">' + escapeHTML(fallback) + '</td></tr>';
+    elements.tableBody.setAttribute('data-state', 'error');
+  }
+  if (elements.card) {
+    elements.card.setAttribute('data-state', 'error');
+  }
+}
+
+async function fetchGlobalGoldSpot() {
+  if (typeof fetch !== 'function') return null;
+  var elements = getGlobalGoldElements();
+  if (!elements.card && !elements.tableBody) return null;
+
+  if (GLOBAL_GOLD_SPOT_CACHE) {
+    renderGlobalGoldSpot(GLOBAL_GOLD_SPOT_CACHE, elements);
+    return GLOBAL_GOLD_SPOT_CACHE;
+  }
+
+  setGlobalGoldBusy(elements, true);
+  if (!GLOBAL_GOLD_SPOT_PROMISE) {
+    GLOBAL_GOLD_SPOT_PROMISE = (async function() {
+      let lastError = null;
+      for (const endpoint of getGlobalGoldEndpoints()) {
+        try {
+          const response = await fetch(endpoint, {
+            cache: 'no-store'
+          });
+          if (!response.ok) {
+            throw new Error('Gagal memuat harga dunia: ' + response.status);
+          }
+          const payload = await response.json();
+          const normalized = normalizeGlobalGoldPayload(payload);
+          GLOBAL_GOLD_SPOT_CACHE = normalized;
+          return normalized;
+        } catch (error) {
+          lastError = error;
+          console.warn('Gagal mengambil dari ' + endpoint + ', mencoba fallback...');
+        }
+      }
+      throw lastError || new Error('Semua endpoint harga dunia gagal.');
+    })();
+  }
+
+  try {
+    var result = await GLOBAL_GOLD_SPOT_PROMISE;
+    renderGlobalGoldSpot(result, elements);
+    return result;
+  } catch (err) {
+    /* istanbul ignore next */
+    console.warn('Harga emas dunia gagal dimuat dari semua sumber:', err?.message || err);
+    renderGlobalGoldError('Harga emas dunia belum tersedia. Silakan coba lagi.', elements);
+    return null;
+  } finally {
+    setGlobalGoldBusy(elements, false);
+    GLOBAL_GOLD_SPOT_PROMISE = null;
+  }
+}
+
 var HIGHLIGHT_ADD_BOUND = false;
 
 var SHARE_LOGO_PROMISE = null;
@@ -3444,9 +3646,16 @@ setupSharePriceButton();
 function shouldFetchGoldPrice() {
   return !!(document.getElementById('goldPriceTable') || document.getElementById('lmBaruCurrent'));
 }
+
+function shouldFetchGlobalGoldPrice() {
+  return !!(document.getElementById('globalGoldPriceCard') || document.getElementById('globalGoldPriceTable'));
+}
 setupHighlightRangeControls();
 if (shouldFetchGoldPrice()) {
   fetchGoldPrice();
+}
+if (shouldFetchGlobalGoldPrice()) {
+  fetchGlobalGoldSpot();
 }
 
 window.addEventListener('resize', function() {
@@ -5060,6 +5269,7 @@ if (typeof window !== 'undefined') {
   testingApi.refreshRangeMetrics = refreshRangeMetrics;
   testingApi.displayFromBasePrice = displayFromBasePrice;
   testingApi.fetchGoldPrice = fetchGoldPrice;
+  testingApi.fetchGlobalGoldSpot = fetchGlobalGoldSpot;
   testingApi.displayDefaultPrices = displayDefaultPrices;
   testingApi.formatDateTimeIndo = formatDateTimeIndo;
   testingApi.displayDateTimeWIB = displayDateTimeWIB;

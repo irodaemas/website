@@ -11,7 +11,7 @@
         script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net 'sha256-OmpoefMaacLy61S+i7zIyHiferp/ad+4RJSwODcABw4=' 'sha256-y4xXnjmvzpy7oQMw2l4evnsFZevxqtfXecoDCR5CnVU=' 'sha256-W/3/q7VezXXwzZMQxP8QPF6HgSLxhIFVUqnbB6YTmQQ=' 'sha256-DGXoYNDjkpgiN7XSylxGI8Q/NLgDFVTzhCc4+FSBho4=' 'sha256-U+66+q/PLjnT5dp8UVRgUZxG9z6xxCBCl4cdymRvn4Q=' 'sha256-RIF8DAiASgL99gqe+w6X4SLTZFCzkuWnjm2By3u8vv0=' 'sha256-dPg4cXBd21M3BQJX3JytBnvqfwe1ar/fCpDaI7DPhI4=' 'sha256-e0OHB/k6PoqORQ9e1lsxcKl8VpFktsSg0qKmkwBZ8Z0=' 'sha256-s5jGOr5xL+rh2kSZySAK1A+3R3HwIk5JY8B959Prq2k=';
         style-src 'self' 'unsafe-inline';
         font-src 'self';
-        connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
+        connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net https://cdn.jsdelivr.net https://latest.currency-api.pages.dev;
         frame-src 'self' https://www.googletagmanager.com https://www.google.com;
         form-action 'self';" />
   <title>Sentral Emas – Terima Jual Emas & Berlian COD</title>
@@ -398,6 +398,48 @@
           <button type="button" id="sharePriceTable" class="btn btn-ghost" data-track="share-harga">Bagikan Tabel</button>
         </div>
         <p id="sharePriceFallback" class="text-note mt-06" hidden>Peramban Anda belum mendukung fitur bagi gambar otomatis. Setelah tombol ditekan, sistem akan mengunduh gambar yang bisa Anda bagikan manual.</p>
+      </div>
+    </section>
+
+    <!-- ===================== HARGA EMAS DUNIA ===================== -->
+    <section id="harga-emas-dunia" data-scroll-section>
+      <div class="container">
+        <div class="accent-title">Referensi Global</div>
+        <h2 class="h2">Harga Emas Spot Dunia (XAU)</h2>
+        <div id="globalGoldPriceCard" class="card world-price-card mt-12" role="status" aria-live="polite" aria-busy="true">
+          <div class="world-price-card__head">
+            <div>
+              <div class="accent-title">Acuan Harga Spot</div>
+              <h3 class="h3">Nilai Murni Emas Global</h3>
+            </div>
+            <span id="globalGoldPriceDate" class="date-badge">—</span>
+          </div>
+          <div class="world-price-card__body">
+            <div class="world-price-value" id="globalGoldPricePerGram">Rp —</div>
+            <p class="text-note" id="globalGoldPriceNote">Harga per gram dalam Rupiah (kurs <span class="nowrap">XAU/IDR</span>).</p>
+          </div>
+          <div class="table-wrap">
+            <table class="world-price-table" aria-label="Tabel harga emas dunia">
+              <thead>
+                <tr>
+                  <th>Satuan</th>
+                  <th>Harga (Rp)</th>
+                </tr>
+              </thead>
+              <tbody id="globalGoldPriceTable" aria-live="polite" aria-busy="true">
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td>
+                    <div class="skeleton skeleton-line" style="width: 90px;"></div>
+                  </td>
+                  <td align="right">
+                    <div class="skeleton skeleton-price"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-note" id="globalGoldPriceTableNote" style="padding: 0 2rem 2rem">Ini adalah harga murni sebagai acuan global, belum termasuk biaya admin atau penyesuaian lainnya.</p>
+        </div>
       </div>
     </section>
 

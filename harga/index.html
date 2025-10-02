@@ -13,7 +13,7 @@
         script-src 'self' https://pluang.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net 'sha256-VMze8vM9iA5eoGxZgMy2QJAu0Hascu5XdrfQ2zictRE=' 'sha256-lKSmt9/xy5jtn0F2bQ4hRVO7kwPtze8xYlDunJfkX88=' 'sha256-BybwlXa4RsTIZMbwN99QXwHYOG9Gi+1qAWr/wBQIl4M=' 'sha256-5hmGas9SExqwK9qN5Bclww8MuhIW7wONGqJRQ2KXb18=' 'sha256-e0OHB/k6PoqORQ9e1lsxcKl8VpFktsSg0qKmkwBZ8Z0=';
         style-src 'self' 'unsafe-inline';
         font-src 'self';
-        connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net;
+        connect-src 'self' https://pluang.com https://wa.me https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://stats.g.doubleclick.net https://www.googleadservices.com https://googleads.g.doubleclick.net https://cdn.jsdelivr.net https://latest.currency-api.pages.dev;
         frame-src 'self' https://www.googletagmanager.com https://www.google.com;
         form-action 'self';" />
   <title>Harga Buyback Emas COD | Sentral Emas</title>
@@ -234,7 +234,7 @@
             <span id="lmBaruDeltaText">Selisih menunggu data</span>
           </div>
         </div>
-      </div>
+      </div> 
     </section>
 
     <section id="harga">
@@ -263,22 +263,6 @@
           <button type="button" id="sharePriceTable" class="btn btn-ghost" data-track="share-harga">Bagikan Tabel</button>
         </div>
         <p id="sharePriceFallback" class="text-note mt-06" hidden>Peramban Anda belum mendukung fitur bagi gambar otomatis. Setelah tombol ditekan, sistem akan mengunduh gambar yang bisa Anda bagikan manual.</p>
-      </div>
-    </section>
-
-    <section class="pad-vertical" aria-labelledby="diamondRedirectTitle">
-      <div class="container">
-        <div class="card card--inline">
-          <div>
-            <div class="accent-title">Butuh Referensi Berlian?</div>
-            <h2 id="diamondRedirectTitle" class="h2">Kami siapkan halaman khusus untuk panduan berlian.</h2>
-            <p class="t-text">Pelajari kualitas 4C, kenali perbedaan tiap bentuk populer, serta dapatkan ringkasan sertifikat dan insight nilai buyback berlian.</p>
-            <div class="btn-row mt-10">
-              <a class="btn btn-gold" href="/blog/panduan-buyback-berlian/">Buka Panduan Berlian</a>
-              <a class="btn btn-ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-panduan-berlian">Diskusi via WhatsApp</a>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -358,6 +342,64 @@
                 <div id="cal-note" class="calc-note">Estimasi mengikuti harga dasar hari ini; hasil akhir tergantung kondisi barang.</div>
               </div>
               <a id="wa-prefill" class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-kalkulator">Kirim Detail via WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HARGA EMAS DUNIA ===================== -->
+    <section id="harga-emas-dunia" data-scroll-section>
+      <div class="container">
+        <div class="accent-title">Referensi Global</div>
+        <h2 class="h2">Harga Emas Spot Dunia (XAU)</h2>
+        <div id="globalGoldPriceCard" class="card world-price-card mt-12" role="status" aria-live="polite" aria-busy="true">
+          <div class="world-price-card__head">
+            <div>
+              <div class="accent-title">Acuan Harga Spot</div>
+              <h3 class="h3">Nilai Murni Emas Global</h3>
+            </div>
+            <span id="globalGoldPriceDate" class="date-badge">—</span>
+          </div>
+          <div class="world-price-card__body">
+            <div class="world-price-value" id="globalGoldPricePerGram">Rp —</div>
+            <p class="text-note" id="globalGoldPriceNote">Harga per gram dalam Rupiah (kurs <span class="nowrap">XAU/IDR</span>).</p>
+          </div>
+          <div class="table-wrap">
+            <table class="world-price-table" aria-label="Tabel harga emas dunia">
+              <thead>
+                <tr>
+                  <th>Satuan</th>
+                  <th>Harga (Rp)</th>
+                </tr>
+              </thead>
+              <tbody id="globalGoldPriceTable" aria-live="polite" aria-busy="true">
+                <tr class="skeleton-row" aria-hidden="true">
+                  <td>
+                    <div class="skeleton skeleton-line" style="width: 90px;"></div>
+                  </td>
+                  <td align="right">
+                    <div class="skeleton skeleton-price"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-note" id="globalGoldPriceTableNote" style="padding: 0 2rem 2rem">Ini adalah harga murni sebagai acuan global, belum termasuk biaya admin atau penyesuaian lainnya.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="pad-vertical" aria-labelledby="diamondRedirectTitle">
+      <div class="container">
+        <div class="card card--inline">
+          <div>
+            <div class="accent-title">Butuh Referensi Berlian?</div>
+            <h2 id="diamondRedirectTitle" class="h2">Kami siapkan halaman khusus untuk panduan berlian.</h2>
+            <p class="t-text">Pelajari kualitas 4C, kenali perbedaan tiap bentuk populer, serta dapatkan ringkasan sertifikat dan insight nilai buyback berlian.</p>
+            <div class="btn-row mt-10">
+              <a class="btn btn-gold" href="/blog/panduan-buyback-berlian/">Buka Panduan Berlian</a>
+              <a class="btn btn-ghost" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-panduan-berlian">Diskusi via WhatsApp</a>
             </div>
           </div>
         </div>
