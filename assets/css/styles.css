@@ -362,6 +362,30 @@ body {
   font-weight: 600
 }
 
+.badge,
+.date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .25rem .65rem;
+  border-radius: 999px;
+  border: 1px solid var(--badge-border, transparent);
+  background: var(--badge-bg, transparent);
+  color: var(--badge-color, inherit);
+  box-shadow: var(--badge-shadow, none);
+  font-weight: 600;
+  font-size: .95rem;
+  line-height: 1.2;
+}
+
+.badge--accent,
+.date-badge {
+  --badge-bg: rgba(212, 175, 55, .14);
+  --badge-border: rgba(212, 175, 55, .38);
+  --badge-color: var(--deep);
+  --badge-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+}
+
 .card {
   background: var(--paper);
   border: 1px solid var(--border);
@@ -1913,9 +1937,10 @@ tbody tr:hover td {
 }
 
 .date-badge--fallback {
-  background: rgba(1, 61, 57, .08);
-  color: var(--text-secondary);
-  border-color: rgba(1, 61, 57, .28)
+  --badge-bg: rgba(1, 61, 57, .08);
+  --badge-border: rgba(1, 61, 57, .28);
+  --badge-color: var(--text-secondary);
+  --badge-shadow: none;
 }
 
 @media (max-width:640px) {
@@ -2063,13 +2088,14 @@ tbody tr:hover td {
 .world-price-card {
   padding: 1.4rem 1.6rem;
   border-radius: var(--radius);
-  border: 1px solid rgba(1, 61, 57, .08);
-  box-shadow: 0 18px 40px rgba(1, 61, 57, .14);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 720px;
   margin: 1.6rem auto 0;
+  container-type: inline-size;
+  container-name: world-price-card;
 }
 
 .world-price-card__head {
@@ -2077,6 +2103,8 @@ tbody tr:hover td {
   justify-content: space-between;
   align-items: flex-start;
   gap: 1.2rem;
+  flex-wrap: wrap;
+  row-gap: .4rem;
 }
 
 .world-price-card__head .accent-title {
@@ -2091,21 +2119,19 @@ tbody tr:hover td {
 }
 
 .world-price-card .date-badge {
-  font-size: .95rem;
-  font-weight: 600;
-  padding: .25rem .65rem;
-  background: rgba(212, 175, 55, .14);
-  border-color: rgba(212, 175, 55, .38);
-  color: var(--deep);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .35);
+  white-space: nowrap;
 }
 
 .world-price-card__body {
   display: grid;
-  gap: .25rem;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-areas: "value note";
+  align-items: start;
+  gap: .6rem 1.4rem;
 }
 
 .world-price-value {
+  grid-area: value;
   font-size: clamp(1.8rem, 2.3vw + 1rem, 2.7rem);
   font-weight: 700;
   color: var(--deep);
@@ -2113,8 +2139,19 @@ tbody tr:hover td {
 }
 
 .world-price-card .text-note {
+  grid-area: note;
   margin: 0;
   color: var(--muted);
+}
+
+@container world-price-card (max-width: 520px) {
+  .world-price-card__body {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "value"
+      "note";
+    gap: .5rem;
+  }
 }
 
 #globalGoldPriceTableCard {
@@ -2158,6 +2195,21 @@ tbody tr:hover td {
   font-weight: 600;
 }
 
+@media (max-width: 860px) {
+  .world-price-card {
+    padding: 1.3rem 1.4rem;
+    gap: .85rem;
+  }
+
+  .world-price-card__head {
+    gap: .9rem;
+  }
+
+  .world-price-value {
+    font-size: clamp(1.65rem, 2.1vw + 1rem, 2.5rem);
+  }
+}
+
 @media (max-width: 720px) {
   .world-price-card {
     padding: 1.2rem 1.25rem;
@@ -2179,16 +2231,6 @@ tbody tr:hover td {
   }
 }
 
-.date-badge {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--accent-green);
-  background: rgba(212, 175, 55, .16);
-  border: 1px solid rgba(212, 175, 55, .45);
-  padding: .2rem .5rem;
-  border-radius: 8px
-}
-
 .price-highlight {
   position: relative;
   overflow: hidden;
@@ -2198,7 +2240,6 @@ tbody tr:hover td {
   border: 1px solid rgba(212, 175, 55, .2);
   border-radius: var(--radius);
   margin: 0 auto;
-  max-width: 880px;
   display: flex;
   flex-direction: column;
   gap: .9rem;
@@ -4594,8 +4635,9 @@ a {
 #lm-highlight {
   position: relative;
   background:
-    radial-gradient(120% 160% at 16% -20%, rgba(212, 175, 55, .14), transparent 60%),
-    linear-gradient(180deg, var(--linen) 0%, var(--sand-soft) 52%, var(--bg-primary) 100%)
+    radial-gradient(140% 190% at 18% -38%, rgba(212, 175, 55, .24), transparent 64%),
+    radial-gradient(180% 220% at 78% 6%, rgba(1, 61, 57, .12), transparent 70%),
+    linear-gradient(180deg, var(--linen) 0%, var(--sand-soft) 54%, var(--bg-primary) 100%)
 }
 
 #lm-highlight .accent-title,
@@ -4606,8 +4648,9 @@ a {
 #harga {
   position: relative;
   background:
-    radial-gradient(135% 150% at 84% -18%, rgba(212, 175, 55, .12), transparent 62%),
-    linear-gradient(180deg, var(--sand) 0%, var(--bg-tertiary) 60%, var(--bg-primary) 100%)
+    radial-gradient(150% 210% at 82% -42%, rgba(212, 175, 55, .22), transparent 64%),
+    radial-gradient(160% 170% at 16% 4%, rgba(237, 217, 187, .22), transparent 70%),
+    linear-gradient(180deg, var(--sand) 0%, var(--bg-tertiary) 58%, var(--bg-primary) 100%)
 }
 
 #harga .accent-title,
@@ -4617,83 +4660,126 @@ a {
 
 [data-theme="dark"] #lm-highlight {
   background:
-    radial-gradient(120% 160% at 16% -20%, rgba(212, 175, 55, .22), transparent 60%),
-    linear-gradient(180deg, var(--sand) 0%, rgba(12, 17, 16, .96) 58%, rgba(6, 10, 9, .98) 100%)
+    radial-gradient(140% 190% at 18% -38%, rgba(212, 175, 55, .36), transparent 64%),
+    radial-gradient(180% 220% at 78% 6%, rgba(12, 73, 68, .24), transparent 72%),
+    linear-gradient(180deg, rgba(16, 22, 21, .98) 0%, rgba(6, 10, 9, .99) 100%)
 }
 
 [data-theme="dark"] #harga {
   background:
-    radial-gradient(135% 150% at 84% -18%, rgba(212, 175, 55, .26), transparent 62%),
-    linear-gradient(180deg, var(--sand-soft) 0%, rgba(7, 11, 10, .97) 100%)
+    radial-gradient(150% 210% at 82% -42%, rgba(212, 175, 55, .34), transparent 66%),
+    radial-gradient(160% 170% at 16% 4%, rgba(90, 72, 48, .24), transparent 70%),
+    linear-gradient(180deg, rgba(18, 24, 23, .97) 0%, rgba(7, 11, 10, .99) 100%)
 }
 
-#harga-emas-dunia  {
+#harga-emas-dunia {
   position: relative;
+  padding-bottom: clamp(4.5rem, 8vw, 6rem);
   background:
-    radial-gradient(135% 150% at 84% -18%, rgba(212, 175, 55, .12), transparent 62%),
-    linear-gradient(180deg, var(--sand) 0%, var(--bg-tertiary) 60%, var(--bg-primary) 100%)
+    radial-gradient(160% 210% at 20% -28%, rgba(212, 175, 55, .26), transparent 62%),
+    radial-gradient(130% 170% at 78% 6%, rgba(237, 217, 187, .22), transparent 70%),
+    linear-gradient(180deg, var(--linen-soft) 0%, var(--sand) 54%, var(--bg-primary) 100%)
+}
+
+#harga-emas-dunia::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 -1px;
+  height: clamp(90px, 18vw, 140px);
+  background: linear-gradient(180deg, rgba(249, 244, 235, 0) 0%, rgba(249, 244, 235, .85) 58%, var(--bg-primary) 100%);
+  pointer-events: none
+}
+
+#harga-emas-dunia .accent-title,
+#harga-emas-dunia .h2 {
+  color: var(--deep)
+}
+
+[data-theme="dark"] #harga-emas-dunia {
+  background:
+    radial-gradient(160% 210% at 20% -28%, rgba(212, 175, 55, .38), transparent 64%),
+    radial-gradient(130% 170% at 78% 6%, rgba(120, 94, 62, .24), transparent 70%),
+    linear-gradient(180deg, rgba(12, 17, 16, .98) 0%, rgba(5, 8, 7, .99) 100%)
+}
+
+[data-theme="dark"] #harga-emas-dunia::after {
+  background: linear-gradient(180deg, rgba(9, 13, 12, 0) 0%, rgba(9, 13, 12, .85) 60%, rgba(5, 8, 7, .98) 100%)
+}
+
+[data-theme="dark"] #harga-emas-dunia .accent-title,
+[data-theme="dark"] #harga-emas-dunia .h2 {
+  color: var(--paper)
 }
 
 #kalkulator {
   position: relative;
   background:
-    radial-gradient(125% 135% at 0% -18%, rgba(237, 217, 187, .24), transparent 66%),
-    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 50%, var(--bg-primary) 100%)
+    radial-gradient(160% 200% at -12% -24%, rgba(237, 217, 187, .3), transparent 68%),
+    radial-gradient(180% 170% at 94% 10%, rgba(1, 61, 57, .12), transparent 72%),
+    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 48%, var(--bg-primary) 100%)
 }
 
 #konversi {
   position: relative;
   background:
-    radial-gradient(140% 150% at 110% -22%, rgba(212, 175, 55, .2), transparent 68%),
-    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen-soft) 58%, var(--paper) 100%)
+    radial-gradient(160% 220% at 112% -28%, rgba(212, 175, 55, .2), transparent 70%),
+    radial-gradient(150% 180% at 8% 6%, rgba(1, 61, 57, .12), transparent 72%),
+    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen-soft) 56%, var(--paper) 100%)
 }
 
 #fitur {
   position: relative;
   background:
-    radial-gradient(130% 140% at 12% 8%, rgba(1, 61, 57, .08), transparent 64%),
-    linear-gradient(180deg, var(--linen-soft) 0%, var(--sand) 54%, var(--bg-secondary) 100%)
+    radial-gradient(160% 210% at 12% -12%, rgba(12, 73, 68, .14), transparent 70%),
+    radial-gradient(150% 180% at 86% 18%, rgba(237, 217, 187, .22), transparent 74%),
+    linear-gradient(180deg, var(--linen-soft) 0%, var(--sand) 52%, var(--bg-secondary) 100%)
 }
 
 #diterima {
   position: relative;
   background:
-    radial-gradient(150% 145% at 90% -18%, rgba(1, 61, 57, .1), transparent 66%),
-    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 48%, var(--bg-secondary) 100%)
+    radial-gradient(150% 190% at 92% -26%, rgba(12, 73, 68, .12), transparent 68%),
+    radial-gradient(140% 170% at 18% 16%, rgba(237, 217, 187, .26), transparent 74%),
+    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 46%, var(--bg-secondary) 100%)
 }
 
 #galeri {
   position: relative;
   background:
-    radial-gradient(160% 150% at 50% -26%, rgba(212, 175, 55, .16), transparent 70%),
-    linear-gradient(180deg, var(--bg-primary) 0%, var(--linen-soft) 60%, var(--paper) 100%)
+    radial-gradient(180% 210% at 52% -36%, rgba(212, 175, 55, .2), transparent 70%),
+    radial-gradient(160% 200% at 84% 22%, rgba(237, 217, 187, .24), transparent 76%),
+    linear-gradient(180deg, var(--bg-primary) 0%, var(--linen-soft) 58%, var(--paper) 100%)
 }
 
 #lokasi {
   position: relative;
   background:
-    radial-gradient(135% 160% at 8% -32%, rgba(0, 88, 80, .14), transparent 62%),
-    linear-gradient(180deg, var(--sand) 0%, var(--bg-tertiary) 58%, var(--bg-primary) 100%)
+    radial-gradient(160% 210% at 10% -30%, rgba(0, 88, 80, .22), transparent 66%),
+    radial-gradient(150% 170% at 86% 8%, rgba(212, 175, 55, .18), transparent 74%),
+    linear-gradient(180deg, var(--sand) 0%, var(--bg-tertiary) 56%, var(--bg-primary) 100%)
 }
 
 #insight {
   position: relative;
   background:
-    radial-gradient(130% 150% at 88% -24%, rgba(212, 175, 55, .18), transparent 64%),
+    radial-gradient(160% 210% at 88% -22%, rgba(212, 175, 55, .2), transparent 66%),
+    radial-gradient(140% 180% at 14% 18%, rgba(1, 61, 57, .1), transparent 74%),
     linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 52%, var(--bg-primary) 100%)
 }
 
 #testimoni {
   position: relative;
   background:
-    radial-gradient(125% 145% at 10% -26%, rgba(237, 217, 187, .22), transparent 62%),
-    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen-soft) 58%, var(--bg-primary) 100%)
+    radial-gradient(160% 200% at 8% -24%, rgba(237, 217, 187, .3), transparent 66%),
+    radial-gradient(150% 170% at 82% 18%, rgba(1, 61, 57, .1), transparent 76%),
+    linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen-soft) 56%, var(--bg-primary) 100%)
 }
 
 #faq {
   position: relative;
   background:
-    radial-gradient(145% 150% at 0% -18%, rgba(1, 61, 57, .12), transparent 60%),
+    radial-gradient(180% 210% at -8% -32%, rgba(1, 61, 57, .18), transparent 60%),
+    radial-gradient(160% 170% at 82% 16%, rgba(237, 217, 187, .24), transparent 74%),
     linear-gradient(180deg, var(--bg-secondary) 0%, var(--linen) 56%, var(--bg-primary) 100%)
 }
 

@@ -2930,47 +2930,6 @@ function drawRoundedRect(ctx, x, y, width, height, radius, mode) {
   }
 }
 
-function drawWrappedText(ctx, text, x, y, maxWidth, lineHeight) {
-  if (!text) return y;
-  var words = text.split(/\s+/).filter(Boolean);
-  if (!words.length) return y;
-  var line = '';
-  var cursorY = y;
-  for (var i = 0; i < words.length; i++) {
-    var testLine = line ? line + ' ' + words[i] : words[i];
-    if (ctx.measureText(testLine).width > maxWidth && line) {
-      ctx.fillText(line, x, cursorY);
-      cursorY += lineHeight;
-      line = words[i];
-    } else {
-      line = testLine;
-    }
-  }
-  if (line) {
-    ctx.fillText(line, x, cursorY);
-    cursorY += lineHeight;
-  }
-  return cursorY;
-}
-
-function measureWrappedText(ctx, text, maxWidth, lineHeight) {
-  if (!text) return 0;
-  var words = text.split(/\s+/).filter(Boolean);
-  if (!words.length) return 0;
-  var line = '';
-  var lines = 0;
-  for (var i = 0; i < words.length; i++) {
-    var testLine = line ? line + ' ' + words[i] : words[i];
-    if (ctx.measureText(testLine).width > maxWidth && line) {
-      lines++;
-      line = words[i];
-    } else {
-      line = testLine;
-    }
-  }
-  if (line) lines++;
-  return lines * lineHeight;
-}
 
 function truncateTextToWidth(ctx, text, maxWidth) {
   if (!ctx || !text) return '';
