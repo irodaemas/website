@@ -806,6 +806,26 @@ if (typeof window !== 'undefined') {
   } else {
     revealables.forEach(el => el.classList.add('visible'));
   }
+
+  const timeline = document.querySelector('.value-steps');
+  if (timeline) {
+    const activateTimeline = () => timeline.classList.add('is-animated');
+    if ('IntersectionObserver' in window) {
+      const timelineObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            activateTimeline();
+            observer.unobserve(entry.target);
+          }
+        });
+      }, {
+        threshold: .25
+      });
+      timelineObserver.observe(timeline);
+    } else {
+      activateTimeline();
+    }
+  }
   // Date badge minute tick glow
   const badge = document.getElementById('currentDateTime');
   if (badge) {
