@@ -822,14 +822,13 @@ if (typeof window !== 'undefined') {
       return style.display !== 'none' && style.visibility !== 'hidden';
     };
 
-    timelineSections = timelineSections.filter(isVisibleSection);
-    if (timelineSections.length < 2) return;
-
     const getScrollTop = () => window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     const getScrollLeft = () => window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0;
 
     const findAnchor = (section) => {
       if (!section) return null;
+      const accent = section.querySelector('.accent-title');
+      if (accent) return accent;
       const labelledId = section.getAttribute('aria-labelledby');
       if (labelledId) {
         const labelled = document.getElementById(labelledId);
@@ -837,6 +836,16 @@ if (typeof window !== 'undefined') {
       }
       return section.querySelector('h2, h3, h1, [role="heading"]') || section;
     };
+
+    timelineSections = timelineSections.filter(isVisibleSection);
+
+    const timelineAnchors = timelineSections.map((section) => {
+      const anchor = findAnchor(section);
+      if (!anchor) return null;
+      return { section, anchor };
+    }).filter(Boolean);
+
+    if (timelineAnchors.length < 2) return;
 
     const getLabelText = (section) => {
       const labelledId = section.getAttribute('aria-labelledby');
@@ -876,7 +885,7 @@ if (typeof window !== 'undefined') {
     const HEADROOM = 56;
     const TAILROOM = 96;
 
-    const nodeData = timelineSections.map((section) => {
+    const nodeData = timelineAnchors.map(({ section, anchor }) => {
       const item = document.createElement('li');
       item.className = 'page-timeline__item';
 
@@ -891,6 +900,7 @@ if (typeof window !== 'undefined') {
 
       return {
         section,
+        anchor,
         item,
         link,
         position: 0
@@ -912,8 +922,8 @@ if (typeof window !== 'undefined') {
       const firstSection = nodeData[0].section;
       const lastSection = nodeData[nodeData.length - 1].section;
 
-      const firstAnchor = findAnchor(firstSection);
-      const lastAnchor = findAnchor(lastSection);
+      const firstAnchor = nodeData[0].anchor || findAnchor(firstSection);
+      const lastAnchor = nodeData[nodeData.length - 1].anchor || findAnchor(lastSection);
 
       const firstTop = getAnchorOffsetTop(firstAnchor);
       const lastTop = getAnchorOffsetTop(lastAnchor);
@@ -933,7 +943,7 @@ if (typeof window !== 'undefined') {
       timeline.style.height = timelineHeight + 'px';
 
       nodeData.forEach((data) => {
-        const anchor = findAnchor(data.section);
+        const anchor = data.anchor || findAnchor(data.section);
         const anchorTop = getAnchorOffsetTop(anchor);
         const relative = (anchorTop - firstTop) / totalRange;
         const positionPx = HEADROOM + relative * totalRange;
@@ -951,7 +961,7 @@ if (typeof window !== 'undefined') {
       let newIndex = -1;
 
       nodeData.forEach((data, idx) => {
-        const anchor = findAnchor(data.section);
+        const anchor = data.anchor || findAnchor(data.section);
         const rect = anchor.getBoundingClientRect();
         if (rect.top <= window.innerHeight * 0.45) {
           newIndex = idx;
