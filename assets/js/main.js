@@ -2581,9 +2581,10 @@ function getGlobalGoldElements() {
   return {
     card: document.getElementById('globalGoldPriceCard'),
     perGram: document.getElementById('globalGoldPricePerGram'),
+    perOunce: document.getElementById('globalGoldPricePerOunce'),
+    perTenGram: document.getElementById('globalGoldPricePerTenGram'),
     date: document.getElementById('globalGoldPriceDate'),
     note: document.getElementById('globalGoldPriceNote'),
-    tableBody: document.getElementById('globalGoldPriceTable'),
     tableNote: document.getElementById('globalGoldPriceTableNote')
   };
 }
@@ -2592,18 +2593,23 @@ function setGlobalGoldBusy(elements, busy) {
   var target = elements || getGlobalGoldElements();
   var value = busy ? 'true' : 'false';
   if (target.card) target.card.setAttribute('aria-busy', value);
-  if (target.tableBody) target.tableBody.setAttribute('aria-busy', value);
 }
 
 function setGlobalNoteText(noteEl, message) {
   if (!noteEl) return;
   var currentText = noteEl.textContent || '';
+  var currentHtml = noteEl.innerHTML;
   if (noteEl.dataset) {
     if (!noteEl.dataset.defaultText) {
       noteEl.dataset.defaultText = currentText.trim();
     }
+    if (!noteEl.dataset.defaultHtml) {
+      noteEl.dataset.defaultHtml = currentHtml;
+    }
     if (typeof message === 'string' && message.length) {
       noteEl.textContent = message;
+    } else if (noteEl.dataset.defaultHtml) {
+      noteEl.innerHTML = noteEl.dataset.defaultHtml;
     } else {
       noteEl.textContent = noteEl.dataset.defaultText || currentText;
     }
@@ -2613,8 +2619,15 @@ function setGlobalNoteText(noteEl, message) {
       noteEl.setAttribute('data-default-text', currentText.trim());
       stored = noteEl.getAttribute('data-default-text');
     }
+    var storedHtml = noteEl.getAttribute('data-default-html');
+    if (!storedHtml) {
+      noteEl.setAttribute('data-default-html', currentHtml);
+      storedHtml = noteEl.getAttribute('data-default-html');
+    }
     if (typeof message === 'string' && message.length) {
       noteEl.textContent = message;
+    } else if (storedHtml) {
+      noteEl.innerHTML = storedHtml;
     } else {
       noteEl.textContent = stored || currentText;
     }
@@ -2647,16 +2660,22 @@ function normalizeGlobalGoldPayload(payload) {
 
 function renderGlobalGoldSpot(data, targetElements) {
   var elements = targetElements || getGlobalGoldElements();
-  if (!elements.card && !elements.tableBody) return;
-  if (elements.card) elements.card.removeAttribute('data-state');
-  if (elements.tableBody) elements.tableBody.removeAttribute('data-state');
+  if (!elements.card) return;
+  elements.card.removeAttribute('data-state');
 
   var perGramValue = (typeof data.perGram === 'number' && isFinite(data.perGram)) ? Math.round(data.perGram) : null;
   var perOunceValue = (typeof data.perOunce === 'number' && isFinite(data.perOunce)) ? Math.round(data.perOunce) : null;
+  var perTenGramValue = perGramValue !== null ? perGramValue * 10 : null;
   var dateLabel = data.dateLabel || (data.date ? formatDateOnlyIndo(data.date) : '');
 
   if (elements.perGram) {
     elements.perGram.textContent = perGramValue !== null ? 'Rp ' + formatCurrencyIDR(perGramValue) : 'Rp —';
+  }
+  if (elements.perOunce) {
+    elements.perOunce.textContent = perOunceValue !== null ? 'Rp ' + formatCurrencyIDR(perOunceValue) : 'Rp —';
+  }
+  if (elements.perTenGram) {
+    elements.perTenGram.textContent = perTenGramValue !== null ? 'Rp ' + formatCurrencyIDR(perTenGramValue) : 'Rp —';
   }
   if (elements.date) {
     elements.date.textContent = dateLabel || '—';
@@ -2664,29 +2683,21 @@ function renderGlobalGoldSpot(data, targetElements) {
 
   setGlobalNoteText(elements.note, null);
   setGlobalNoteText(elements.tableNote, null);
-
-  if (elements.tableBody) {
-    var rows = [];
-    if (perOunceValue !== null) {
-      rows.push('<tr><td>Per Troy Ounce (31,103 gram)</td><td align="right">Rp ' + formatCurrencyIDR(perOunceValue) + '</td></tr>');
-    }
-    if (perGramValue !== null) {
-      rows.push('<tr><td>Per Gram</td><td align="right">Rp ' + formatCurrencyIDR(perGramValue) + '</td></tr>');
-    }
-    if (!rows.length) {
-      rows.push('<tr><td colspan="2" class="text-note">Data harga emas dunia belum tersedia.</td></tr>');
-    }
-    elements.tableBody.innerHTML = rows.join('');
-  }
 }
 
 function renderGlobalGoldError(message, targetElements) {
   var elements = targetElements || getGlobalGoldElements();
-  if (!elements.card && !elements.tableBody) return;
+  if (!elements.card) return;
   var fallback = typeof message === 'string' && message.length ? message : 'Harga emas dunia belum tersedia.';
 
   if (elements.perGram) {
     elements.perGram.textContent = 'Rp —';
+  }
+  if (elements.perOunce) {
+    elements.perOunce.textContent = 'Rp —';
+  }
+  if (elements.perTenGram) {
+    elements.perTenGram.textContent = 'Rp —';
   }
   if (elements.date) {
     elements.date.textContent = '—';
@@ -2694,20 +2705,13 @@ function renderGlobalGoldError(message, targetElements) {
 
   setGlobalNoteText(elements.note, fallback);
   setGlobalNoteText(elements.tableNote, fallback);
-
-  if (elements.tableBody) {
-    elements.tableBody.innerHTML = '<tr><td colspan="2" class="text-note">' + escapeHTML(fallback) + '</td></tr>';
-    elements.tableBody.setAttribute('data-state', 'error');
-  }
-  if (elements.card) {
-    elements.card.setAttribute('data-state', 'error');
-  }
+  elements.card.setAttribute('data-state', 'error');
 }
 
 async function fetchGlobalGoldSpot() {
   if (typeof fetch !== 'function') return null;
   var elements = getGlobalGoldElements();
-  if (!elements.card && !elements.tableBody) return null;
+  if (!elements.card) return null;
 
   if (GLOBAL_GOLD_SPOT_CACHE) {
     renderGlobalGoldSpot(GLOBAL_GOLD_SPOT_CACHE, elements);
