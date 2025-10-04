@@ -807,6 +807,218 @@ if (typeof window !== 'undefined') {
     revealables.forEach(el => el.classList.add('visible'));
   }
 
+  const initPageScrollTimeline = () => {
+    const sections = Array.from(document.querySelectorAll('[data-scroll-section]'));
+    if (!sections.length) return;
+
+    const heroIndex = sections.findIndex(section => section.id === 'home');
+    let timelineSections = heroIndex >= 0 ? sections.slice(heroIndex + 1) : sections.slice();
+
+    const isVisibleSection = (section) => {
+      if (!section || !section.id) return false;
+      if (section.hasAttribute('hidden')) return false;
+      if (section.dataset.scrollTimeline === 'ignore') return false;
+      const style = window.getComputedStyle(section);
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    };
+
+    timelineSections = timelineSections.filter(isVisibleSection);
+    if (timelineSections.length < 2) return;
+
+    const getScrollTop = () => window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
+    const getScrollLeft = () => window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0;
+
+    const findAnchor = (section) => {
+      if (!section) return null;
+      const labelledId = section.getAttribute('aria-labelledby');
+      if (labelledId) {
+        const labelled = document.getElementById(labelledId);
+        if (labelled) return labelled;
+      }
+      return section.querySelector('h2, h3, h1, [role="heading"]') || section;
+    };
+
+    const getLabelText = (section) => {
+      const labelledId = section.getAttribute('aria-labelledby');
+      if (labelledId) {
+        const labelled = document.getElementById(labelledId);
+        if (labelled) {
+          const text = labelled.textContent || labelled.innerText;
+          if (text) return text.trim();
+        }
+      }
+      const heading = section.querySelector('h2, h3, h1');
+      if (heading) {
+        const text = heading.textContent || heading.innerText;
+        if (text) return text.trim();
+      }
+      return section.dataset.timelineLabel || section.id.replace(/[-_]+/g, ' ');
+    };
+
+    const timeline = document.createElement('aside');
+    timeline.className = 'page-timeline';
+    timeline.setAttribute('role', 'navigation');
+    timeline.setAttribute('aria-label', 'Navigasi bagian halaman');
+
+    const line = document.createElement('div');
+    line.className = 'page-timeline__line';
+    const progressEl = document.createElement('div');
+    progressEl.className = 'page-timeline__line-progress';
+    line.appendChild(progressEl);
+
+    const list = document.createElement('ol');
+    list.className = 'page-timeline__nodes';
+
+    timeline.appendChild(line);
+    timeline.appendChild(list);
+    document.body.appendChild(timeline);
+
+    const HEADROOM = 56;
+    const TAILROOM = 96;
+
+    const nodeData = timelineSections.map((section) => {
+      const item = document.createElement('li');
+      item.className = 'page-timeline__item';
+
+      const link = document.createElement('a');
+      link.className = 'page-timeline__node';
+      link.href = '#' + section.id;
+      const label = getLabelText(section);
+      link.setAttribute('aria-label', label);
+      link.title = label;
+      item.appendChild(link);
+      list.appendChild(item);
+
+      return {
+        section,
+        item,
+        link,
+        position: 0
+      };
+    });
+
+    const getAnchorOffsetTop = (el) => {
+      if (!el) return 0;
+      const rect = el.getBoundingClientRect();
+      return rect.top + getScrollTop();
+    };
+
+    let timelineTop = 0;
+    let timelineHeight = 0;
+    let lastSectionBottom = 0;
+    let activeIndex = -1;
+
+    const updateLayout = () => {
+      const firstSection = nodeData[0].section;
+      const lastSection = nodeData[nodeData.length - 1].section;
+
+      const firstAnchor = findAnchor(firstSection);
+      const lastAnchor = findAnchor(lastSection);
+
+      const firstTop = getAnchorOffsetTop(firstAnchor);
+      const lastTop = getAnchorOffsetTop(lastAnchor);
+
+      const totalRange = Math.max(1, lastTop - firstTop);
+
+      timelineTop = firstTop - HEADROOM;
+      timelineHeight = totalRange + HEADROOM + TAILROOM;
+
+      const container = firstSection.querySelector('.container') || firstSection;
+      const containerRect = container.getBoundingClientRect();
+      const containerLeft = containerRect.left + getScrollLeft();
+      const desiredLeft = containerLeft - 72;
+      const clampedLeft = Math.max(16, desiredLeft);
+      timeline.style.left = clampedLeft + 'px';
+      timeline.style.top = timelineTop + 'px';
+      timeline.style.height = timelineHeight + 'px';
+
+      nodeData.forEach((data) => {
+        const anchor = findAnchor(data.section);
+        const anchorTop = getAnchorOffsetTop(anchor);
+        const relative = (anchorTop - firstTop) / totalRange;
+        const positionPx = HEADROOM + relative * totalRange;
+        data.position = positionPx;
+        data.item.style.top = positionPx + 'px';
+      });
+
+      const lastRect = lastSection.getBoundingClientRect();
+      lastSectionBottom = lastRect.bottom + getScrollTop();
+    };
+
+    const updateProgress = () => {
+      if (!timelineHeight) return;
+
+      let newIndex = -1;
+
+      nodeData.forEach((data, idx) => {
+        const anchor = findAnchor(data.section);
+        const rect = anchor.getBoundingClientRect();
+        if (rect.top <= window.innerHeight * 0.45) {
+          newIndex = idx;
+        }
+      });
+
+      let targetHeight = 0;
+      if (newIndex >= 0) {
+        targetHeight = nodeData[newIndex].position;
+      }
+
+      const viewportBottom = getScrollTop() + window.innerHeight;
+      if (viewportBottom >= lastSectionBottom - 80) {
+        targetHeight = timelineHeight;
+        newIndex = nodeData.length - 1;
+      }
+
+      if (targetHeight > timelineHeight) {
+        targetHeight = timelineHeight;
+      }
+
+      progressEl.style.height = targetHeight + 'px';
+
+      if (newIndex !== activeIndex) {
+        activeIndex = newIndex;
+        nodeData.forEach((data, idx) => {
+          data.item.classList.toggle('is-active', idx === activeIndex && activeIndex >= 0);
+          data.item.classList.toggle('is-past', idx <= activeIndex && activeIndex >= 0);
+        });
+      } else {
+        nodeData.forEach((data, idx) => {
+          const isPast = targetHeight >= data.position - 2;
+          data.item.classList.toggle('is-past', isPast);
+        });
+      }
+    };
+
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        updateProgress();
+        ticking = false;
+      });
+    };
+
+    let layoutFrame = null;
+    const requestLayoutUpdate = () => {
+      if (layoutFrame) {
+        window.cancelAnimationFrame(layoutFrame);
+      }
+      layoutFrame = window.requestAnimationFrame(() => {
+        updateLayout();
+        updateProgress();
+      });
+    };
+
+    requestLayoutUpdate();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', requestLayoutUpdate);
+    window.addEventListener('orientationchange', requestLayoutUpdate);
+    window.addEventListener('load', requestLayoutUpdate, { once: true });
+  };
+
+  initPageScrollTimeline();
+
   const timeline = document.querySelector('.value-steps');
   if (timeline) {
     const activateTimeline = () => timeline.classList.add('is-animated');
