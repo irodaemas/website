@@ -2235,19 +2235,19 @@ tbody tr:hover td {
   position: relative;
   overflow: hidden;
   background:
-    radial-gradient(135% 160% at 6% -8%, rgba(255, 223, 186, .55), transparent 58%),
-    radial-gradient(110% 150% at 84% -12%, rgba(88, 255, 169, .18), transparent 66%),
-    linear-gradient(145deg, rgba(16, 77, 62, .98) 0%, rgba(7, 43, 36, .96) 52%, rgba(5, 26, 23, .98) 100%);
-  color: #fdfaf2;
+    radial-gradient(135% 160% at 12% -12%, rgba(255, 224, 180, .45), transparent 60%),
+    radial-gradient(110% 150% at 86% -14%, rgba(92, 214, 181, .18), transparent 68%),
+    linear-gradient(140deg, rgba(9, 58, 54, .98) 0%, rgba(4, 37, 34, .97) 55%, rgba(2, 24, 22, .98) 100%);
+  color: #f6faf6;
   padding: clamp(1.7rem, 2.4vw, 2.6rem);
-  border: 1px solid rgba(255, 255, 255, .18);
+  border: 1px solid rgba(206, 231, 222, .22);
   border-radius: calc(var(--radius) * 1.4);
   margin: 0 auto;
   max-width: 960px;
   display: flex;
   flex-direction: column;
   gap: clamp(1.1rem, 1.8vw, 1.8rem);
-  box-shadow: 0 32px 68px rgba(5, 24, 22, .55);
+  box-shadow: 0 28px 64px rgba(3, 24, 22, .52);
   isolation: isolate;
   transition: transform .3s ease, box-shadow .3s ease
 }
@@ -2262,16 +2262,16 @@ tbody tr:hover td {
 
 .price-highlight::before {
   background:
-    radial-gradient(120% 150% at 10% 5%, rgba(255, 235, 205, .75), transparent 58%),
-    radial-gradient(160% 180% at 88% 0%, rgba(51, 173, 139, .22), transparent 68%);
+    radial-gradient(120% 150% at 16% 4%, rgba(255, 234, 200, .65), transparent 60%),
+    radial-gradient(160% 180% at 86% 2%, rgba(70, 189, 160, .18), transparent 70%);
   mix-blend-mode: screen;
-  opacity: .95
+  opacity: .85
 }
 
 .price-highlight::after {
-  background: conic-gradient(from 160deg at 50% 50%, rgba(255, 219, 154, .22), rgba(9, 56, 48, 0) 42%, rgba(255, 219, 154, .28) 68%, rgba(9, 56, 48, 0) 90%);
+  background: conic-gradient(from 160deg at 50% 50%, rgba(255, 216, 150, .2), rgba(6, 44, 39, 0) 42%, rgba(255, 216, 150, .3) 68%, rgba(6, 44, 39, 0) 90%);
   animation: priceHighlightShimmer 16s linear infinite;
-  opacity: .4
+  opacity: .32
 }
 
 .price-highlight>* {
@@ -2304,14 +2304,14 @@ tbody tr:hover td {
   justify-content: center;
   padding: .38rem .95rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 231, 192, .5);
-  background: linear-gradient(135deg, rgba(255, 231, 192, .32), rgba(255, 231, 192, .12));
-  color: #ffe7c0;
+  border: 1px solid rgba(232, 205, 156, .6);
+  background: linear-gradient(135deg, rgba(232, 205, 156, .38), rgba(232, 205, 156, .14));
+  color: #fde6c4;
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  box-shadow: 0 18px 28px rgba(8, 32, 27, .42);
+  box-shadow: 0 18px 28px rgba(6, 30, 26, .42);
   backdrop-filter: blur(10px)
 }
 
@@ -2320,8 +2320,8 @@ tbody tr:hover td {
   font-size: clamp(1.55rem, 3.4vw, 2.15rem);
   font-weight: 700;
   letter-spacing: -.01em;
-  color: #fffaf0;
-  text-shadow: 0 22px 38px rgba(5, 24, 22, .48)
+  color: #fff9ec;
+  text-shadow: 0 20px 34px rgba(5, 26, 24, .46)
 }
 
 .price-highlight-label {
@@ -2330,14 +2330,14 @@ tbody tr:hover td {
   letter-spacing: .16em;
   font-weight: 700;
   font-size: .75rem;
-  color: rgba(255, 240, 220, .72)
+  color: rgba(244, 232, 209, .74)
 }
 
 .price-highlight-description {
   margin: 0;
   font-size: .92rem;
   line-height: 1.6;
-  color: rgba(236, 252, 249, .78)
+  color: rgba(228, 244, 241, .82)
 }
 
 .price-highlight-controls {
@@ -2437,9 +2437,9 @@ tbody tr:hover td {
 
 .price-highlight-body {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
   gap: clamp(1.3rem, 3vw, 2.4rem);
-  align-items: end
+  align-items: center
 }
 
 .price-highlight-main {
@@ -2462,8 +2462,8 @@ tbody tr:hover td {
   height: 70px;
   display: block;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgba(8, 52, 44, .78), rgba(6, 36, 30, .32));
-  box-shadow: inset 0 0 0 1px rgba(186, 244, 233, .12), inset 0 -18px 40px rgba(4, 24, 21, .45);
+  background: linear-gradient(180deg, rgba(7, 52, 48, .78), rgba(3, 30, 27, .35));
+  box-shadow: inset 0 0 0 1px rgba(176, 224, 214, .18), inset 0 -16px 34px rgba(2, 22, 20, .45);
   opacity: 0;
   transition: opacity .3s ease
 }
@@ -2570,8 +2570,8 @@ tbody tr:hover td {
 .price-highlight-value {
   font-size: clamp(2.4rem, 4.8vw, 3.4rem);
   font-weight: 700;
-  color: #fff6d9;
-  text-shadow: 0 16px 34px rgba(6, 30, 26, .6);
+  color: #ffeac2;
+  text-shadow: 0 16px 30px rgba(4, 28, 25, .58);
   transition: color .3s ease, transform .3s ease
 }
 
@@ -2582,7 +2582,7 @@ tbody tr:hover td {
 .price-highlight-unit {
   font-size: 1.05rem;
   font-weight: 600;
-  color: rgba(236, 252, 249, .78)
+  color: rgba(224, 239, 236, .8)
 }
 
 
@@ -2598,17 +2598,19 @@ tbody tr:hover td {
 .price-highlight-insights {
   flex: 1 1 60%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-auto-rows: 1fr;
   gap: .9rem;
-  margin: 0
+  margin: 0;
+  align-items: stretch
 }
 
 .price-highlight-insight {
   padding: .85rem 1rem;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, .18);
-  background: linear-gradient(150deg, rgba(255, 255, 255, .18), rgba(6, 44, 37, .24));
-  box-shadow: 0 22px 36px rgba(5, 24, 22, .28);
+  border: 1px solid rgba(204, 227, 219, .22);
+  background: linear-gradient(155deg, rgba(204, 227, 219, .22), rgba(5, 37, 33, .32));
+  box-shadow: 0 20px 32px rgba(4, 22, 20, .28);
   backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
@@ -2620,14 +2622,14 @@ tbody tr:hover td {
   font-size: .72rem;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(234, 252, 247, .72)
+  color: rgba(218, 236, 231, .78)
 }
 
 
 .price-highlight-insight-value {
   font-size: 1.08rem;
   font-weight: 700;
-  color: rgba(255, 249, 236, .95);
+  color: rgba(254, 238, 209, .95);
 }
 
 .price-highlight-insight-value--stack {
@@ -2650,8 +2652,8 @@ tbody tr:hover td {
   font-weight: 600;
   padding: .32rem .75rem;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 228, 188, .26), rgba(6, 44, 36, .34));
-  color: rgba(255, 248, 235, .9);
+  background: linear-gradient(135deg, rgba(232, 205, 156, .26), rgba(4, 40, 34, .34));
+  color: rgba(255, 244, 229, .9);
   letter-spacing: .03em;
   text-transform: none;
   transition: background .3s ease, color .3s ease, transform .3s ease;
@@ -2700,13 +2702,13 @@ tbody tr:hover td {
   justify-content: flex-start;
   font-weight: 600;
   font-size: .96rem;
-  color: rgba(255, 248, 235, .92);
+  color: rgba(255, 244, 229, .92);
   transition: transform .3s ease;
   padding: 1rem 1.2rem;
   border-radius: 20px;
-  background: linear-gradient(155deg, rgba(255, 224, 180, .24), rgba(6, 40, 33, .6));
-  border: 1px solid rgba(255, 224, 180, .32);
-  box-shadow: 0 26px 40px rgba(5, 24, 22, .32);
+  background: linear-gradient(155deg, rgba(232, 205, 156, .26), rgba(4, 40, 34, .62));
+  border: 1px solid rgba(232, 205, 156, .34);
+  box-shadow: 0 26px 40px rgba(4, 24, 22, .3);
   min-width: min(280px, 100%);
   flex: 0 1 280px
 }
