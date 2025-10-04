@@ -3794,6 +3794,79 @@ window.addEventListener('resize', function() {
   var items = [];
   var lastPreview = null;
   var idCounter = 1;
+  var lastSub24KValue = null;
+  var previousCategory = cat.value;
+
+  function getAvailableSubKadarValues() {
+    if (!kadar || !kadar.options) return [];
+    var options = Array.prototype.slice.call(kadar.options);
+    var numericOptions = options.reduce(function(list, opt) {
+      var num = Number(opt && opt.value);
+      if (Number.isFinite(num) && num < 24) {
+        list.push({
+          value: String(opt.value),
+          weight: num
+        });
+      }
+      return list;
+    }, []);
+    numericOptions.sort(function(a, b) {
+      return b.weight - a.weight;
+    });
+    return numericOptions.map(function(entry) {
+      return entry.value;
+    });
+  }
+
+  function ensureLastSubKadarInitialized() {
+    if (lastSub24KValue !== null) return;
+    var available = getAvailableSubKadarValues();
+    if (available.length) {
+      lastSub24KValue = available[0];
+    }
+  }
+
+  function sanitizeSubKadarValue(preferred) {
+    ensureLastSubKadarInitialized();
+    var available = getAvailableSubKadarValues();
+    if (!available.length) {
+      return preferred !== undefined && preferred !== null ? String(preferred) : '23';
+    }
+    var normalized = preferred !== undefined && preferred !== null ? String(preferred) : '';
+    if (normalized && available.indexOf(normalized) !== -1) {
+      return normalized;
+    }
+    if (lastSub24KValue && available.indexOf(lastSub24KValue) !== -1) {
+      return lastSub24KValue;
+    }
+    return available[0];
+  }
+
+  function sanitizeKadarForCategory(catValue, rawKadar) {
+    var normalizedCat = catValue || '';
+    var normalizedKadar = rawKadar !== undefined && rawKadar !== null ? String(rawKadar) : '';
+    if (normalizedCat === 'lm_baru' || normalizedCat === 'lm_lama' || normalizedCat === 'perhiasan_24') {
+      return '24';
+    }
+    if (normalizedCat === 'perhiasan_sub') {
+      return sanitizeSubKadarValue(normalizedKadar);
+    }
+    return normalizedKadar || '24';
+  }
+
+  function enforceKadarForCategory() {
+    var sanitized = sanitizeKadarForCategory(cat.value, kadar.value);
+    if (sanitized !== undefined && sanitized !== null && sanitized !== kadar.value) {
+      kadar.value = sanitized;
+    }
+    if (cat.value === 'perhiasan_sub') {
+      ensureLastSubKadarInitialized();
+      if (sanitized && Number(sanitized) < 24) {
+        lastSub24KValue = sanitized;
+      }
+    }
+    return sanitized;
+  }
 
   function ceilStep(n, step) {
     step = step || 1000;
@@ -3849,7 +3922,19 @@ window.addEventListener('resize', function() {
   function calculateValues(catValue, kadarValue, beratValue) {
     var base = REI_LAST_BASE_P || (readLastBasePrice()?.p) || 1200000;
     var c = catValue || 'perhiasan_sub';
-    var k = Number(kadarValue || 24);
+    var sanitizedKadar = sanitizeKadarForCategory(c, kadarValue);
+    var k = Number(sanitizedKadar || 24);
+    if (!Number.isFinite(k)) {
+      k = 24;
+    }
+    if (c === 'perhiasan_sub' && k >= 24) {
+      var fallbackNumeric = Number(sanitizeSubKadarValue(sanitizedKadar));
+      if (Number.isFinite(fallbackNumeric) && fallbackNumeric < 24) {
+        k = fallbackNumeric;
+      } else {
+        k = 23;
+      }
+    }
     var g = Math.max(0, Number(beratValue || 0));
     g = Math.round(g * 100) / 100;
     var FACTOR_LM_BARU = 0.932;
@@ -4089,16 +4174,47 @@ window.addEventListener('resize', function() {
   }
 
   function toggleKadar() {
-    var disable = (cat.value === 'lm_baru' || cat.value === 'lm_lama' || cat.value === 'perhiasan_24');
+    var currentCat = cat.value;
+    ensureLastSubKadarInitialized();
+    if (previousCategory === 'perhiasan_sub' && currentCat !== 'perhiasan_sub') {
+      var previousValue = sanitizeSubKadarValue(kadar.value);
+      if (previousValue && Number(previousValue) < 24) {
+        lastSub24KValue = previousValue;
+      }
+    }
+    var option24 = kadar && typeof kadar.querySelector === 'function' ? kadar.querySelector('option[value="24"]') : null;
+    if (option24) {
+      if (currentCat === 'perhiasan_sub') {
+        option24.disabled = true;
+        option24.hidden = true;
+        option24.setAttribute('aria-hidden', 'true');
+      } else {
+        option24.disabled = false;
+        option24.hidden = false;
+        option24.removeAttribute('aria-hidden');
+      }
+    }
+    var disable = (currentCat === 'lm_baru' || currentCat === 'lm_lama' || currentCat === 'perhiasan_24');
     kadar.disabled = disable;
     if (disable) {
       kadar.value = '24';
+    } else {
+      enforceKadarForCategory();
     }
+    if (currentCat === 'perhiasan_sub') {
+      kadar.setAttribute('data-lt24-active', 'true');
+    } else {
+      kadar.removeAttribute('data-lt24-active');
+    }
+    previousCategory = currentCat;
   }
 
   ['input', 'change'].forEach(function(ev) {
     berat.addEventListener(ev, updatePreview);
-    kadar.addEventListener(ev, updatePreview);
+    kadar.addEventListener(ev, function() {
+      enforceKadarForCategory();
+      updatePreview();
+    });
   });
   cat.addEventListener('change', function() {
     toggleKadar();
@@ -4111,7 +4227,8 @@ window.addEventListener('resize', function() {
 
   if (addBtn) {
     addBtn.addEventListener('click', function() {
-      if (!addItem(cat.value, kadar.value, berat.value) && berat) {
+      var safeKadar = enforceKadarForCategory() || kadar.value;
+      if (!addItem(cat.value, safeKadar, berat.value) && berat) {
         berat.focus();
       }
       updatePreview();
@@ -4200,6 +4317,7 @@ window.addEventListener('resize', function() {
         kadar.value = val;
       }
     }
+    enforceKadarForCategory();
     if (options.berat !== undefined && options.berat !== null) {
       berat.value = String(options.berat);
     }
@@ -4223,6 +4341,7 @@ window.addEventListener('resize', function() {
         if (previousState.kadarDisabled) {
           kadar.disabled = true;
         }
+        enforceKadarForCategory();
         updatePreview();
       }
     }
