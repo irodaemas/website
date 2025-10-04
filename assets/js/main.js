@@ -938,35 +938,50 @@ if (typeof window !== 'undefined') {
       timelineTop = firstTop - HEADROOM;
       timelineHeight = totalRange + HEADROOM + TAILROOM;
 
-      const anchorPositions = nodeData.map((data) => {
+      const anchorMetrics = nodeData.map((data) => {
         const anchor = data.anchor || findAnchor(data.section);
         const rect = anchor.getBoundingClientRect();
-        return rect.left + getScrollLeft();
-      });
-      const anchorLeft = anchorPositions.length ? Math.min.apply(null, anchorPositions) : 0;
-
-      let spacing = 3;
-      if (firstAnchor) {
-        const anchorStyles = window.getComputedStyle(firstAnchor);
-        const beforeStyles = window.getComputedStyle(firstAnchor, '::before');
-        const gap = parsePx(anchorStyles.columnGap || anchorStyles.gap);
+        const computed = window.getComputedStyle(anchor);
+        const beforeStyles = window.getComputedStyle(anchor, '::before');
+        const left = rect.left + getScrollLeft();
+        const pseudoMarginLeft = parsePx(beforeStyles.marginLeft);
         const pseudoWidth = parsePx(beforeStyles.width);
-        const pseudoMargin = parsePx(beforeStyles.marginRight) + parsePx(beforeStyles.marginLeft);
-        if (gap) {
-          spacing = Math.max(1.5, gap * 0.35);
-        }
-        if (pseudoWidth) {
-          spacing = Math.min(spacing, Math.max(1.5, pseudoWidth * 0.2));
-        }
-        spacing += pseudoMargin;
-      }
+        const pseudoStart = left + pseudoMarginLeft;
+        const gap = parsePx(computed.columnGap || computed.gap);
+        return {
+          anchor,
+          left,
+          pseudoWidth,
+          pseudoStart,
+          gap
+        };
+      });
 
       const timelineWidth = parsePx(window.getComputedStyle(timeline).width) || 80;
       const halfTimeline = timelineWidth / 2;
       const nodeRadius = 10;
-      const desiredCenter = anchorLeft - spacing - nodeRadius;
-      const desiredLeft = desiredCenter - halfTimeline;
-      const clampedLeft = Math.max(16, desiredLeft);
+
+      let timelineCenter = null;
+      const pseudoStarts = anchorMetrics
+        .filter((metric) => metric.pseudoWidth)
+        .map((metric) => metric.pseudoStart);
+
+      if (pseudoStarts.length) {
+        const averageStart = pseudoStarts.reduce((sum, value) => sum + value, 0) / pseudoStarts.length;
+        timelineCenter = averageStart - nodeRadius;
+      } else if (anchorMetrics.length) {
+        const averageLeft = anchorMetrics.reduce((sum, metric) => sum + metric.left, 0) / anchorMetrics.length;
+        const reference = anchorMetrics[0];
+        const fallbackGap = reference && reference.gap ? reference.gap : 12;
+        timelineCenter = averageLeft - fallbackGap - nodeRadius;
+      }
+
+      if (timelineCenter == null) {
+        timelineCenter = 0;
+      }
+
+      const minLeft = 16;
+      const clampedLeft = Math.max(minLeft, timelineCenter - halfTimeline);
       timeline.style.left = clampedLeft + 'px';
       timeline.style.top = timelineTop + 'px';
       timeline.style.height = timelineHeight + 'px';
