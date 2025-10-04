@@ -2581,6 +2581,7 @@ function getGlobalGoldElements() {
   return {
     card: document.getElementById('globalGoldPriceCard'),
     perGram: document.getElementById('globalGoldPricePerGram'),
+    perOunce: document.getElementById('globalGoldPricePerOunce'),
     date: document.getElementById('globalGoldPriceDate'),
     note: document.getElementById('globalGoldPriceNote'),
     tableBody: document.getElementById('globalGoldPriceTable'),
@@ -2658,6 +2659,9 @@ function renderGlobalGoldSpot(data, targetElements) {
   if (elements.perGram) {
     elements.perGram.textContent = perGramValue !== null ? 'Rp ' + formatCurrencyIDR(perGramValue) : 'Rp —';
   }
+  if (elements.perOunce) {
+    elements.perOunce.textContent = perOunceValue !== null ? 'Rp ' + formatCurrencyIDR(perOunceValue) : 'Rp —';
+  }
   if (elements.date) {
     elements.date.textContent = dateLabel || '—';
   }
@@ -2665,19 +2669,6 @@ function renderGlobalGoldSpot(data, targetElements) {
   setGlobalNoteText(elements.note, null);
   setGlobalNoteText(elements.tableNote, null);
 
-  if (elements.tableBody) {
-    var rows = [];
-    if (perOunceValue !== null) {
-      rows.push('<tr><td>Per Troy Ounce (31,103 gram)</td><td align="right">Rp ' + formatCurrencyIDR(perOunceValue) + '</td></tr>');
-    }
-    if (perGramValue !== null) {
-      rows.push('<tr><td>Per Gram</td><td align="right">Rp ' + formatCurrencyIDR(perGramValue) + '</td></tr>');
-    }
-    if (!rows.length) {
-      rows.push('<tr><td colspan="2" class="text-note">Data harga emas dunia belum tersedia.</td></tr>');
-    }
-    elements.tableBody.innerHTML = rows.join('');
-  }
 }
 
 function renderGlobalGoldError(message, targetElements) {
@@ -2687,6 +2678,9 @@ function renderGlobalGoldError(message, targetElements) {
 
   if (elements.perGram) {
     elements.perGram.textContent = 'Rp —';
+  }
+  if (elements.perOunce) {
+    elements.perOunce.textContent = 'Rp —';
   }
   if (elements.date) {
     elements.date.textContent = '—';

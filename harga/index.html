@@ -354,38 +354,38 @@
       <div class="container">
         <div class="accent-title">Referensi Global</div>
         <h2 class="h2">Harga Emas Spot Dunia (XAU)</h2>
-        <div id="globalGoldPriceCard" class="card world-price-card mt-12" role="status" aria-live="polite" aria-busy="true">
-          <div class="world-price-card__head">
-            <div>
-              <h3 class="h3">Nilai Murni Emas Global</h3>
+        <div id="globalGoldPriceCard" class="card price-highlight world-price-highlight mt-12" role="status" aria-live="polite" aria-busy="true">
+          <div class="skeleton-content" aria-hidden="true">
+            <div class="flex-split">
+              <div class="skeleton skeleton-line" style="width: 180px; height: 1.1rem;"></div>
+              <div class="skeleton skeleton-badge"></div>
+            </div>
+            <div class="skeleton skeleton-price" style="height: 2.4rem; width: 220px; margin-top: .2rem;"></div>
+            <div class="skeleton skeleton-line" style="width: 220px; height: 1rem; margin-top: .8rem;"></div>
+            <div class="skeleton skeleton-line" style="width: 100%; height: 52px; margin-top: .8rem;"></div>
+          </div>
+          <div class="price-highlight-head">
+            <div class="price-highlight-headline">
+              <p class="price-highlight-label">Nilai Murni Emas Global</p>
+              <h3 class="h3">Spot XAU → IDR</h3>
             </div>
             <span id="globalGoldPriceDate" class="date-badge">—</span>
           </div>
-          <div class="world-price-card__body">
-            <div class="world-price-value" id="globalGoldPricePerGram">Rp —</div>
-            <p class="text-note" id="globalGoldPriceNote">Harga per gram dalam Rupiah (kurs <span class="nowrap">XAU/IDR</span>).</p>
+          <div class="price-highlight-main">
+            <span id="globalGoldPricePerGram" class="price-highlight-value">Rp —</span>
+            <span class="price-highlight-unit">/gram</span>
           </div>
-          <div class="table-wrap">
-            <table class="world-price-table" aria-label="Tabel harga emas dunia">
-              <thead>
-                <tr>
-                  <th>Satuan</th>
-                  <th>Harga (Rp)</th>
-                </tr>
-              </thead>
-              <tbody id="globalGoldPriceTable" aria-live="polite" aria-busy="true">
-                <tr class="skeleton-row" aria-hidden="true">
-                  <td>
-                    <div class="skeleton skeleton-line" style="width: 90px;"></div>
-                  </td>
-                  <td align="right">
-                    <div class="skeleton skeleton-price"></div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="price-highlight-insights" aria-live="polite">
+            <div class="price-highlight-insight">
+              <span class="price-highlight-insight-label">Per Troy Ounce</span>
+              <span id="globalGoldPricePerOunce" class="price-highlight-insight-value">Rp —</span>
+            </div>
+            <div class="price-highlight-insight world-price-highlight__note">
+              <span class="price-highlight-insight-label">Catatan</span>
+              <span class="price-highlight-insight-value price-highlight-insight-value--stack" id="globalGoldPriceNote">Harga per gram dalam Rupiah (kurs XAU/IDR).</span>
+            </div>
           </div>
-          <p class="text-note" id="globalGoldPriceTableNote" style="padding: 0 2rem 2rem">Ini adalah harga murni sebagai acuan global, belum termasuk biaya admin atau penyesuaian lainnya.</p>
+          <p class="price-highlight-footnote text-note" id="globalGoldPriceTableNote">Ini adalah harga murni sebagai acuan global, belum termasuk biaya admin atau penyesuaian lainnya.</p>
         </div>
       </div>
     </section>
