@@ -824,6 +824,11 @@ if (typeof window !== 'undefined') {
 
     const getScrollTop = () => window.scrollY || window.pageYOffset || document.documentElement.scrollTop || 0;
     const getScrollLeft = () => window.scrollX || window.pageXOffset || document.documentElement.scrollLeft || 0;
+    const parsePx = (value) => {
+      if (!value || value === 'auto' || value === 'normal') return 0;
+      const parsed = parseFloat(value);
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
 
     const findAnchor = (section) => {
       if (!section) return null;
@@ -933,10 +938,34 @@ if (typeof window !== 'undefined') {
       timelineTop = firstTop - HEADROOM;
       timelineHeight = totalRange + HEADROOM + TAILROOM;
 
-      const container = firstSection.querySelector('.container') || firstSection;
-      const containerRect = container.getBoundingClientRect();
-      const containerLeft = containerRect.left + getScrollLeft();
-      const desiredLeft = containerLeft - 72;
+      const anchorPositions = nodeData.map((data) => {
+        const anchor = data.anchor || findAnchor(data.section);
+        const rect = anchor.getBoundingClientRect();
+        return rect.left + getScrollLeft();
+      });
+      const anchorLeft = anchorPositions.length ? Math.min.apply(null, anchorPositions) : 0;
+
+      let spacing = 3;
+      if (firstAnchor) {
+        const anchorStyles = window.getComputedStyle(firstAnchor);
+        const beforeStyles = window.getComputedStyle(firstAnchor, '::before');
+        const gap = parsePx(anchorStyles.columnGap || anchorStyles.gap);
+        const pseudoWidth = parsePx(beforeStyles.width);
+        const pseudoMargin = parsePx(beforeStyles.marginRight) + parsePx(beforeStyles.marginLeft);
+        if (gap) {
+          spacing = Math.max(1.5, gap * 0.35);
+        }
+        if (pseudoWidth) {
+          spacing = Math.min(spacing, Math.max(1.5, pseudoWidth * 0.2));
+        }
+        spacing += pseudoMargin;
+      }
+
+      const timelineWidth = parsePx(window.getComputedStyle(timeline).width) || 80;
+      const halfTimeline = timelineWidth / 2;
+      const nodeRadius = 10;
+      const desiredCenter = anchorLeft - spacing - nodeRadius;
+      const desiredLeft = desiredCenter - halfTimeline;
       const clampedLeft = Math.max(16, desiredLeft);
       timeline.style.left = clampedLeft + 'px';
       timeline.style.top = timelineTop + 'px';
