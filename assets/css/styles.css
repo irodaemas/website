@@ -2234,26 +2234,44 @@ tbody tr:hover td {
 .price-highlight {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, var(--deep-2));
-  color: var(--paper);
-  padding: 1.4rem;
-  border: 1px solid rgba(212, 175, 55, .2);
-  border-radius: var(--radius);
+  background:
+    radial-gradient(135% 160% at 6% -8%, rgba(255, 223, 186, .55), transparent 58%),
+    radial-gradient(110% 150% at 84% -12%, rgba(88, 255, 169, .18), transparent 66%),
+    linear-gradient(145deg, rgba(16, 77, 62, .98) 0%, rgba(7, 43, 36, .96) 52%, rgba(5, 26, 23, .98) 100%);
+  color: #fdfaf2;
+  padding: clamp(1.7rem, 2.4vw, 2.6rem);
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: calc(var(--radius) * 1.4);
   margin: 0 auto;
+  max-width: 960px;
   display: flex;
   flex-direction: column;
-  gap: .9rem;
+  gap: clamp(1.1rem, 1.8vw, 1.8rem);
+  box-shadow: 0 32px 68px rgba(5, 24, 22, .55);
+  isolation: isolate;
   transition: transform .3s ease, box-shadow .3s ease
 }
 
+.price-highlight::before,
 .price-highlight::after {
   content: "";
   position: absolute;
-  inset: -40%;
-  background: conic-gradient(from 120deg at 50% 50%, rgba(212, 175, 55, .12), rgba(1, 61, 57, 0) 40%, rgba(212, 175, 55, .18) 60%, rgba(1, 61, 57, 0) 85%);
-  animation: priceHighlightShimmer 12s linear infinite;
-  opacity: .6;
+  inset: -35%;
   pointer-events: none
+}
+
+.price-highlight::before {
+  background:
+    radial-gradient(120% 150% at 10% 5%, rgba(255, 235, 205, .75), transparent 58%),
+    radial-gradient(160% 180% at 88% 0%, rgba(51, 173, 139, .22), transparent 68%);
+  mix-blend-mode: screen;
+  opacity: .95
+}
+
+.price-highlight::after {
+  background: conic-gradient(from 160deg at 50% 50%, rgba(255, 219, 154, .22), rgba(9, 56, 48, 0) 42%, rgba(255, 219, 154, .28) 68%, rgba(9, 56, 48, 0) 90%);
+  animation: priceHighlightShimmer 16s linear infinite;
+  opacity: .4
 }
 
 .price-highlight>* {
@@ -2265,61 +2283,97 @@ tbody tr:hover td {
   animation: priceHighlightPop .7s cubic-bezier(.21, 1.02, .73, 1)
 }
 
-.price-highlight-head {
+.price-highlight-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: .8rem
+  gap: clamp(1rem, 2vw, 1.8rem)
 }
 
-.price-highlight-headline {
+.price-highlight-meta {
   display: flex;
   flex-direction: column;
-  gap: .35rem
+  gap: .55rem;
+  max-width: min(32rem, 100%)
+}
+
+.price-highlight-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .38rem .95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 231, 192, .5);
+  background: linear-gradient(135deg, rgba(255, 231, 192, .32), rgba(255, 231, 192, .12));
+  color: #ffe7c0;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  box-shadow: 0 18px 28px rgba(8, 32, 27, .42);
+  backdrop-filter: blur(10px)
+}
+
+.price-highlight-title {
+  margin: 0;
+  font-size: clamp(1.55rem, 3.4vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -.01em;
+  color: #fffaf0;
+  text-shadow: 0 22px 38px rgba(5, 24, 22, .48)
 }
 
 .price-highlight-label {
   margin: 0;
   text-transform: uppercase;
-  letter-spacing: .1em;
+  letter-spacing: .16em;
   font-weight: 700;
-  font-size: .82rem;
-  color: rgba(239, 255, 252, .92)
+  font-size: .75rem;
+  color: rgba(255, 240, 220, .72)
+}
+
+.price-highlight-description {
+  margin: 0;
+  font-size: .92rem;
+  line-height: 1.6;
+  color: rgba(236, 252, 249, .78)
 }
 
 .price-highlight-controls {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: .6rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  gap: .65rem;
+  min-width: max(220px, 30%);
   margin-left: auto
 }
+
 
 .price-range-toggle {
   display: inline-flex;
   align-items: center;
-  gap: .2rem;
-  padding: .25rem;
+  gap: .3rem;
+  padding: .3rem;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, .22);
-  background: linear-gradient(135deg, rgba(255, 255, 255, .12), rgba(255, 255, 255, .02));
-  box-shadow: 0 12px 26px rgba(1, 25, 23, .24);
-  backdrop-filter: blur(8px)
+  border: 1px solid rgba(255, 255, 255, .25);
+  background: linear-gradient(135deg, rgba(4, 35, 29, .8), rgba(9, 67, 54, .65));
+  box-shadow: 0 18px 30px rgba(5, 24, 22, .45);
+  backdrop-filter: blur(10px)
 }
 
 .price-range-btn {
   appearance: none;
   border: 0;
   border-radius: 999px;
-  padding: .35rem .85rem;
+  padding: .38rem .95rem;
   font-weight: 600;
   font-size: .78rem;
-  letter-spacing: .05em;
+  letter-spacing: .08em;
   text-transform: uppercase;
   background: transparent;
-  color: rgba(224, 248, 244, .78);
+  color: rgba(219, 244, 238, .76);
   cursor: pointer;
   transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease
 }
@@ -2330,9 +2384,9 @@ tbody tr:hover td {
 
 .price-range-btn.is-active,
 .price-range-btn[aria-pressed="true"] {
-  background: linear-gradient(135deg, rgba(88, 255, 169, .85), rgba(18, 163, 134, .72));
-  color: #012c24;
-  box-shadow: 0 14px 28px rgba(12, 143, 100, .34);
+  background: linear-gradient(135deg, rgba(255, 224, 167, .9), rgba(255, 198, 120, .8));
+  color: #2f1d05;
+  box-shadow: 0 18px 28px rgba(255, 198, 120, .35);
   transform: translateY(-1px)
 }
 
@@ -2352,10 +2406,10 @@ tbody tr:hover td {
   letter-spacing: .09em;
   text-transform: uppercase;
   min-width: 0;
-  border: 1px solid rgba(255, 255, 255, .28);
-  background: linear-gradient(135deg, rgba(255, 255, 255, .24), rgba(255, 255, 255, .06));
-  color: var(--paper);
-  box-shadow: 0 16px 32px rgba(1, 25, 23, .3);
+  border: 1px solid rgba(255, 226, 176, .36);
+  background: linear-gradient(135deg, rgba(255, 226, 176, .32), rgba(6, 40, 33, .42));
+  color: rgba(255, 248, 235, .94);
+  box-shadow: 0 18px 34px rgba(5, 24, 22, .32);
   white-space: nowrap;
   transition: transform .2s ease, box-shadow .2s ease
 }
@@ -2380,27 +2434,36 @@ tbody tr:hover td {
   border-color: rgba(255, 255, 255, .26)
 }
 
+
+.price-highlight-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: clamp(1.3rem, 3vw, 2.4rem);
+  align-items: end
+}
+
 .price-highlight-main {
   display: flex;
   align-items: flex-end;
-  gap: .4rem
+  gap: .6rem;
+  flex-wrap: wrap
 }
 
 .price-highlight-chart {
   position: relative;
   width: 100%;
-  margin-top: .3rem;
+  margin-top: 0;
   --sparkline-bottom-gap: clamp(1.6rem, calc(1.6vw + 1rem), 2.4rem);
   padding-bottom: var(--sparkline-bottom-gap)
 }
 
 .price-highlight-chart canvas {
   width: 100%;
-  height: 60px;
+  height: 70px;
   display: block;
-  border-radius: calc(var(--radius)/2);
-  background: linear-gradient(180deg, rgba(2, 44, 41, .62), rgba(1, 31, 29, .08));
-  box-shadow: inset 0 0 0 1px rgba(191, 236, 228, .08);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(8, 52, 44, .78), rgba(6, 36, 30, .32));
+  box-shadow: inset 0 0 0 1px rgba(186, 244, 233, .12), inset 0 -18px 40px rgba(4, 24, 21, .45);
   opacity: 0;
   transition: opacity .3s ease
 }
@@ -2505,9 +2568,10 @@ tbody tr:hover td {
 }
 
 .price-highlight-value {
-  font-size: 2.6rem;
+  font-size: clamp(2.4rem, 4.8vw, 3.4rem);
   font-weight: 700;
-  color: var(--gold-2);
+  color: #fff6d9;
+  text-shadow: 0 16px 34px rgba(6, 30, 26, .6);
   transition: color .3s ease, transform .3s ease
 }
 
@@ -2516,42 +2580,54 @@ tbody tr:hover td {
 }
 
 .price-highlight-unit {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: var(--paper)
+  color: rgba(236, 252, 249, .78)
 }
 
 
+
+.price-highlight-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(1rem, 2vw, 1.8rem);
+  align-items: stretch;
+  justify-content: space-between
+}
+
 .price-highlight-insights {
+  flex: 1 1 60%;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: .75rem;
-  margin: .1rem 0 .3rem
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: .9rem;
+  margin: 0
 }
 
 .price-highlight-insight {
-  padding: .7rem .9rem;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, .14);
-  background: linear-gradient(140deg, rgba(255, 255, 255, .1), rgba(1, 31, 29, .18));
-  box-shadow: 0 16px 30px rgba(1, 25, 23, .22);
-  backdrop-filter: blur(8px);
+  padding: .85rem 1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  background: linear-gradient(150deg, rgba(255, 255, 255, .18), rgba(6, 44, 37, .24));
+  box-shadow: 0 22px 36px rgba(5, 24, 22, .28);
+  backdrop-filter: blur(12px);
   display: flex;
   flex-direction: column;
-  gap: .2rem
+  gap: .25rem
 }
+
 
 .price-highlight-insight-label {
-  font-size: .68rem;
-  letter-spacing: .08em;
+  font-size: .72rem;
+  letter-spacing: .12em;
   text-transform: uppercase;
-  color: rgba(225, 250, 246, .76)
+  color: rgba(234, 252, 247, .72)
 }
 
+
 .price-highlight-insight-value {
-  font-size: 1.02rem;
+  font-size: 1.08rem;
   font-weight: 700;
-  color: rgba(239, 255, 252, .92);
+  color: rgba(255, 249, 236, .95);
 }
 
 .price-highlight-insight-value--stack {
@@ -2565,17 +2641,18 @@ tbody tr:hover td {
   line-height: 1.25;
 }
 
+
 .price-highlight-compare-delta {
   display: inline-flex;
   align-items: center;
-  gap: .3rem;
-  font-size: .78rem;
+  gap: .35rem;
+  font-size: .8rem;
   font-weight: 600;
-  padding: .25rem .6rem;
+  padding: .32rem .75rem;
   border-radius: 999px;
-  background: rgba(255, 255, 255, .12);
-  color: var(--paper);
-  letter-spacing: .01em;
+  background: linear-gradient(135deg, rgba(255, 228, 188, .26), rgba(6, 44, 36, .34));
+  color: rgba(255, 248, 235, .9);
+  letter-spacing: .03em;
   text-transform: none;
   transition: background .3s ease, color .3s ease, transform .3s ease;
 }
@@ -2590,19 +2667,20 @@ tbody tr:hover td {
   opacity: .9;
 }
 
+
 .price-highlight-compare-delta[data-trend="up"] {
-  background: linear-gradient(135deg, rgba(88, 255, 169, .32), rgba(16, 130, 101, .42));
-  color: #012e24;
+  background: linear-gradient(135deg, rgba(88, 255, 169, .35), rgba(18, 129, 104, .55));
+  color: #02251b;
 }
 
 .price-highlight-compare-delta[data-trend="down"] {
-  background: linear-gradient(135deg, rgba(255, 179, 164, .36), rgba(214, 72, 58, .52));
-  color: #fff4f1;
+  background: linear-gradient(135deg, rgba(255, 179, 164, .38), rgba(214, 72, 58, .54));
+  color: #ffecea;
 }
 
 .price-highlight-compare-delta[data-trend="flat"] {
-  background: rgba(255, 255, 255, .16);
-  color: var(--paper);
+  background: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(6, 44, 36, .3));
+  color: rgba(255, 248, 235, .9);
 }
 
 .price-highlight-compare-delta[data-trend="pending"] {
@@ -2613,20 +2691,24 @@ tbody tr:hover td {
   font-size: 1.02rem;
 }
 
+
 .price-highlight-delta {
   display: flex;
   align-items: center;
-  gap: .75rem;
+  gap: .85rem;
   flex-wrap: wrap;
+  justify-content: flex-start;
   font-weight: 600;
-  font-size: .95rem;
-  color: var(--paper);
+  font-size: .96rem;
+  color: rgba(255, 248, 235, .92);
   transition: transform .3s ease;
-  padding: .7rem .9rem;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, .07);
-  border: 1px solid rgba(255, 255, 255, .1);
-  box-shadow: 0 18px 34px rgba(1, 25, 23, .22)
+  padding: 1rem 1.2rem;
+  border-radius: 20px;
+  background: linear-gradient(155deg, rgba(255, 224, 180, .24), rgba(6, 40, 33, .6));
+  border: 1px solid rgba(255, 224, 180, .32);
+  box-shadow: 0 26px 40px rgba(5, 24, 22, .32);
+  min-width: min(280px, 100%);
+  flex: 0 1 280px
 }
 
 .price-highlight-delta.delta-flash {
@@ -2634,18 +2716,18 @@ tbody tr:hover td {
 }
 
 .price-highlight-delta .delta-icon {
-  width: 34px;
-  height: 34px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, .2);
-  color: var(--paper);
+  background: linear-gradient(145deg, rgba(255, 230, 194, .32), rgba(255, 198, 120, .45));
+  color: #2f1d05;
   position: relative;
   overflow: hidden;
   font-size: 0;
-  box-shadow: 0 12px 22px rgba(0, 0, 0, .28)
+  box-shadow: 0 18px 32px rgba(5, 24, 22, .35)
 }
 
 .price-highlight-delta .delta-icon::before,
@@ -2724,82 +2806,134 @@ tbody tr:hover td {
   display: none
 }
 
+
 .price-highlight-delta.trend-up {
-  color: #58ffa9;
-  background: linear-gradient(135deg, rgba(88, 255, 169, .2), rgba(16, 130, 101, .18));
-  border-color: rgba(88, 255, 169, .32)
+  color: rgba(12, 58, 45, .95);
+  background: linear-gradient(155deg, rgba(88, 255, 169, .32), rgba(7, 55, 43, .62));
+  border-color: rgba(88, 255, 169, .45)
 }
 
 .price-highlight-delta.trend-up .delta-icon {
-  background: linear-gradient(135deg, rgba(88, 255, 169, .78), rgba(16, 130, 101, .64));
-  color: #012d23;
-  box-shadow: 0 14px 26px rgba(11, 110, 87, .35)
+  background: linear-gradient(145deg, rgba(88, 255, 169, .58), rgba(25, 168, 126, .72));
+  color: #022018;
+  box-shadow: 0 18px 36px rgba(6, 54, 43, .38)
 }
 
 .price-highlight-delta.trend-down {
-  color: #ffb3a8;
-  background: linear-gradient(135deg, rgba(255, 179, 164, .24), rgba(214, 72, 58, .16));
-  border-color: rgba(255, 179, 164, .3)
+  color: rgba(255, 220, 212, .92);
+  background: linear-gradient(155deg, rgba(255, 179, 164, .34), rgba(92, 26, 18, .6));
+  border-color: rgba(255, 179, 164, .38)
 }
 
 .price-highlight-delta.trend-down .delta-icon {
-  background: linear-gradient(135deg, rgba(255, 179, 164, .68), rgba(214, 72, 58, .62));
-  color: #5c0b02;
-  box-shadow: 0 14px 26px rgba(142, 24, 16, .32)
+  background: linear-gradient(145deg, rgba(255, 179, 164, .62), rgba(214, 72, 58, .72));
+  color: #4b0700;
+  box-shadow: 0 18px 36px rgba(78, 21, 16, .36)
 }
 
 .price-highlight-delta.trend-flat {
-  color: var(--paper);
-  background: linear-gradient(135deg, rgba(255, 255, 255, .16), rgba(255, 255, 255, .08));
-  border-color: rgba(255, 255, 255, .16)
+  color: rgba(255, 248, 235, .9);
+  background: linear-gradient(155deg, rgba(255, 255, 255, .2), rgba(6, 40, 33, .58));
+  border-color: rgba(255, 255, 255, .22)
 }
 
 .price-highlight-delta.trend-flat .delta-icon {
-  background: rgba(255, 255, 255, .2);
-  color: var(--paper)
+  background: linear-gradient(145deg, rgba(255, 255, 255, .28), rgba(6, 44, 36, .36));
+  color: rgba(255, 248, 235, .9)
 }
 
-@media (max-width:720px) {
+@media (max-width:1024px) {
   .price-highlight {
-    padding: 1.1rem;
-    margin-bottom: 1.1rem
-  }
-
-  .price-highlight-chart canvas {
-    height: 54px
-  }
-
-  .price-highlight-value {
-    font-size: 2rem
-  }
-
-  .price-highlight-unit {
-    font-size: 1rem
-  }
-
-  .price-highlight-head {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: .4rem
-  }
-
-  .price-badge {
-    min-width: 0
+    padding: clamp(1.4rem, 3.2vw, 2.1rem);
   }
 
   .price-highlight-controls {
+    min-width: 0;
     width: 100%;
     margin-left: 0;
+    align-items: flex-start;
+    flex-direction: row;
     justify-content: space-between
   }
 
+  .price-highlight-controls .price-badge {
+    margin-left: auto
+  }
+
   .price-range-toggle {
-    width: 100%;
+    flex: 1 1 auto;
     justify-content: space-between
   }
 
   .price-range-btn {
-    flex: 1
+    flex: 1 1 auto
+  }
+
+  .price-highlight-body {
+    grid-template-columns: 1fr;
+    gap: 1.6rem
+  }
+
+  .price-highlight-footer {
+    flex-direction: column
+  }
+
+  .price-highlight-delta {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%
+  }
+}
+
+@media (max-width:720px) {
+  .price-highlight {
+    padding: 1.25rem;
+    margin-bottom: 1.2rem
+  }
+
+  .price-highlight-meta {
+    gap: .45rem
+  }
+
+  .price-highlight-title {
+    font-size: clamp(1.35rem, 6vw, 1.8rem)
+  }
+
+  .price-highlight-value {
+    font-size: clamp(2rem, 8vw, 2.4rem)
+  }
+
+  .price-highlight-unit {
+    font-size: .95rem
+  }
+
+  .price-range-toggle {
+    width: 100%
+  }
+
+  .price-highlight-controls {
+    flex-direction: column;
+    gap: .8rem
+  }
+
+  .price-highlight-controls .price-badge {
+    margin-left: 0
+  }
+
+  .price-highlight-body {
+    gap: 1.4rem
+  }
+
+  .price-highlight-chart canvas {
+    height: 60px
+  }
+
+  .price-highlight-footer {
+    gap: 1.1rem
+  }
+
+  .price-highlight-delta {
+    padding: .9rem 1rem
   }
 }
 
@@ -5529,6 +5663,27 @@ a {
   background-color: var(--border-subtle);
 }
 
+.skeleton-chip {
+  height: 28px;
+  width: 150px;
+  border-radius: 999px;
+  background-color: var(--border-subtle);
+}
+
+.skeleton-title {
+  height: 1.45rem;
+  width: 68%;
+  border-radius: .35rem;
+  background-color: var(--border-subtle);
+}
+
+.skeleton-subtitle {
+  height: 1.05rem;
+  width: 40%;
+  border-radius: .3rem;
+  background-color: var(--border-subtle);
+}
+
 .skeleton-price {
   height: 1.5rem;
   width: 120px;
@@ -5538,6 +5693,20 @@ a {
 .skeleton-delta {
   height: 1.25rem;
   width: 180px;
+  background-color: var(--border-subtle);
+}
+
+.skeleton-chart {
+  height: 70px;
+  width: 100%;
+  border-radius: 18px;
+  background-color: var(--border-subtle);
+}
+
+.skeleton-insight {
+  height: 58px;
+  width: 100%;
+  border-radius: 16px;
   background-color: var(--border-subtle);
 }
 
@@ -5563,12 +5732,12 @@ a {
   display: flex;
 }
 
-#lmBaruHighlight[aria-busy="true"] .price-highlight-head,
-#lmBaruHighlight[aria-busy="true"] .price-highlight-main,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-top,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-body,
+#lmBaruHighlight[aria-busy="true"] .price-highlight-footer,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-chart,
 #lmBaruHighlight[aria-busy="true"] .price-highlight-insights,
-#lmBaruHighlight[aria-busy="true"] .price-highlight-delta,
-#lmBaruHighlight[aria-busy="true"] .price-highlight-actions {
+#lmBaruHighlight[aria-busy="true"] .price-highlight-delta {
   visibility: hidden;
 }
 
@@ -5587,7 +5756,7 @@ a {
 [data-theme="dark"] #cta-harga .accent-title,
 [data-theme="dark"] #cta-harga .h2,
 [data-theme="dark"] .price-highlight {
-  color: var(--ink) !important;
+  color: #fdfaf2 !important;
 }
 
 [data-theme="dark"] #kalkulator .h2 {
@@ -5598,7 +5767,7 @@ a {
 [data-theme="dark"] .price-badge.price-neutral,
 [data-theme="dark"] .price-highlight-unit,
 [data-theme="dark"] .price-highlight-delta.trend-flat {
-  color: var(--ink) !important;
+  color: rgba(255, 248, 235, .88) !important;
 }
 
 [data-theme="dark"] .search-chip {
