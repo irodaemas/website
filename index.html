@@ -97,6 +97,87 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5D39RVL3" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
+  <div id="onboardingWizard" class="onboarding-overlay" hidden aria-hidden="true">
+    <div class="onboarding-overlay__backdrop" data-onboarding-close></div>
+    <div class="onboarding-dialog" role="dialog" aria-modal="true" aria-labelledby="onboardingTitle" data-onboarding-dialog>
+      <button type="button" class="onboarding-close" data-onboarding-close aria-label="Tutup wizard onboarding">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <span class="onboarding-progress" data-onboarding-progress>Langkah 1 dari 3</span>
+      <h2 id="onboardingTitle" class="onboarding-title">Selamat Datang di Sentral Emas</h2>
+      <p class="onboarding-summary" data-onboarding-summary>Pilih kebutuhan utama Anda agar rekomendasi lebih tepat.</p>
+      <form class="onboarding-form" data-onboarding-form novalidate>
+        <section class="onboarding-step" data-step="0">
+          <fieldset class="onboarding-fieldset">
+            <legend class="onboarding-legend">Apa yang ingin Anda jual?</legend>
+            <div class="onboarding-options">
+              <label class="onboarding-option">
+                <input type="radio" name="need" value="emas" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">Emas</span>
+                  <span class="onboarding-option__desc">Logam mulia & perhiasan emas</span>
+                </span>
+              </label>
+              <label class="onboarding-option">
+                <input type="radio" name="need" value="berlian" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">Berlian</span>
+                  <span class="onboarding-option__desc">Loose diamond atau berbalut perhiasan</span>
+                </span>
+              </label>
+              <label class="onboarding-option">
+                <input type="radio" name="need" value="jam" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">Jam Tangan Mewah</span>
+                  <span class="onboarding-option__desc">Rolex, Patek, AP, dan premium lainnya</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </section>
+        <section class="onboarding-step" data-step="1" hidden>
+          <div class="onboarding-field">
+            <label class="onboarding-label" for="onboardingLocation">Di kota/area mana Anda berada?</label>
+            <input id="onboardingLocation" class="form-control onboarding-input" type="text" name="location" placeholder="Contoh: Jakarta Selatan" autocomplete="address-level2" />
+            <p class="onboarding-hint">Informasi lokasi membantu kami mengirim tim appraisal terdekat dan menyiapkan jadwal COD yang sesuai.</p>
+          </div>
+        </section>
+        <section class="onboarding-step" data-step="2" hidden>
+          <fieldset class="onboarding-fieldset">
+            <legend class="onboarding-legend">Kami perlu menghubungi Anda via?</legend>
+            <div class="onboarding-options">
+              <label class="onboarding-option">
+                <input type="radio" name="communication" value="whatsapp" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">WhatsApp</span>
+                  <span class="onboarding-option__desc">Respon tercepat & bisa kirim foto barang</span>
+                </span>
+              </label>
+              <label class="onboarding-option">
+                <input type="radio" name="communication" value="telepon" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">Telepon</span>
+                  <span class="onboarding-option__desc">Kami siap menjelaskan detail melalui panggilan</span>
+                </span>
+              </label>
+              <label class="onboarding-option">
+                <input type="radio" name="communication" value="email" />
+                <span class="onboarding-option__box">
+                  <span class="onboarding-option__title">Email</span>
+                  <span class="onboarding-option__desc">Lengkap dengan dokumentasi & rangkuman</span>
+                </span>
+              </label>
+            </div>
+          </fieldset>
+        </section>
+        <div class="onboarding-actions">
+          <button type="button" class="btn btn-ghost" data-onboarding-prev disabled>Sebelumnya</button>
+          <button type="button" class="btn btn-gold" data-onboarding-next disabled>Lanjut</button>
+        </div>
+      </form>
+      <button type="button" class="onboarding-skip" data-onboarding-close>Lewati untuk sekarang</button>
+    </div>
+  </div>
   <!-- ===================== NAVBAR ===================== -->
   <header>
     <div class="container nav">
@@ -215,6 +296,10 @@
             <span class="text-shimmer">Lebih Aman, Cepat, & Nyaman</span>
           </h1>
           <div class="typewriter" aria-live="polite"><span id="typer" class="text-rainbow"></span></div>
+          <div id="onboardingWelcome" class="onboarding-welcome" hidden>
+            <p class="onboarding-welcome__message" data-onboarding-message></p>
+            <button type="button" class="onboarding-welcome__edit" data-onboarding-edit>Ubah preferensi</button>
+          </div>
           <p class="lead">Di sini kami menerima jual dengan layanan buyback aman melalui <strong>COD se‑Jabodetabek & sekitarnya</strong>, mengikuti <strong>harga pasar pada hari transaksi</strong>. Terima: logam mulia; perhiasan emas (baru/lama, warisan/luar negeri, rusak/patah, bersurat/tanpa surat); berlian tanpa surat; jam tangan mewah; serta batu mulia (Safir, Rubi, Jamrud). Transparan, cepat, dan terpercaya.</p>
           <div class="btn-row mt-12">
             <a class="btn btn-gold" href="https://wa.me/6285591088503" target="_blank" rel="noopener noreferrer" data-track="wa-hero">WhatsApp Sekarang</a>

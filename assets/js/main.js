@@ -5119,6 +5119,340 @@ if ('serviceWorker' in navigator) {
   });
 })();
 
+/* istanbul ignore next */
+(function() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  var STORAGE_KEY = 'sentralemas_onboarding_preferences';
+  var STATUS_KEY = 'sentralemas_onboarding_status';
+  var overlay = document.getElementById('onboardingWizard');
+  if (!overlay) return;
+
+  var form = overlay.querySelector('[data-onboarding-form]');
+  if (!form) return;
+
+  var steps = Array.prototype.slice.call(form.querySelectorAll('[data-step]'));
+  if (!steps.length) return;
+
+  var nextBtn = overlay.querySelector('[data-onboarding-next]');
+  var prevBtn = overlay.querySelector('[data-onboarding-prev]');
+  var progressEl = overlay.querySelector('[data-onboarding-progress]');
+  var summaryEl = overlay.querySelector('[data-onboarding-summary]');
+  var closeTriggers = overlay.querySelectorAll('[data-onboarding-close]');
+  var welcome = document.getElementById('onboardingWelcome');
+  var welcomeMessage = welcome ? welcome.querySelector('[data-onboarding-message]') : null;
+  var editTriggers = document.querySelectorAll('[data-onboarding-edit]');
+  var stepSummaries = [
+    'Pilih kebutuhan utama Anda agar rekomendasi lebih tepat.',
+    'Beritahu lokasi Anda supaya kami bisa menjadwalkan COD tercepat.',
+    'Tentukan preferensi komunikasi yang paling nyaman untuk Anda.'
+  ];
+  var currentStep = 0;
+
+  function readPreferences() {
+    try {
+      var raw = window.localStorage ? localStorage.getItem(STORAGE_KEY) : null;
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== 'object') return null;
+      var need = typeof parsed.need === 'string' ? parsed.need : '';
+      var location = typeof parsed.location === 'string' ? parsed.location : '';
+      var communication = typeof parsed.communication === 'string' ? parsed.communication : '';
+      if (!need || !location || !communication) return null;
+      return {
+        need: need,
+        location: location,
+        communication: communication
+      };
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function savePreferences(prefs) {
+    if (!prefs) return;
+    try {
+      if (window.localStorage) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+        localStorage.setItem(STATUS_KEY, 'completed');
+      }
+    } catch (err) {}
+  }
+
+  function getStatus() {
+    try {
+      return window.localStorage ? localStorage.getItem(STATUS_KEY) || '' : '';
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function shouldAutoOpen() {
+    if (readPreferences()) return false;
+    return !getStatus();
+  }
+
+  function formatNeed(value) {
+    switch (value) {
+      case 'emas':
+        return 'emas & logam mulia';
+      case 'berlian':
+        return 'berlian pilihan Anda';
+      case 'jam':
+        return 'jam tangan mewah';
+      default:
+        return 'barang berharga';
+    }
+  }
+
+  function formatCommunication(value) {
+    switch (value) {
+      case 'whatsapp':
+        return 'WhatsApp';
+      case 'telepon':
+        return 'telepon';
+      case 'email':
+        return 'email';
+      default:
+        return 'saluran kontak pilihan Anda';
+    }
+  }
+
+  function updateWelcome(prefs) {
+    if (!welcome || !welcomeMessage) return;
+    if (!prefs || !prefs.location) {
+      welcome.hidden = true;
+      return;
+    }
+    var needText = formatNeed(prefs.need);
+    var locationText = String(prefs.location || '').trim();
+    var commText = formatCommunication(prefs.communication);
+    if (!locationText) {
+      welcome.hidden = true;
+      return;
+    }
+    var message = 'Halo! Kami siap bantu proses jual ' + needText + ' Anda di ' + locationText + '. Kami akan prioritaskan ' + commText + ' sesuai preferensi Anda.';
+    welcomeMessage.textContent = message;
+    welcome.hidden = false;
+  }
+
+  function prefillForm(prefs) {
+    if (typeof form.reset === 'function') {
+      form.reset();
+    }
+    var radios = form.querySelectorAll('input[type="radio"]');
+    if (radios && radios.length) {
+      Array.prototype.forEach.call(radios, function(input) {
+        input.checked = false;
+      });
+    }
+    var locationField = form.querySelector('[name="location"]');
+    if (locationField) {
+      locationField.value = '';
+    }
+    if (!prefs) return;
+    if (locationField) {
+      locationField.value = prefs.location || '';
+    }
+    if (prefs.need) {
+      var needInput = form.querySelector('input[name="need"][value="' + prefs.need + '"]');
+      if (needInput) needInput.checked = true;
+    }
+    if (prefs.communication) {
+      var commInput = form.querySelector('input[name="communication"][value="' + prefs.communication + '"]');
+      if (commInput) commInput.checked = true;
+    }
+  }
+
+  function updateSummary() {
+    if (!summaryEl) return;
+    summaryEl.textContent = stepSummaries[currentStep] || '';
+  }
+
+  function updateNavState() {
+    if (prevBtn) {
+      prevBtn.disabled = currentStep === 0;
+    }
+    if (nextBtn) {
+      nextBtn.textContent = currentStep === steps.length - 1 ? 'Simpan preferensi' : 'Lanjut';
+      nextBtn.disabled = !validateStep(currentStep);
+    }
+  }
+
+  function showStep(index) {
+    if (!steps.length) return;
+    if (index < 0) index = 0;
+    if (index >= steps.length) index = steps.length - 1;
+    currentStep = index;
+    steps.forEach(function(step, stepIndex) {
+      if (!step) return;
+      step.hidden = stepIndex !== currentStep;
+    });
+    if (progressEl) {
+      progressEl.textContent = 'Langkah ' + (currentStep + 1) + ' dari ' + steps.length;
+    }
+    updateSummary();
+    updateNavState();
+  }
+
+  function validateStep(index) {
+    if (index === 0) {
+      return !!form.querySelector('input[name="need"]:checked');
+    }
+    if (index === 1) {
+      var locationField = form.querySelector('[name="location"]');
+      if (!locationField) return false;
+      var value = String(locationField.value || '').trim();
+      return value.length > 1;
+    }
+    if (index === 2) {
+      return !!form.querySelector('input[name="communication"]:checked');
+    }
+    return true;
+  }
+
+  function getFormValues() {
+    var formData = new window.FormData(form);
+    var need = String(formData.get('need') || '');
+    var location = String(formData.get('location') || '').trim();
+    if (location.length > 120) {
+      location = location.slice(0, 120).trim();
+    }
+    var communication = String(formData.get('communication') || '');
+    return {
+      need: need,
+      location: location,
+      communication: communication
+    };
+  }
+
+  function openWizard(options) {
+    var startStep = options && typeof options.step === 'number' ? options.step : 0;
+    var prefs = options && options.prefs ? options.prefs : null;
+    prefillForm(prefs);
+    overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
+    if (document.body && document.body.classList) {
+      document.body.classList.add('onboarding-is-open');
+    }
+    showStep(startStep);
+    window.setTimeout(function() {
+      try {
+        var targetStep = steps[startStep] || steps[0];
+        if (!targetStep) return;
+        var focusable = targetStep.querySelector('input, select, textarea, button');
+        if (focusable && typeof focusable.focus === 'function') {
+          focusable.focus();
+        }
+      } catch (err) {}
+    }, 60);
+  }
+
+  function closeWizard(status) {
+    overlay.hidden = true;
+    overlay.setAttribute('aria-hidden', 'true');
+    if (document.body && document.body.classList) {
+      document.body.classList.remove('onboarding-is-open');
+    }
+    if (status) {
+      try {
+        if (window.localStorage) {
+          localStorage.setItem(STATUS_KEY, status);
+        }
+      } catch (err) {}
+    }
+  }
+
+  function handleNext(event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    if (!validateStep(currentStep)) {
+      updateNavState();
+      return;
+    }
+    if (currentStep < steps.length - 1) {
+      showStep(currentStep + 1);
+      return;
+    }
+    var values = getFormValues();
+    if (!values.need || !values.location || !values.communication) {
+      updateNavState();
+      return;
+    }
+    savePreferences(values);
+    updateWelcome(values);
+    closeWizard('completed');
+  }
+
+  function handlePrev(event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    if (currentStep > 0) {
+      showStep(currentStep - 1);
+    }
+  }
+
+  function handleInputChange() {
+    updateNavState();
+  }
+
+  function handleKeydown(event) {
+    if (!event) return;
+    if (event.key === 'Escape' && !overlay.hidden) {
+      event.preventDefault();
+      var existing = readPreferences();
+      closeWizard(existing ? 'completed' : 'dismissed');
+    }
+  }
+
+  if (nextBtn) nextBtn.addEventListener('click', handleNext);
+  if (prevBtn) prevBtn.addEventListener('click', handlePrev);
+  form.addEventListener('submit', function(evt) {
+    if (evt && typeof evt.preventDefault === 'function') {
+      evt.preventDefault();
+    }
+  });
+  form.addEventListener('input', handleInputChange);
+  form.addEventListener('change', handleInputChange);
+
+  Array.prototype.forEach.call(closeTriggers, function(trigger) {
+    trigger.addEventListener('click', function(evt) {
+      if (evt && typeof evt.preventDefault === 'function') {
+        evt.preventDefault();
+      }
+      var existing = readPreferences();
+      closeWizard(existing ? 'completed' : 'dismissed');
+    });
+  });
+
+  Array.prototype.forEach.call(editTriggers, function(trigger) {
+    trigger.addEventListener('click', function(evt) {
+      if (evt && typeof evt.preventDefault === 'function') {
+        evt.preventDefault();
+      }
+      openWizard({
+        prefs: readPreferences()
+      });
+    });
+  });
+
+  document.addEventListener('keydown', handleKeydown);
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var saved = readPreferences();
+    updateWelcome(saved);
+    if (shouldAutoOpen()) {
+      window.setTimeout(function() {
+        openWizard({
+          prefs: saved
+        });
+      }, 400);
+    }
+  });
+})();
+
 // Dark Mode Toggle
 /* istanbul ignore next */
 (function() {
