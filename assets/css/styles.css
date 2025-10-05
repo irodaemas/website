@@ -4639,7 +4639,6 @@ a {
   position: absolute;
   inset: auto 0 -1px;
   height: clamp(90px, 18vw, 140px);
-  background: linear-gradient(180deg, rgba(249, 244, 235, 0) 0%, rgba(249, 244, 235, .85) 58%, var(--bg-primary) 100%);
   pointer-events: none
 }
 
@@ -4653,10 +4652,6 @@ a {
     radial-gradient(160% 210% at 20% -28%, rgba(212, 175, 55, .38), transparent 64%),
     radial-gradient(130% 170% at 78% 6%, rgba(120, 94, 62, .24), transparent 70%),
     linear-gradient(180deg, rgba(12, 17, 16, .98) 0%, rgba(5, 8, 7, .99) 100%)
-}
-
-[data-theme="dark"] #harga-emas-dunia::after {
-  background: linear-gradient(180deg, rgba(9, 13, 12, 0) 0%, rgba(9, 13, 12, .85) 60%, rgba(5, 8, 7, .98) 100%)
 }
 
 [data-theme="dark"] #harga-emas-dunia .accent-title,
