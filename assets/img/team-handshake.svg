@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title desc">
+  <title id="title">Ikon Kolaborasi Tim</title>
+  <desc id="desc">Dua tangan berjabat dalam bentuk garis untuk melambangkan kolaborasi Sentral Emas.</desc>
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#D4AF37" />
+      <stop offset="100%" stop-color="#F2D16B" />
+    </linearGradient>
+  </defs>
+  <rect width="96" height="96" rx="18" fill="url(#grad)" opacity="0.18" />
+  <path fill="none" stroke="#D4AF37" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+    d="M26 36c6 0 10 4 14 8l8 8 12-12c4-4 10-4 14 0s4 10 0 14l-16 16-16-16-6 6c-4 4-10 4-14 0s-4-10 0-14l12-12" />
+  <path fill="none" stroke="#0E4D47" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"
+    d="M36 30 48 42l10-10c4-4 10-4 14 0" />
+</svg>
