@@ -258,6 +258,7 @@ if (typeof window !== 'undefined') {
   var reduceMotionQuery = null;
   var prefersReducedMotion = false;
   var heroRevealed = false;
+  var tiltCards = [];
   var root = document.scrollingElement || document.documentElement || document.body;
   var lastSP = -1,
     lastPar = -1,
@@ -470,6 +471,7 @@ if (typeof window !== 'undefined') {
         } else {
           queueParallaxRefresh();
         }
+        tiltCards.forEach(resetTiltTransform);
       };
       if (typeof reduceMotionQuery.addEventListener === 'function') {
         reduceMotionQuery.addEventListener('change', handleMotionPreference);
@@ -497,15 +499,31 @@ if (typeof window !== 'undefined') {
     });
   });
 
+  function resetTiltTransform(card) {
+    if (!card || !card.style) return;
+    card.style.transform = 'none';
+  }
+
   // ---- Hover tilt (desktop only) ----
   if (window.matchMedia && window.matchMedia('(pointer:fine)').matches) {
-    var cards = document.querySelectorAll('.feature, .t-card');
-    cards.forEach(function(card) {
+    try {
+      tiltCards = Array.prototype.slice.call(document.querySelectorAll('.feature, .t-card, .value-card'));
+    } catch (_err) {
+      tiltCards = [];
+    }
+    tiltCards.forEach(function(card) {
       var rect;
       card.addEventListener('mouseenter', function() {
         rect = card.getBoundingClientRect();
+        if (prefersReducedMotion) {
+          resetTiltTransform(card);
+        }
       });
       card.addEventListener('mousemove', function(ev) {
+        if (prefersReducedMotion) {
+          resetTiltTransform(card);
+          return;
+        }
         if (!rect) rect = card.getBoundingClientRect();
         var px = (ev.clientX - rect.left) / rect.width - .5;
         var py = (ev.clientY - rect.top) / rect.height - .5;
@@ -514,7 +532,7 @@ if (typeof window !== 'undefined') {
         card.style.transform = 'perspective(700px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateZ(0)';
       });
       card.addEventListener('mouseleave', function() {
-        card.style.transform = 'none';
+        resetTiltTransform(card);
       });
     });
   }
