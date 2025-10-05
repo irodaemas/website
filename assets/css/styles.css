@@ -2102,20 +2102,6 @@ tbody tr:hover td {
   letter-spacing: -.01em;
 }
 
-.world-price-card .date-badge {
-  --badge-bg: rgba(239, 255, 252, .12);
-  --badge-border: rgba(239, 255, 252, .28);
-  --badge-color: rgba(239, 255, 252, .94);
-  --badge-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
-  white-space: nowrap;
-}
-
-[data-theme="dark"] .world-price-card .date-badge {
-  --badge-bg: rgba(239, 255, 252, .16);
-  --badge-border: rgba(239, 255, 252, .36);
-  --badge-color: rgba(239, 255, 252, .96);
-}
-
 .world-price-card .price-highlight-main {
   align-items: baseline;
   gap: .6rem;
@@ -2291,6 +2277,7 @@ tbody tr:hover td {
   color: rgba(255, 255, 255, .92)
 }
 
+.world-price-card .date-badge,
 .price-range-btn.is-active,
 .price-range-btn[aria-pressed="true"] {
   background: linear-gradient(135deg, rgba(88, 255, 169, .85), rgba(18, 163, 134, .72));
