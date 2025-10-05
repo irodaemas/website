@@ -881,16 +881,27 @@ nav a {
 
 /* --- Card hover tilt --- */
 .feature,
-.t-card {
+.t-card,
+.value-card {
   transform-style: preserve-3d
 }
 
 @media (hover:hover) and (pointer:fine) {
 
   .feature,
-  .t-card {
+  .t-card,
+  .value-card {
     transition: transform .15s ease;
     will-change: transform
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature,
+  .t-card,
+  .value-card {
+    transition: none !important;
+    transform: none !important;
   }
 }
 
