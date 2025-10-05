@@ -2103,7 +2103,17 @@ tbody tr:hover td {
 }
 
 .world-price-card .date-badge {
+  --badge-bg: rgba(239, 255, 252, .12);
+  --badge-border: rgba(239, 255, 252, .28);
+  --badge-color: rgba(239, 255, 252, .94);
+  --badge-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
   white-space: nowrap;
+}
+
+[data-theme="dark"] .world-price-card .date-badge {
+  --badge-bg: rgba(239, 255, 252, .16);
+  --badge-border: rgba(239, 255, 252, .36);
+  --badge-color: rgba(239, 255, 252, .96);
 }
 
 .world-price-card .price-highlight-main {
