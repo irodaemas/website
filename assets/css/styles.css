@@ -3688,6 +3688,157 @@ a {
   background: rgba(212, 175, 55, .18)
 }
 
+/* ---------- comparison table ---------- */
+.comparison-section {
+  padding: clamp(2.6rem, 3.6vw + 1rem, 4.2rem) 0;
+  background: var(--bg-secondary)
+}
+
+.comparison-table-wrap {
+  margin-top: 1.6rem
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+  background: var(--paper);
+  box-shadow: var(--shadow);
+  border-radius: 18px;
+  overflow: hidden
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--border-subtle);
+  vertical-align: top;
+  text-align: left;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.6
+}
+
+.comparison-table thead th {
+  background: var(--bg-tertiary);
+  color: var(--accent-green);
+  font-size: 1.05rem;
+  font-weight: 700
+}
+
+.comparison-table tbody th[scope="row"] {
+  color: var(--accent-green);
+  background: rgba(212, 175, 55, .08);
+  font-weight: 700;
+  min-width: 200px
+}
+
+.comparison-table tbody tr:nth-child(even) td {
+  background: rgba(1, 61, 57, .02)
+}
+
+.comparison-badge {
+  margin-left: .4rem;
+  white-space: nowrap
+}
+
+.comparison-cta {
+  margin-top: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.4rem;
+  background: var(--paper);
+  border: 1px solid var(--border-subtle);
+  border-radius: 18px;
+  box-shadow: var(--shadow)
+}
+
+.comparison-cta__content {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem
+}
+
+.comparison-cta .h3 {
+  margin: 0;
+  color: var(--accent-green)
+}
+
+.comparison-cta p {
+  margin: 0
+}
+
+@media (max-width: 900px) {
+  .comparison-table {
+    min-width: 100%;
+    font-size: .98rem
+  }
+
+  .comparison-table th,
+  .comparison-table td {
+    padding: .9rem 1rem
+  }
+
+  .comparison-cta {
+    flex-direction: column;
+    align-items: flex-start
+  }
+}
+
+@media (max-width: 720px) {
+  .comparison-table {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: none;
+    border: none
+  }
+
+  .comparison-table thead {
+    display: none
+  }
+
+  .comparison-table tbody {
+    display: grid;
+    gap: 1.2rem
+  }
+
+  .comparison-table tr {
+    border: 1px solid var(--border-subtle);
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: var(--shadow)
+  }
+
+  .comparison-table tbody th[scope="row"] {
+    display: block;
+    border: 0;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: .95rem 1.1rem;
+    background: rgba(212, 175, 55, .12)
+  }
+
+  .comparison-table td {
+    display: block;
+    border: 0;
+    border-top: 1px solid var(--border-subtle);
+    padding: .9rem 1.1rem
+  }
+
+  .comparison-table td::before {
+    content: attr(data-label);
+    display: block;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: .35rem
+  }
+
+  .comparison-table tbody tr:nth-child(even) td {
+    background: transparent
+  }
+}
+
 .price-row[role="button"]:focus-visible td {
   background: rgba(212, 175, 55, .24)
 }
