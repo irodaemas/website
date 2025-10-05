@@ -3689,6 +3689,23 @@ a {
 }
 
 /* ---------- comparison table ---------- */
+@keyframes columnGlow {
+  0% {
+    background-color: rgba(212, 175, 55, .06);
+    box-shadow: inset 0 0 0 0 rgba(212, 175, 55, .3);
+  }
+
+  50% {
+    background-color: rgba(212, 175, 55, .16);
+    box-shadow: inset 0 0 0 1px rgba(212, 175, 55, .38), 0 0 18px rgba(212, 175, 55, .28);
+  }
+
+  100% {
+    background-color: rgba(212, 175, 55, .06);
+    box-shadow: inset 0 0 0 0 rgba(212, 175, 55, .3);
+  }
+}
+
 .comparison-section {
   padding: clamp(2.6rem, 3.6vw + 1rem, 4.2rem) 0;
   background: var(--bg-secondary)
@@ -3724,6 +3741,11 @@ a {
   color: var(--accent-green);
   font-size: 1.05rem;
   font-weight: 700
+}
+
+.comparison-table thead th:nth-of-type(2),
+.comparison-table tbody td:nth-of-type(2) {
+  animation: columnGlow 7s ease-in-out infinite;
 }
 
 .comparison-table tbody th[scope="row"] {
@@ -3826,6 +3848,10 @@ a {
     padding: .9rem 1.1rem
   }
 
+  .comparison-table td[data-label="Sentral Emas"] {
+    animation: columnGlow 7s ease-in-out infinite;
+  }
+
   .comparison-table td::before {
     content: attr(data-label);
     display: block;
@@ -3836,6 +3862,14 @@ a {
 
   .comparison-table tbody tr:nth-child(even) td {
     background: transparent
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comparison-table thead th:nth-of-type(2),
+  .comparison-table tbody td:nth-of-type(2),
+  .comparison-table td[data-label="Sentral Emas"] {
+    animation: none;
   }
 }
 
