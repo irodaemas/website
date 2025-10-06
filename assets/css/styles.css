@@ -27,6 +27,10 @@ body.js-enabled [data-scroll-section].is-visible {
     transition: none;
     transform: none;
   }
+
+  .typewriter #typer {
+    animation: none;
+  }
 }
 
 .skip-link:focus {
@@ -438,6 +442,20 @@ body {
   overflow: hidden;
   display: inline-block;
   padding-right: .1rem;
+  animation: typewriter-caret .9s steps(1) infinite;
+}
+
+@keyframes typewriter-caret {
+  0%,
+  100% {
+    border-color: rgba(255, 255, 255, .6);
+    opacity: 1;
+  }
+
+  50% {
+    border-color: transparent;
+    opacity: 0;
+  }
 }
 
 .grid {
