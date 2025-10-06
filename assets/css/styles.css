@@ -334,6 +334,227 @@ body {
   background: rgba(255, 255, 255, .08)
 }
 
+.sparkle-cta {
+  --sparkle-shadow: rgba(212, 175, 55, .45);
+  --sparkle-glare: hsla(0, 0%, 100%, .75);
+  --sparkle-font-size: 1rem;
+  --sparkle-transition: .2s;
+  --sparkle-padding-x: 1.2rem;
+  --sparkle-padding-y: .9rem;
+  --sparkle-label-color: var(--text-on-accent);
+  --sparkle-hover-bg: var(--gold-2);
+  --sparkle-rest-bg: var(--gold);
+  --sparkle-border-color: transparent;
+  --hover: .4;
+  --pos: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  padding: var(--sparkle-padding-y) var(--sparkle-padding-x);
+  border-radius: 999px;
+  text-decoration: none;
+  background: var(--sparkle-rest-bg, transparent);
+  border: 1px solid var(--sparkle-border-color);
+  color: transparent;
+  font-family: inherit;
+  font-size: var(--sparkle-font-size);
+  font-weight: 600;
+  box-sizing: border-box;
+  overflow: visible;
+  transition: background var(--sparkle-transition);
+}
+
+.sparkle-cta:hover {
+  --hover: 1;
+  --pos: 1;
+  background: var(--sparkle-hover-bg);
+  border-color: transparent;
+}
+
+.sparkle-cta:active {
+  --hover: 0;
+  --pos: 1;
+  background: var(--sparkle-active-bg, var(--sparkle-hover-bg));
+  border-color: transparent;
+}
+
+.sparkle-cta:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.sparkle-cta__label,
+.sparkle-cta__glare {
+  display: inline-block;
+  font-family: inherit;
+  font-size: var(--sparkle-font-size);
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform var(--sparkle-transition), text-shadow var(--sparkle-transition);
+  transform: translate(
+    calc(var(--hover) * (var(--sparkle-font-size) * .1)),
+    calc(var(--hover) * (var(--sparkle-font-size) * -.1))
+  );
+}
+
+.sparkle-cta__label {
+  position: relative;
+  z-index: 1;
+  color: var(--sparkle-label-color);
+  text-shadow: none;
+}
+
+.sparkle-cta__glare {
+  position: absolute;
+  inset: var(--sparkle-padding-y) var(--sparkle-padding-x);
+  background:
+    linear-gradient(
+      108deg,
+      transparent 0 55%,
+      var(--sparkle-glare) 55% 60%,
+      transparent 60% 70%,
+      var(--sparkle-glare) 70% 85%,
+      transparent 85%
+    ) calc(var(--pos) * -200%) 0% / 200% 100%,
+    var(--sparkle-color);
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: transform var(--sparkle-transition), background-position 0s, opacity var(--sparkle-transition);
+}
+
+.sparkle-cta:active .sparkle-cta__glare {
+  --hover: 0;
+}
+
+.sparkle-cta:hover .sparkle-cta__glare {
+  opacity: 1;
+  transition: transform var(--sparkle-transition), background-position calc(var(--hover) * 1.5s) calc(var(--hover) * .25s), opacity var(--sparkle-transition);
+}
+
+.sparkle-cta:focus-visible .sparkle-cta__glare {
+  opacity: 1;
+}
+
+.sparkle-cta--ghost {
+  --sparkle-color: rgba(255, 255, 255, .95);
+  --sparkle-shadow: rgba(255, 255, 255, .35);
+  --sparkle-label-color: #fff;
+  --sparkle-glare: hsla(0, 0%, 100%, .85);
+  --sparkle-hover-bg: rgba(255, 255, 255, .14);
+  --sparkle-active-bg: rgba(255, 255, 255, .1);
+  --sparkle-rest-bg: rgba(255, 255, 255, .08);
+  --sparkle-border-color: rgba(255, 255, 255, .35);
+}
+
+@media (max-width: 520px) {
+  .hero .btn-row {
+    flex-wrap: nowrap;
+    gap: .6rem;
+  }
+
+  .hero .btn-row .sparkle-cta {
+    flex: 1 1 0;
+    min-width: 0;
+    --sparkle-font-size: .9rem;
+    --sparkle-padding-x: 1.1rem;
+    --sparkle-padding-y: .9rem;
+  }
+
+  .hero .btn-row .sparkle-cta__label,
+  .hero .btn-row .sparkle-cta__glare {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+.sparkle-cta svg {
+  position: absolute;
+  z-index: 3;
+  width: calc(var(--sparkle-font-size) * .55);
+  aspect-ratio: 1;
+  top: calc(var(--y, 50) * 1%);
+  left: calc(var(--x, 50) * 1%);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  --delay-step: .15;
+}
+
+.sparkle-cta svg path {
+  fill: var(--sparkle-glare);
+}
+
+.sparkle-cta:hover svg {
+  animation: sparkle .75s calc((var(--delay-step) * var(--d)) * 1s) both;
+}
+
+.sparkle-cta svg:nth-of-type(1) {
+  --x: 0;
+  --y: 20;
+  --s: 1.1;
+  --d: 1;
+}
+
+.sparkle-cta svg:nth-of-type(2) {
+  --x: 15;
+  --y: 80;
+  --s: 1.25;
+  --d: 2;
+}
+
+.sparkle-cta svg:nth-of-type(3) {
+  --x: 45;
+  --y: 40;
+  --s: 1.1;
+  --d: 3;
+}
+
+.sparkle-cta svg:nth-of-type(4) {
+  --x: 75;
+  --y: 60;
+  --s: .9;
+  --d: 2;
+}
+
+.sparkle-cta svg:nth-of-type(5) {
+  --x: 100;
+  --y: 30;
+  --s: .8;
+  --d: 4;
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(var(--s, 1));
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sparkle-cta,
+  .sparkle-cta__label,
+  .sparkle-cta__glare {
+    transition: none;
+    transform: none;
+  }
+
+  .sparkle-cta:hover svg {
+    animation: none;
+  }
+}
+
 .table-actions .btn-ghost {
   background: rgba(12, 88, 79, .08);
   border-color: rgba(12, 88, 79, .28);

@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v30';
+const CACHE_NAME = 'sentralemas-v31';
 const FONT_CACHE = 'sentralemas-fonts-v3';
 const rawTrackEndpoint = (typeof self !== 'undefined' && 'SENTRALEM_TRACK_ENDPOINT' in self) ? self.SENTRALEM_TRACK_ENDPOINT : null;
 const TRACK_ENDPOINT = typeof rawTrackEndpoint === 'string' && rawTrackEndpoint.trim().length ? rawTrackEndpoint : null;
