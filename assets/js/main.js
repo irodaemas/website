@@ -5164,154 +5164,12 @@ window.addEventListener('resize', function() {
 /* istanbul ignore next */
 if ('serviceWorker' in navigator) {
   var hadController = !!navigator.serviceWorker.controller;
-  var pendingUpdateWorker = null;
-  var updatePromptEl = null;
-  var updatePromptTimer = null;
-  var updateActivationInFlight = false;
-
-  function clearUpdatePromptTimer() {
-    if (updatePromptTimer) {
-      clearTimeout(updatePromptTimer);
-      updatePromptTimer = null;
-    }
-  }
-
-  function removeUpdatePrompt() {
-    clearUpdatePromptTimer();
-    if (updatePromptEl && updatePromptEl.parentNode) {
-      updatePromptEl.parentNode.removeChild(updatePromptEl);
-    }
-    updatePromptEl = null;
-  }
-
-  function triggerUpdateActivation() {
-    if (updateActivationInFlight) return;
-    updateActivationInFlight = true;
-    var worker = pendingUpdateWorker;
-    removeUpdatePrompt();
-    if (!worker) {
-      window.location.reload();
-      return;
-    }
-    var fallbackTimer = setTimeout(function() {
-      window.location.reload();
-    }, 5000);
-    var handleStateChange = function() {
-      if (worker.state === 'activated') {
-        clearTimeout(fallbackTimer);
-        window.location.reload();
-      }
-    };
-    try {
-      worker.addEventListener('statechange', handleStateChange);
-    } catch (_) {}
-    if (worker.state === 'activated') {
-      handleStateChange();
-      return;
-    }
-    try {
-      worker.postMessage({ type: 'SKIP_WAITING' });
-    } catch (_) {
-      clearTimeout(fallbackTimer);
-      window.location.reload();
-    }
-  }
-
-  function buildUpdatePrompt(worker) {
-    if (!hadController) return;
-    if (worker) {
-      pendingUpdateWorker = worker;
-    }
-    if (updateActivationInFlight || updatePromptEl) return;
-
-    var createPrompt = function() {
-      if (updateActivationInFlight || updatePromptEl) return;
-      var container = document.createElement('div');
-      container.id = 'sw-update-toast';
-      container.setAttribute('data-sw-update-notice', 'true');
-      container.setAttribute('role', 'status');
-      container.setAttribute('aria-live', 'polite');
-      container.style.position = 'fixed';
-      container.style.right = '16px';
-      container.style.bottom = '16px';
-      container.style.left = '16px';
-      container.style.maxWidth = '320px';
-      container.style.marginLeft = 'auto';
-      container.style.backgroundColor = '#013D39';
-      container.style.color = '#FFFFFF';
-      container.style.padding = '16px 18px';
-      container.style.borderRadius = '12px';
-      container.style.boxShadow = '0 12px 32px rgba(0, 0, 0, 0.22)';
-      container.style.zIndex = '2147483646';
-      container.style.fontFamily = 'inherit';
-      container.style.fontSize = '15px';
-      container.style.lineHeight = '1.45';
-      container.style.display = 'flex';
-      container.style.flexDirection = 'column';
-      container.style.gap = '8px';
-      container.style.transform = 'translateY(16px)';
-      container.style.opacity = '0';
-      container.style.transition = 'transform 0.24s ease, opacity 0.24s ease';
-
-      var title = document.createElement('strong');
-      title.textContent = 'Versi terbaru tersedia';
-      title.style.fontSize = '16px';
-      title.style.display = 'block';
-
-      var message = document.createElement('span');
-      message.textContent = 'Halaman akan memuat ulang otomatis untuk memuat pembaruan.';
-
-      updatePromptEl = container;
-
-      container.appendChild(title);
-      container.appendChild(message);
-
-      var appendPrompt = function() {
-        document.body.appendChild(container);
-        if (typeof requestAnimationFrame === 'function') {
-          requestAnimationFrame(function() {
-            requestAnimationFrame(function() {
-              container.style.transform = 'translateY(0)';
-              container.style.opacity = '1';
-            });
-          });
-        } else {
-          container.style.transform = 'translateY(0)';
-          container.style.opacity = '1';
-        }
-        clearUpdatePromptTimer();
-        updatePromptTimer = setTimeout(function() {
-          triggerUpdateActivation();
-        }, 3500);
-      };
-
-      if (document.body) {
-        appendPrompt();
-      } else {
-        setTimeout(appendPrompt, 0);
-      }
-    };
-
-    if (document.readyState === 'loading') {
-      var handleReady = function() {
-        document.removeEventListener('DOMContentLoaded', handleReady);
-        createPrompt();
-      };
-      document.addEventListener('DOMContentLoaded', handleReady);
-    } else {
-      createPrompt();
-    }
-  }
+  var isReloadingAfterUpdate = false;
 
   navigator.serviceWorker.addEventListener('controllerchange', function() {
-    if (!hadController) {
-      hadController = true;
-      return;
-    }
-    removeUpdatePrompt();
-    if (!updateActivationInFlight) {
-      window.location.reload();
-    }
+    if (!hadController || isReloadingAfterUpdate) return;
+    isReloadingAfterUpdate = true;
+    window.location.reload();
   });
 
   window.addEventListener('load', function() {
@@ -5319,18 +5177,35 @@ if ('serviceWorker' in navigator) {
         scope: '/'
       })
       .then(function(reg) {
-        if (!reg) return;
-        if (hadController && reg.waiting) {
-          buildUpdatePrompt(reg.waiting);
+        if (!hadController) return;
+        if (reg.waiting) {
+          if (typeof reg.waiting.postMessage === 'function') {
+            try {
+              reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+            } catch (_) {}
+          }
+          if (!isReloadingAfterUpdate) {
+            isReloadingAfterUpdate = true;
+            window.location.reload();
+          }
         }
         reg.addEventListener('updatefound', function() {
           var nw = reg.installing;
-          if (!nw) return;
-          nw.addEventListener('statechange', function() {
-            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-              buildUpdatePrompt(nw);
-            }
-          });
+          if (nw) {
+            nw.addEventListener('statechange', function() {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                if (typeof nw.postMessage === 'function') {
+                  try {
+                    nw.postMessage({ type: 'SKIP_WAITING' });
+                  } catch (_) {}
+                }
+                if (!isReloadingAfterUpdate) {
+                  isReloadingAfterUpdate = true;
+                  window.location.reload();
+                }
+              }
+            });
+          }
         });
       })
       .catch(function(err) {
