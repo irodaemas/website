@@ -4592,6 +4592,127 @@ window.addEventListener('resize', function() {
   var mobileBackdrop = null;
   var forms = Array.prototype.slice.call(document.querySelectorAll('[data-search-form]'));
   var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-search-input]'));
+  var motionMedia = null;
+  var prefersReducedMotion = false;
+  var hideTimeoutId = null;
+  var hideTransitionHandler = null;
+
+  try {
+    if (window.matchMedia) {
+      motionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+      prefersReducedMotion = motionMedia.matches;
+      var handleMotionChange = function(ev) {
+        prefersReducedMotion = !!(ev && ev.matches);
+      };
+      if (motionMedia.addEventListener) {
+        motionMedia.addEventListener('change', handleMotionChange);
+      } else if (motionMedia.addListener) {
+        motionMedia.addListener(handleMotionChange);
+      }
+    }
+  } catch (e) {}
+
+  function cancelHideWatcher() {
+    if (hideTimeoutId) {
+      clearTimeout(hideTimeoutId);
+      hideTimeoutId = null;
+    }
+    if (hideTransitionHandler && searchSection) {
+      searchSection.removeEventListener('transitionend', hideTransitionHandler);
+      hideTransitionHandler = null;
+    }
+  }
+
+  function showSearchSection() {
+    if (!searchSection) return;
+    cancelHideWatcher();
+    searchSection.hidden = false;
+    if (!(searchSection.classList && searchSection.classList.add)) return;
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+          if (searchSection && searchSection.classList) {
+            searchSection.classList.add('is-visible');
+          }
+        });
+      });
+    } else {
+      searchSection.classList.add('is-visible');
+    }
+  }
+
+  function finalizeHide() {
+    if (!searchSection) return;
+    cancelHideWatcher();
+    searchSection.hidden = true;
+  }
+
+  function hideSearchSection() {
+    if (!searchSection) return;
+    cancelHideWatcher();
+    if (searchSection.classList) {
+      searchSection.classList.remove('is-visible');
+    }
+    if (prefersReducedMotion) {
+      finalizeHide();
+      return;
+    }
+    var duration = getTransitionDurationMs(searchSection);
+    if (duration <= 0) {
+      finalizeHide();
+      return;
+    }
+    hideTransitionHandler = function(event) {
+      if (event && event.target !== searchSection) return;
+      finalizeHide();
+    };
+    searchSection.addEventListener('transitionend', hideTransitionHandler);
+    hideTimeoutId = setTimeout(finalizeHide, duration + 50);
+  }
+
+  function getTransitionDurationMs(element) {
+    if (!element || typeof window === 'undefined' || !window.getComputedStyle) return 0;
+    var style;
+    try {
+      style = window.getComputedStyle(element);
+    } catch (e) {
+      return 0;
+    }
+    if (!style) return 0;
+    var duration = style.transitionDuration || '';
+    var delay = style.transitionDelay || '';
+    return parseTimeList(duration, delay);
+  }
+
+  function parseTimeList(durations, delays) {
+    var max = 0;
+    var durationList = durations ? durations.split(',') : [];
+    var delayList = delays ? delays.split(',') : [];
+    var totalCount = Math.max(durationList.length, delayList.length);
+    if (!totalCount) return 0;
+    for (var i = 0; i < totalCount; i++) {
+      var durationValue = parseTime(durationList[i] || durationList[durationList.length - 1] || '0s');
+      var delayValue = parseTime(delayList[i] || delayList[delayList.length - 1] || '0s');
+      if (durationValue + delayValue > max) {
+        max = durationValue + delayValue;
+      }
+    }
+    return max;
+  }
+
+  function parseTime(value) {
+    if (!value) return 0;
+    var trimmed = value.toString().trim();
+    if (!trimmed) return 0;
+    if (trimmed.slice(-2) === 'ms') {
+      return parseFloat(trimmed.slice(0, -2)) || 0;
+    }
+    if (trimmed.slice(-1) === 's') {
+      return ((parseFloat(trimmed.slice(0, -1)) || 0) * 1000);
+    }
+    var numeric = parseFloat(trimmed);
+    return isNaN(numeric) ? 0 : numeric;
+  }
 
   function addSearchActiveClass() {
     if (body && body.classList) {
@@ -4683,17 +4804,13 @@ window.addEventListener('resize', function() {
   });
 
   if (!hasSearchParam) {
-    if (searchSection) {
-      searchSection.hidden = true;
-    }
+    hideSearchSection();
     removeSearchActiveClass();
     if (resetLink) {
       resetLink.hidden = true;
     }
   } else {
-    if (searchSection) {
-      searchSection.hidden = false;
-    }
+    showSearchSection();
 
     if (rawQuery) {
       addSearchActiveClass();
