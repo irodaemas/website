@@ -559,6 +559,71 @@ nav a {
   flex: 0 0 auto
 }
 
+.mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  flex: 0 0 auto;
+  min-width: 0;
+  position: relative
+}
+
+.mode-status {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1.1;
+  white-space: nowrap;
+  color: var(--ink);
+  background: var(--paper)
+}
+
+.mode-toggle button:focus-visible + .mode-status {
+  left: 50%;
+  top: calc(100% + .65rem);
+  width: auto;
+  height: auto;
+  padding: .35rem .7rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 60
+}
+
+@supports not selector(:focus-visible) {
+  .mode-toggle button:focus + .mode-status {
+    left: 50%;
+    top: calc(100% + .65rem);
+    width: auto;
+    height: auto;
+    padding: .35rem .7rem;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 60
+  }
+}
+
 .header-search {
   display: flex;
   align-items: center;
@@ -928,6 +993,10 @@ nav a {
 
   .header-actions {
     gap: .8rem
+  }
+
+  .mode-toggle {
+    gap: .45rem
   }
 
   .blog-card__link {

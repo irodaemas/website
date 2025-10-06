@@ -5382,54 +5382,125 @@ if ('serviceWorker' in navigator) {
 (function() {
   const THEME_KEY = 'sentral_emas_theme';
   const toggle = document.getElementById('darkModeToggle');
+  const statusLabel = document.getElementById('colorModeStatus');
 
   if (!toggle) return;
 
-  function applyTheme(theme) {
-    let isDark;
-    if (theme === 'auto') {
-      isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    } else {
-      isDark = theme === 'dark';
-      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  const MODE_SEQUENCE = ['light', 'dark', 'auto'];
+  const MODE_METADATA = {
+    light: {
+      statusText: 'Mode: Terang',
+      shortLabel: 'Terang',
+      pressed: 'false',
+    },
+    dark: {
+      statusText: 'Mode: Gelap',
+      shortLabel: 'Gelap',
+      pressed: 'true',
+    },
+    auto: {
+      statusText: 'Mode: Otomatis',
+      shortLabel: 'Otomatis',
+      pressed: 'mixed',
+    },
+  };
+
+  function isValidTheme(theme) {
+    return MODE_SEQUENCE.indexOf(theme) !== -1;
+  }
+
+  function getNextTheme(current) {
+    const index = MODE_SEQUENCE.indexOf(current);
+    if (index === -1 || index === MODE_SEQUENCE.length - 1) {
+      return MODE_SEQUENCE[0];
     }
+    return MODE_SEQUENCE[index + 1];
+  }
+
+  function applyThemePreference(theme) {
+    let appliedTheme = theme;
+    if (theme === 'auto') {
+      let prefersDark = false;
+      try {
+        if (window.matchMedia) {
+          prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+      } catch (_err) {}
+      appliedTheme = prefersDark ? 'dark' : 'light';
+    } else {
+      appliedTheme = theme === 'dark' ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', appliedTheme);
+    return appliedTheme;
   }
 
   function updateToggleIcon(theme) {
     toggle.setAttribute('data-theme-mode', theme);
   }
 
-  function cycleTheme() {
-    const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
-    let newTheme;
-    if (currentTheme === 'light') {
-      newTheme = 'dark';
-    } else if (currentTheme === 'dark') {
-      newTheme = 'auto';
-    } else {
-      newTheme = 'light';
+  function updateToggleState(theme, appliedTheme) {
+    const metadata = MODE_METADATA[theme] || MODE_METADATA.auto;
+    const nextTheme = getNextTheme(theme);
+    const nextMeta = MODE_METADATA[nextTheme] || MODE_METADATA.light;
+    const nextLabel = 'Beralih ke mode ' + nextMeta.shortLabel;
+
+    updateToggleIcon(theme);
+    toggle.setAttribute('aria-pressed', metadata.pressed);
+    toggle.setAttribute('aria-label', nextLabel);
+    toggle.setAttribute('title', nextLabel);
+
+    if (statusLabel) {
+      let statusText = metadata.statusText;
+      if (theme === 'auto') {
+        statusText += appliedTheme === 'dark' ? ' (Gelap)' : ' (Terang)';
+      }
+      statusLabel.textContent = statusText;
+      statusLabel.setAttribute('data-mode', theme);
+      statusLabel.setAttribute('data-applied-mode', appliedTheme);
     }
-    localStorage.setItem(THEME_KEY, newTheme);
-    applyTheme(newTheme);
-    updateToggleIcon(newTheme);
   }
 
-  // Initialize
-  const savedTheme = localStorage.getItem(THEME_KEY) || 'auto';
-  applyTheme(savedTheme);
-  updateToggleIcon(savedTheme);
+  function setTheme(theme, persist) {
+    const themeToApply = isValidTheme(theme) ? theme : 'auto';
+    if (persist) {
+      try {
+        localStorage.setItem(THEME_KEY, themeToApply);
+      } catch (_err) {}
+    }
+    const appliedTheme = applyThemePreference(themeToApply);
+    updateToggleState(themeToApply, appliedTheme);
+  }
 
-  // Event listeners
+  function cycleTheme() {
+    const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
+    const safeTheme = isValidTheme(currentTheme) ? currentTheme : 'auto';
+    const nextTheme = getNextTheme(safeTheme);
+    setTheme(nextTheme, true);
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'auto';
+  setTheme(isValidTheme(savedTheme) ? savedTheme : 'auto', false);
+
   toggle.addEventListener('click', cycleTheme);
 
   if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handlePreferenceChange = function() {
       const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
-      if (currentTheme === 'auto') {
-        applyTheme('auto');
+      if (!isValidTheme(currentTheme)) {
+        setTheme('auto', true);
+        return;
       }
-    });
+      if (currentTheme === 'auto') {
+        setTheme('auto', false);
+      }
+    };
+
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', handlePreferenceChange);
+    } else if (typeof mediaQuery.addListener === 'function') {
+      mediaQuery.addListener(handlePreferenceChange);
+    }
   }
 })();
 
