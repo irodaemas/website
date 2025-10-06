@@ -996,13 +996,34 @@ body.search-active {
   background: var(--bg-primary);
   z-index: 40;
   overflow-y: auto;
-  display: none;
-  /* Hidden by default */
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(0, 16px, 0);
+  transition: opacity .28s ease, visibility .28s ease, transform .32s ease;
+  will-change: opacity, transform;
 }
 
-body.search-active .search-section {
-  display: block;
-  /* Shown when search is active */
+.search-section.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+}
+
+.search-section.is-animating {
+  will-change: opacity, transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-section {
+    transition: opacity .2s ease, visibility .2s ease;
+    transform: none;
+  }
+
+  .search-section.is-visible {
+    transform: none;
+  }
 }
 
 .search-empty[hidden] {
