@@ -216,6 +216,8 @@ describe('main.js behaviours', () => {
           addEventListener: jest.fn(),
           installing: null,
         })),
+        addEventListener: jest.fn(),
+        controller: null,
         ready: Promise.resolve({
           sync: { register: jest.fn(() => Promise.resolve()) },
         }),
@@ -884,39 +886,48 @@ describe('main.js behaviours', () => {
     window.history.replaceState(null, '', originalUrl);
   });
 
-  test('service worker registration shows toast when waiting worker exists', async () => {
-    await loadMain();
-    const ready = Promise.resolve({ sync: { register: jest.fn(() => Promise.resolve()) } });
+  test('service worker menampilkan prompt singkat sebelum reload otomatis', async () => {
     const listeners = {};
     const stateListeners = [];
-    const waitingReg = {
+    const waitingWorker = {
+      state: 'installing',
+      postMessage: jest.fn(),
+      addEventListener: jest.fn((event, cb) => {
+        if (event === 'statechange') {
+          stateListeners.push(cb);
+        }
+      }),
+    };
+
+    const registerMock = window.navigator.serviceWorker.register;
+    registerMock.mockImplementationOnce(() => Promise.resolve({
       scope: '/',
-      waiting: {},
-      installing: {
-        state: 'installing',
-        addEventListener: jest.fn((event, cb) => {
-          if (event === 'statechange') {
-            stateListeners.push(cb);
-          }
-        }),
-      },
+      waiting: null,
+      installing: waitingWorker,
       addEventListener: jest.fn((event, cb) => {
         listeners[event] = cb;
       }),
-    };
-    window.navigator.serviceWorker.register = jest.fn(() => Promise.resolve(waitingReg));
-    window.navigator.serviceWorker.ready = ready;
+    }));
+
     Object.defineProperty(window.navigator.serviceWorker, 'controller', {
       configurable: true,
       value: {},
     });
-    window.dispatchEvent(new Event('load'));
-    await Promise.resolve();
+
+    await loadMain();
+    await flush();
+
     listeners.updatefound();
-    waitingReg.installing.state = 'installed';
+    waitingWorker.state = 'installed';
     stateListeners.forEach((cb) => cb());
-    const toast = document.getElementById('sw-toast');
+    await flush();
+
+    const toast = document.getElementById('sw-update-toast');
     expect(toast).not.toBeNull();
+    expect(toast.textContent).toContain('Versi terbaru tersedia');
+
+    const listenerCountBeforeTrigger = stateListeners.length;
+
     const originalLocation = window.location;
     const reloadSpy = jest.fn();
     Object.defineProperty(window, 'location', {
@@ -928,9 +939,22 @@ describe('main.js behaviours', () => {
         search: originalLocation.search,
       },
     });
-    const btn = toast.querySelector('button');
-    btn.click();
+
+    jest.advanceTimersByTime(4000);
+    await flush();
+
+    expect(waitingWorker.postMessage).toHaveBeenCalledWith({ type: 'SKIP_WAITING' });
+
+    const newListeners = stateListeners.slice(listenerCountBeforeTrigger);
+    expect(newListeners.length).toBeGreaterThan(0);
+    newListeners.forEach((cb) => {
+      waitingWorker.state = 'activated';
+      cb();
+    });
+
     expect(reloadSpy).toHaveBeenCalled();
+    expect(document.getElementById('sw-update-toast')).toBeNull();
+
     Object.defineProperty(window, 'location', {
       configurable: true,
       value: originalLocation,
