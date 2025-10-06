@@ -249,6 +249,154 @@ if (typeof window !== 'undefined') {
 
 /* istanbul ignore next */
 (function() {
+  if (typeof document === 'undefined') return;
+  var doc = document;
+  var body = doc.body;
+  if (!body) return;
+
+  var navToggle = doc.querySelector('[data-nav-toggle]');
+  if (!navToggle) return;
+
+  var navMenu = doc.getElementById('primaryNav');
+  if (!navMenu) {
+    try {
+      navMenu = doc.querySelector('.nav .menu');
+    } catch (_err) {
+      navMenu = null;
+    }
+  }
+  if (!navMenu) return;
+
+  body.classList.add('nav-enhanced');
+  navToggle.setAttribute('aria-expanded', 'false');
+
+  var navOverlay = doc.querySelector('[data-nav-overlay]');
+  if (!navOverlay) {
+    navOverlay = doc.createElement('div');
+    navOverlay.className = 'nav-overlay';
+    navOverlay.setAttribute('data-nav-overlay', '');
+    body.appendChild(navOverlay);
+  } else if (!navOverlay.classList.contains('nav-overlay')) {
+    navOverlay.classList.add('nav-overlay');
+  }
+  navOverlay.setAttribute('aria-hidden', 'true');
+
+  var focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  function focusElement(el) {
+    if (!el || typeof el.focus !== 'function') return;
+    try {
+      el.focus({
+        preventScroll: true
+      });
+    } catch (_err) {
+      el.focus();
+    }
+  }
+
+  function findClosestLink(node) {
+    var current = node;
+    while (current) {
+      if (current.tagName && current.tagName.toLowerCase() === 'a') {
+        return current;
+      }
+      current = current.parentElement || current.parentNode || null;
+    }
+    return null;
+  }
+
+  function openMenu() {
+    if (body.classList.contains('nav-open')) return;
+    body.classList.add('nav-open');
+    navToggle.setAttribute('aria-expanded', 'true');
+    var firstItem = null;
+    try {
+      firstItem = navMenu.querySelector(focusableSelector);
+    } catch (_err) {
+      var links = navMenu ? navMenu.getElementsByTagName('a') : null;
+      firstItem = links && links.length ? links[0] : null;
+    }
+    focusElement(firstItem);
+  }
+
+  function closeMenu(options) {
+    var opts = options || {};
+    if (!body.classList.contains('nav-open')) return;
+    body.classList.remove('nav-open');
+    navToggle.setAttribute('aria-expanded', 'false');
+    if (opts.restoreFocus !== false) {
+      focusElement(navToggle);
+    }
+  }
+
+  function toggleMenu() {
+    if (body.classList.contains('nav-open')) {
+      closeMenu({
+        restoreFocus: true
+      });
+    } else {
+      openMenu();
+    }
+  }
+
+  navToggle.addEventListener('click', function(event) {
+    if (event && typeof event.preventDefault === 'function') {
+      event.preventDefault();
+    }
+    toggleMenu();
+  });
+
+  navMenu.addEventListener('click', function(event) {
+    var target = event ? (event.target || event.srcElement) : null;
+    if (!target) return;
+    var link = typeof target.closest === 'function' ? target.closest('a[href]') : findClosestLink(target);
+    if (!link) return;
+    closeMenu({
+      restoreFocus: true
+    });
+  });
+
+  if (navOverlay) {
+    navOverlay.addEventListener('click', function() {
+      closeMenu({
+        restoreFocus: true
+      });
+    });
+  }
+
+  doc.addEventListener('keydown', function(event) {
+    var key = event ? (event.key || event.keyCode) : null;
+    if (key === 'Escape' || key === 'Esc' || key === 27) {
+      if (!body.classList.contains('nav-open')) return;
+      if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+      }
+      closeMenu({
+        restoreFocus: true
+      });
+    }
+  });
+
+  var desktopQuery = (typeof window !== 'undefined' && window.matchMedia) ? window.matchMedia('(min-width: 861px)') : null;
+
+  function handleDesktopChange(e) {
+    if (!e || !e.matches) return;
+    closeMenu({
+      restoreFocus: false
+    });
+  }
+
+  if (desktopQuery) {
+    if (typeof desktopQuery.addEventListener === 'function') {
+      desktopQuery.addEventListener('change', handleDesktopChange);
+    } else if (typeof desktopQuery.addListener === 'function') {
+      desktopQuery.addListener(handleDesktopChange);
+    }
+  }
+})();
+
+/* istanbul ignore next */
+(function() {
   // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
   var bar = document.querySelector('.scroll-progress');
   var hero = document.querySelector('.hero');

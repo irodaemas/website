@@ -104,7 +104,15 @@
         <img src="assets/img/logo.webp?v=1" alt="Logo Sentral Emas" width="32" height="32" decoding="async" />
         <strong>Sentral Emas</strong>
       </a>
-      <nav class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">
+      <button class="nav-toggle" type="button" data-nav-toggle aria-expanded="false" aria-controls="primaryNav">
+        <span class="nav-toggle__icon" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+        <span class="sr-only">Buka menu navigasi</span>
+      </button>
+      <nav id="primaryNav" class="menu" itemscope itemtype="https://schema.org/SiteNavigationElement" aria-label="Navigasi utama">
         <a itemprop="url" href="#fitur"><span itemprop="name">Fitur</span></a>
         <a itemprop="url" href="#komparasi"><span itemprop="name">Komparasi</span></a>
         <a itemprop="url" href="#diterima"><span itemprop="name">Yang Diterima</span></a>
