@@ -448,13 +448,11 @@ body {
 @keyframes typewriter-caret {
   0%,
   100% {
-    border-color: rgba(255, 255, 255, .6);
-    opacity: 1;
+    border-right-color: rgba(255, 255, 255, .6);
   }
 
   50% {
-    border-color: transparent;
-    opacity: 0;
+    border-right-color: transparent;
   }
 }
 
