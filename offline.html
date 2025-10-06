@@ -187,6 +187,69 @@
       z-index: 10
     }
 
+    .mode-toggle {
+      display: flex;
+      align-items: center;
+      gap: .55rem;
+      position: relative;
+    }
+
+    .mode-status {
+      position: absolute;
+      left: -999px;
+      top: auto;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      clip-path: inset(50%);
+      border: 0;
+      border-radius: 999px;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+      line-height: 1.1;
+      white-space: nowrap;
+      color: var(--offline-text);
+      background: var(--offline-card-bg);
+    }
+
+    .mode-toggle button:focus-visible + .mode-status {
+      left: 50%;
+      top: calc(100% + .65rem);
+      width: auto;
+      height: auto;
+      padding: .35rem .7rem;
+      overflow: visible;
+      clip: auto;
+      clip-path: none;
+      border: 1px solid var(--offline-card-border);
+      box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 60;
+    }
+
+    @supports not selector(:focus-visible) {
+      .mode-toggle button:focus + .mode-status {
+        left: 50%;
+        top: calc(100% + .65rem);
+        width: auto;
+        height: auto;
+        padding: .35rem .7rem;
+        overflow: visible;
+        clip: auto;
+        clip-path: none;
+        border: 1px solid var(--offline-card-border);
+        box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+        transform: translateX(-50%);
+        white-space: nowrap;
+        z-index: 60;
+      }
+    }
+
     .breadcrumb {
       margin: 2.25rem auto .8rem auto;
       font-size: .72rem;
@@ -273,20 +336,23 @@
 <body>
   <a href="#main-content" class="skip-link">Lewati ke konten utama</a>
   <div class="offline-actions">
-    <button id="darkModeToggle" class="btn btn-icon" aria-label="Toggle dark mode" title="Toggle dark mode">
-      <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="5" />
-        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
-      </svg>
-      <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-      </svg>
-      <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
-        <line x1="8" y1="21" x2="16" y2="21"></line>
-        <line x1="12" y1="17" x2="12" y2="21"></line>
-      </svg>
-    </button>
+    <div class="mode-toggle">
+      <button id="darkModeToggle" class="btn btn-icon" aria-label="Beralih ke mode Terang" aria-pressed="mixed" title="Beralih ke mode Terang">
+        <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5" />
+          <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+        </svg>
+        <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+        </svg>
+        <svg class="auto-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+      </button>
+      <span id="colorModeStatus" class="mode-status" role="status" aria-live="polite" aria-atomic="true">Mode: Otomatis</span>
+    </div>
   </div>
   <nav class="breadcrumb" aria-label="Breadcrumb">
     <ol class="breadcrumb__list">
