@@ -926,10 +926,10 @@ function getGmtPlus7DateString() {
 function getGlobalGoldEndpoints(dateStr) {
   const date = dateStr || getGmtPlus7DateString();
   return [
-    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/xau.json`,
-    `https://${date}.currency-api.pages.dev/v1/currencies/xau.json`,
     'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/xau.json',
-    'https://latest.currency-api.pages.dev/v1/currencies/xau.json'
+    'https://latest.currency-api.pages.dev/v1/currencies/xau.json',
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/xau.json`,
+    `https://${date}.currency-api.pages.dev/v1/currencies/xau.json`
   ];
 }
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
