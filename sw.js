@@ -1,6 +1,8 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v29';
-const FONT_CACHE = 'sentralemas-fonts-v2';
+const CACHE_NAME = 'sentralemas-v30';
+const FONT_CACHE = 'sentralemas-fonts-v3';
+const rawTrackEndpoint = (typeof self !== 'undefined' && 'SENTRALEM_TRACK_ENDPOINT' in self) ? self.SENTRALEM_TRACK_ENDPOINT : null;
+const TRACK_ENDPOINT = typeof rawTrackEndpoint === 'string' && rawTrackEndpoint.trim().length ? rawTrackEndpoint : null;
 
 // Core assets gunakan path relatif terhadap scope
 const CORE_ASSETS = [
@@ -11,6 +13,7 @@ const CORE_ASSETS = [
     './assets/css/styles.css',
     './assets/css/fonts.css',
     './assets/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2',
+    './assets/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa25L7SUc.woff2',
     './assets/fonts/nuFiD-vYSZviVYUb_rj3ij__anPXDTzYgA.woff2',
     './assets/js/main.js',
     './assets/img/logo.webp?v=1',
@@ -349,12 +352,17 @@ self.addEventListener('fetch', (event) => {
 
 // ===== Background Sync untuk klik WA
 self.addEventListener('sync', (event) => {
+    if (!TRACK_ENDPOINT) return;
     if (!event.tag || !event.tag.startsWith('wa-click:')) return;
     event.waitUntil((async () => {
         try {
             const parts = event.tag.split(':'); // ['wa-click', 'label', 'ts']
             const label = parts[1] || 'wa';
-            await fetch(`/track?e=wa&label=${encodeURIComponent(label)}&t=${Date.now()}`, {
+            const trackUrl = new URL(TRACK_ENDPOINT, location.origin);
+            trackUrl.searchParams.set('e', 'wa');
+            trackUrl.searchParams.set('label', label);
+            trackUrl.searchParams.set('t', Date.now().toString());
+            await fetch(trackUrl.toString(), {
                 method: 'GET',
                 credentials: 'omit'
             });

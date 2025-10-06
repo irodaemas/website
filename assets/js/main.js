@@ -4515,6 +4515,9 @@ window.addEventListener('resize', function() {
 /* istanbul ignore next */
 (function() {
   const ENABLE_BEACON = false;
+  const TRACK_ENDPOINT = typeof window !== 'undefined' && typeof window.SENTRALEM_TRACK_ENDPOINT === 'string' && window.SENTRALEM_TRACK_ENDPOINT.trim().length
+    ? window.SENTRALEM_TRACK_ENDPOINT
+    : null;
 
   function track(evt, label) {
     try {
@@ -4538,7 +4541,7 @@ window.addEventListener('resize', function() {
     el.addEventListener('click', function() {
       var label = el.getAttribute('data-track');
       track('cta_click', label);
-      if (label && label.indexOf('wa-') === 0 && 'serviceWorker' in navigator) {
+      if (label && label.indexOf('wa-') === 0 && TRACK_ENDPOINT && 'serviceWorker' in navigator) {
         try {
           navigator.serviceWorker.ready.then(function(reg) {
             var tag = 'wa-click:' + label + ':' + Date.now();
@@ -4548,7 +4551,7 @@ window.addEventListener('resize', function() {
             /* istanbul ignore next */
             if (ENABLE_BEACON && navigator.sendBeacon) {
               try {
-                navigator.sendBeacon('/track', new Blob([JSON.stringify({
+                navigator.sendBeacon(TRACK_ENDPOINT, new Blob([JSON.stringify({
                   e: 'wa',
                   label: label,
                   t: Date.now()
