@@ -912,24 +912,47 @@ const FACTOR_PERHIASAN_24K = 0.862;
 const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
+const GMT_PLUS_7_TIMEZONE = 'Asia/Jakarta';
+const GMT_PLUS_7_OFFSET_MINUTES = -7 * 60;
+let GMT_PLUS_7_FORMATTER;
 
 function getGmtPlus7DateString() {
   const now = new Date();
-  const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
-  const gmt7Time = new Date(utc + (3600000 * 7));
-  const year = gmt7Time.getUTCFullYear();
-  const month = String(gmt7Time.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(gmt7Time.getUTCDate()).padStart(2, '0');
+  if (typeof GMT_PLUS_7_FORMATTER === 'undefined') {
+    GMT_PLUS_7_FORMATTER = null;
+    if (typeof Intl === 'object' && typeof Intl.DateTimeFormat === 'function') {
+      try {
+        GMT_PLUS_7_FORMATTER = new Intl.DateTimeFormat('en-CA', {
+          timeZone: GMT_PLUS_7_TIMEZONE,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        });
+      } catch (err) {
+        GMT_PLUS_7_FORMATTER = null;
+      }
+    }
+  }
+
+  if (GMT_PLUS_7_FORMATTER) {
+    return GMT_PLUS_7_FORMATTER.format(now);
+  }
+
+  const offsetDiff = (GMT_PLUS_7_OFFSET_MINUTES - now.getTimezoneOffset()) * 60000;
+  const adjusted = new Date(now.getTime() + offsetDiff);
+  const year = adjusted.getUTCFullYear();
+  const month = String(adjusted.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(adjusted.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 }
 
 function getGlobalGoldEndpoints(dateStr) {
   const date = dateStr || getGmtPlus7DateString();
   return [
-    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/xau.json`,
-    `https://${date}.currency-api.pages.dev/v1/currencies/xau.json`,
     'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/xau.json',
-    'https://latest.currency-api.pages.dev/v1/currencies/xau.json'
+    'https://latest.currency-api.pages.dev/v1/currencies/xau.json',
+    `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${date}/v1/currencies/xau.json`,
+    `https://${date}.currency-api.pages.dev/v1/currencies/xau.json`
   ];
 }
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
@@ -2740,6 +2763,7 @@ async function fetchGlobalGoldSpot() {
   if (!GLOBAL_GOLD_SPOT_PROMISE) {
     GLOBAL_GOLD_SPOT_PROMISE = (async function() {
       let lastError = null;
+      let normalized = null;
       for (const endpoint of getGlobalGoldEndpoints()) {
         try {
           const response = await fetch(endpoint, {
@@ -2749,13 +2773,16 @@ async function fetchGlobalGoldSpot() {
             throw new Error('Gagal memuat harga dunia: ' + response.status);
           }
           const payload = await response.json();
-          const normalized = normalizeGlobalGoldPayload(payload);
+          normalized = normalizeGlobalGoldPayload(payload);
           GLOBAL_GOLD_SPOT_CACHE = normalized;
-          return normalized;
+          break;
         } catch (error) {
           lastError = error;
           console.warn('Gagal mengambil dari ' + endpoint + ', mencoba fallback...');
         }
+      }
+      if (normalized) {
+        return normalized;
       }
       throw lastError || new Error('Semua endpoint harga dunia gagal.');
     })();
