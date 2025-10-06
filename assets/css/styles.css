@@ -564,37 +564,64 @@ nav a {
   align-items: center;
   gap: .55rem;
   flex: 0 0 auto;
-  min-width: 0
+  min-width: 0;
+  position: relative
 }
 
 .mode-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: .32rem .62rem;
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  border: 0;
   border-radius: 999px;
   font-size: .72rem;
   font-weight: 600;
   letter-spacing: .01em;
-  color: rgba(244, 255, 253, .94);
-  background: rgba(255, 255, 255, .12);
-  border: 1px solid rgba(255, 255, 255, .24);
   line-height: 1.1;
   white-space: nowrap;
-  text-transform: none;
-  transition: background-color .2s ease, color .2s ease, border-color .2s ease
+  color: var(--ink);
+  background: var(--paper)
 }
 
-.mode-status[data-applied-mode="light"] {
-  color: #013D39;
-  background: rgba(255, 255, 255, .96);
-  border-color: rgba(1, 61, 57, .22)
+.mode-toggle button:focus-visible + .mode-status {
+  left: 50%;
+  top: calc(100% + .65rem);
+  width: auto;
+  height: auto;
+  padding: .35rem .7rem;
+  overflow: visible;
+  clip: auto;
+  clip-path: none;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 60
 }
 
-.mode-status[data-applied-mode="dark"] {
-  color: rgba(244, 255, 253, .95);
-  background: rgba(255, 255, 255, .14);
-  border-color: rgba(255, 255, 255, .26)
+@supports not selector(:focus-visible) {
+  .mode-toggle button:focus + .mode-status {
+    left: 50%;
+    top: calc(100% + .65rem);
+    width: auto;
+    height: auto;
+    padding: .35rem .7rem;
+    overflow: visible;
+    clip: auto;
+    clip-path: none;
+    border: 1px solid var(--border);
+    box-shadow: 0 12px 24px rgba(1, 33, 30, .2);
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 60
+  }
 }
 
 .header-search {
@@ -992,17 +1019,6 @@ nav a {
     flex-wrap: nowrap
   }
 
-  .mode-toggle {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .25rem
-  }
-
-  .mode-status {
-    font-size: .68rem;
-    padding: .28rem .56rem
-  }
-
   .header-search {
     margin-left: auto;
     position: static
@@ -1022,13 +1038,6 @@ nav a {
 
   .header-search.header-search--expanded .site-search {
     transform: translate(-50%, 0)
-  }
-}
-
-@media (max-width:480px) {
-  .mode-status {
-    white-space: normal;
-    text-align: left
   }
 }
 
