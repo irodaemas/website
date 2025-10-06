@@ -355,6 +355,157 @@ body {
   color: #fff !important;
 }
 
+.assurance-section {
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+.assurance-wrapper {
+  position: relative;
+  padding: clamp(2.4rem, 5vw, 3rem);
+  border-radius: calc(var(--radius) * 1.3);
+  background: linear-gradient(135deg, rgba(212, 175, 55, .14), rgba(12, 88, 79, .12));
+  border: 1px solid rgba(212, 175, 55, .18);
+  box-shadow: 0 24px 60px rgba(1, 61, 57, .15);
+  overflow: hidden;
+}
+
+.assurance-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at top right, rgba(255, 255, 255, .35), transparent 50%);
+  opacity: .6;
+}
+
+.assurance-header {
+  position: relative;
+  text-align: center;
+  margin-bottom: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.assurance-header .accent-title {
+  justify-content: center;
+}
+
+.assurance-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.2rem, 2.6vw, 1.8rem);
+}
+
+.assurance-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: start;
+  padding: clamp(1.6rem, 3vw, 1.9rem);
+  border-radius: calc(var(--radius) * .9);
+  background: var(--paper);
+  border: 1px solid var(--border);
+  box-shadow: 0 16px 32px rgba(1, 61, 57, .12);
+}
+
+.assurance-card h3 {
+  margin: 0 0 .4rem;
+  font-size: 1.15rem;
+}
+
+.assurance-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.assurance-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(140deg, rgba(255, 255, 255, .85), rgba(212, 175, 55, .38));
+  color: var(--deep);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 12px 20px rgba(1, 61, 57, .16);
+}
+
+.assurance-icon svg {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assurance-wrapper,
+  .assurance-card {
+    transition: none;
+  }
+}
+
+@media (hover: hover) {
+  .assurance-card {
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+
+  .assurance-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 44px rgba(1, 61, 57, .18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assurance-card:hover {
+    transform: none;
+  }
+}
+
+@media (max-width: 1024px) {
+  .assurance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .assurance-wrapper {
+    padding: 2rem 1.4rem;
+  }
+
+  .assurance-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .assurance-card {
+    grid-template-columns: minmax(0, 1fr);
+    text-align: left;
+  }
+
+  .assurance-icon {
+    margin-bottom: .8rem;
+  }
+}
+
+[data-theme="dark"] .assurance-wrapper {
+  background: linear-gradient(135deg, rgba(212, 175, 55, .12), rgba(4, 40, 37, .6));
+  border-color: rgba(212, 175, 55, .26);
+  box-shadow: 0 26px 60px rgba(0, 0, 0, .5);
+}
+
+[data-theme="dark"] .assurance-wrapper::after {
+  background: radial-gradient(circle at top right, rgba(212, 175, 55, .3), transparent 55%);
+}
+
+[data-theme="dark"] .assurance-card {
+  background: rgba(26, 31, 30, .95);
+  border-color: var(--border);
+  box-shadow: 0 18px 36px rgba(0, 0, 0, .45);
+}
+
+[data-theme="dark"] .assurance-icon {
+  background: linear-gradient(140deg, rgba(212, 175, 55, .25), rgba(212, 175, 55, .15));
+  color: var(--ink);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .08), 0 12px 24px rgba(0, 0, 0, .4);
+}
+
 .chip {
   display: inline-flex;
   align-items: center;
