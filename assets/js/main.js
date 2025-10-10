@@ -869,7 +869,7 @@ if (typeof window !== 'undefined') {
 })();
 
 // Harga emas: fetch + fallback + waktu W.I.B
-const PRICE_ADJUST_IDR = -20000;
+const PRICE_ADJUST_IDR = 0;
 const PRICE_TIMEOUT_MS = 5000;
 const LM_HISTORY_RANGE_CONFIG = {
   '7': {
@@ -905,11 +905,33 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.932;
-const FACTOR_LM_LAMA = 0.917;
-const PRICE_ADJUST_LM_IDR = -240000;
-const FACTOR_PERHIASAN_24K = 0.862;
-const FACTOR_PERHIASAN_SUB = 0.786;
+const FACTOR_LM_BARU = 0.805045098;
+const FACTOR_LM_LAMA = 0.790074478;
+const PRICE_ADJUST_LM_IDR = 0;
+const FACTOR_PERHIASAN_24K = 0.770986938;
+const PERHIASAN_KARAT_MULTIPLIERS = {
+  24: FACTOR_PERHIASAN_24K,
+  23: 0.672555110,
+  22: 0.645233728,
+  21: 0.618286612,
+  20: 0.590965230,
+  19: 0.563269583,
+  18: 0.536696732,
+  17: 0.509001085,
+  16: 0.481679703,
+  15: 0.428534002,
+  14: 0.400838354,
+  13: 0.373516972,
+  12: 0.346569856,
+  11: 0.319248474,
+  10: 0.291552827,
+  9: 0.264979976,
+  8: 0.237284329,
+  7: 0.209962947,
+  6: 0.183015831,
+  5: 0.155320184
+};
+const DEFAULT_BASE_PRICE = 2671900;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 
@@ -980,8 +1002,16 @@ const GOLD_KARAT_SERIES = [{
     purity: 0.5833
   },
   {
+    karat: 13,
+    purity: 0.5417
+  },
+  {
     karat: 12,
     purity: 0.5
+  },
+  {
+    karat: 11,
+    purity: 0.4583
   },
   {
     karat: 10,
@@ -994,6 +1024,10 @@ const GOLD_KARAT_SERIES = [{
   {
     karat: 8,
     purity: 0.3333
+  },
+  {
+    karat: 7,
+    purity: 0.2917
   },
   {
     karat: 6,
@@ -1253,75 +1287,87 @@ const GOLD_UNIT_DEFS = [{
   }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 1916000,
-  lmLama: 1886000,
+  lmBaru: 2151000,
+  lmLama: 2111000,
   perhiasan: [{
       karat: 24,
-      price: 1776000
+      price: 2060000
     },
     {
       karat: 23,
-      price: 1558000
+      price: 1797000
     },
     {
       karat: 22,
-      price: 1493000
+      price: 1724000
     },
     {
       karat: 21,
-      price: 1427000
+      price: 1652000
     },
     {
       karat: 20,
-      price: 1361000
+      price: 1579000
     },
     {
       karat: 19,
-      price: 1296000
+      price: 1505000
     },
     {
       karat: 18,
-      price: 1230000
+      price: 1434000
     },
     {
       karat: 17,
-      price: 1165000
+      price: 1360000
     },
     {
       karat: 16,
-      price: 1099000
+      price: 1287000
     },
     {
       karat: 15,
-      price: 1034000
+      price: 1145000
     },
     {
       karat: 14,
-      price: 968000
+      price: 1071000
+    },
+    {
+      karat: 13,
+      price: 998000
     },
     {
       karat: 12,
-      price: 837000
+      price: 926000
+    },
+    {
+      karat: 11,
+      price: 853000
     },
     {
       karat: 10,
-      price: 706000
+      price: 779000
     },
     {
       karat: 9,
-      price: 640000
+      price: 708000
     },
     {
       karat: 8,
-      price: 575000
+      price: 634000
+    },
+    {
+      karat: 7,
+      price: 561000
     },
     {
       karat: 6,
-      price: 444000
+      price: 489000
     },
     {
       karat: 5,
-      price: 378000
+      price: 415000
     }
   ]
 };
@@ -1460,11 +1506,11 @@ function roundUpPrice(n, step) {
 }
 
 function computeLmBaruPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_LM_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_BARU);
 }
 
 function computeLmLamaPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_LM_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_LAMA);
 }
 
 function safeNumber(v) {
@@ -2542,17 +2588,34 @@ function extractPreviousBase(data, currentBase) {
   return null;
 }
 
+function getPerhiasanMultiplier(karat) {
+  var numeric = Number(karat);
+  if (!Number.isFinite(numeric)) return null;
+  if (Object.prototype.hasOwnProperty.call(PERHIASAN_KARAT_MULTIPLIERS, numeric)) {
+    return PERHIASAN_KARAT_MULTIPLIERS[numeric];
+  }
+  return null;
+}
+
+function getMultiplierForCategory(catValue, karat) {
+  if (catValue === 'lm_baru') return FACTOR_LM_BARU;
+  if (catValue === 'lm_lama') return FACTOR_LM_LAMA;
+  if (catValue === 'perhiasan_24') return PERHIASAN_KARAT_MULTIPLIERS[24];
+  var perhiasanMultiplier = getPerhiasanMultiplier(karat);
+  return typeof perhiasanMultiplier === 'number' ? perhiasanMultiplier : null;
+}
+
 function buildPerhiasanPricesFromBase(basePrice) {
   return GOLD_KARAT_SERIES.map(function(entry) {
-    var factor = entry.karat === 24 ? FACTOR_PERHIASAN_24K : FACTOR_PERHIASAN_SUB;
-    var adjustment = entry.karat === 24 ? PRICE_ADJUST_LM_IDR : PRICE_ADJUST_IDR;
-    var harga = roundUpPrice(basePrice * entry.purity * factor + adjustment);
+    var multiplier = getPerhiasanMultiplier(entry.karat);
+    if (typeof multiplier !== 'number') return null;
+    var harga = roundUpPrice(basePrice * multiplier);
     return {
       karat: entry.karat,
       price: harga,
       infoKey: 'karat-' + entry.karat
     };
-  });
+  }).filter(Boolean);
 }
 
 function renderPriceTable(rows) {
@@ -3569,7 +3632,7 @@ async function fetchGoldPrice() {
 }
 
 function displayDefaultPrices() {
-  var approxBase = (DEFAULT_PRICE_TABLE.lmBaru - PRICE_ADJUST_LM_IDR) / FACTOR_LM_BARU;
+  var approxBase = DEFAULT_BASE_PRICE;
   REI_LAST_BASE_P = approxBase;
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) highlightCard.setAttribute('aria-busy', 'false');
@@ -3924,10 +3987,6 @@ window.addEventListener('resize', function() {
     return String(rounded);
   }
 
-  function purityFromK(k) {
-    return Math.max(0, Math.min(1, Number(k || 24) / 24));
-  }
-
   function labelCat(c) {
     switch (c) {
       case 'lm_baru':
@@ -3959,25 +4018,11 @@ window.addEventListener('resize', function() {
     }
     var g = Math.max(0, Number(beratValue || 0));
     g = Math.round(g * 100) / 100;
-    var FACTOR_LM_BARU = 0.932;
-    var FACTOR_LM_LAMA = 0.917;
-    var FACTOR_24K = 0.862;
-    var FACTOR_SUB = 0.786;
-    var ADJ_LM = PRICE_ADJUST_LM_IDR;
-    var ADJ_PERHIASAN = PRICE_ADJUST_IDR;
-    var perGram;
-    if (c === 'lm_baru') {
-      perGram = ceilStep(base * FACTOR_LM_BARU + ADJ_LM);
+    var multiplier = getMultiplierForCategory(c, k);
+    if (c === 'lm_baru' || c === 'lm_lama' || c === 'perhiasan_24') {
       k = 24;
-    } else if (c === 'lm_lama') {
-      perGram = ceilStep(base * FACTOR_LM_LAMA + ADJ_LM);
-      k = 24;
-    } else if (c === 'perhiasan_24') {
-      perGram = ceilStep(base * FACTOR_24K + ADJ_LM);
-      k = 24;
-    } else {
-      perGram = ceilStep(base * FACTOR_SUB * purityFromK(k) + ADJ_PERHIASAN);
     }
+    var perGram = typeof multiplier === 'number' ? ceilStep(base * multiplier, 1000) : 0;
     var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
     return {
       cat: c,
