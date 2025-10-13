@@ -107,7 +107,7 @@ The Jest suite runs in a jsdom environment and covers search behaviour, calculat
 ## Maintenance Tips
 
 ### Updating price data sources
-- `assets/js/main.js` -> `fetchGoldPrice()` queries `https://pluang.com/api/asset/gold/pricing`. Adjust `LM_HISTORY_DAYS_LIMIT` or replace the endpoint here if your provider changes.
+- `assets/js/main.js` -> `fetchGoldPrice()` queries `https://data-asg.goldprice.org/dbXRates/IDR`. If the provider changes, update the endpoint and CSP `connect-src` whitelist accordingly.
 - Global spot prices rely on `getGlobalGoldEndpoints()` which currently targets CDN Currency API variants. Add or reorder endpoints to fine-tune fallback behaviour.
 - When schemas or response shapes change, update the normaliser helpers (`normalizeGlobalGoldPayload`, `prepareLmBaruHistorySeries`) and extend the Jest tests to lock in the expected shape.
 

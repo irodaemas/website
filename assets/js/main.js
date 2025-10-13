@@ -877,12 +877,6 @@ const LM_HISTORY_RANGE_CONFIG = {
     days: 7,
     label: '7 hari terakhir',
     displayLabel: '7 Hari Terakhir'
-  },
-  '30': {
-    key: '30',
-    days: 30,
-    label: '30 hari terakhir',
-    displayLabel: '30 Hari Terakhir'
   }
 };
 const LM_HISTORY_DEFAULT_RANGE_KEY = '7';
@@ -905,33 +899,33 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.805045098;
-const FACTOR_LM_LAMA = 0.790074478;
+const FACTOR_LM_BARU = 0.999472431;
+const FACTOR_LM_LAMA = 0.986146126;
 const PRICE_ADJUST_LM_IDR = 0;
-const FACTOR_PERHIASAN_24K = 0.770986938;
+const FACTOR_PERHIASAN_24K = 0.964548321;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
-  23: 0.672555110,
-  22: 0.645233728,
-  21: 0.618286612,
-  20: 0.590965230,
-  19: 0.563269583,
-  18: 0.536696732,
-  17: 0.509001085,
-  16: 0.481679703,
-  15: 0.428534002,
-  14: 0.400838354,
-  13: 0.373516972,
-  12: 0.346569856,
-  11: 0.319248474,
-  10: 0.291552827,
-  9: 0.264979976,
-  8: 0.237284329,
-  7: 0.209962947,
-  6: 0.183015831,
-  5: 0.155320184
+  23: 0.849666379,
+  22: 0.815661325,
+  21: 0.782575326,
+  20: 0.748570271,
+  19: 0.714565216,
+  18: 0.681938745,
+  17: 0.647933690,
+  16: 0.614388163,
+  15: 0.542701832,
+  14: 0.509156305,
+  13: 0.475151250,
+  12: 0.442065251,
+  11: 0.408060196,
+  10: 0.374514670,
+  9: 0.341428670,
+  8: 0.307423616,
+  7: 0.273418561,
+  6: 0.240332562,
+  5: 0.207246563
 };
-const DEFAULT_BASE_PRICE = 2671900;
+const DEFAULT_BASE_PRICE = 2176000;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 
@@ -1809,6 +1803,19 @@ function setActiveSparklineRange(rangeKey, metaOptions) {
     rangeConfig: config
   });
   updateLmBaruSparkline(LM_BARU_PRICE_SERIES, options);
+}
+
+function pruneUnavailableRangeButtons() {
+  var toggle = document.getElementById('lmBaruRangeToggle');
+  if (!toggle) return;
+  var buttons = toggle.querySelectorAll('button[data-range]');
+  Array.prototype.forEach.call(buttons, function(button) {
+    var key = (button.getAttribute('data-range') || '').trim();
+    if (!key) return;
+    if (!Object.prototype.hasOwnProperty.call(LM_HISTORY_RANGE_CONFIG, key)) {
+      button.parentNode && button.parentNode.removeChild(button);
+    }
+  });
 }
 
 function setupHighlightRangeControls() {
@@ -3574,54 +3581,62 @@ function handleGoldPriceFallback(summarySuffix, fallbackSummary) {
   }
 }
 
+function computeBasePriceFromSpot(perGramSpot) {
+  var spot = safeNumber(perGramSpot);
+  if (spot === null || spot <= 0) return null;
+  return spot;
+}
+
 async function fetchGoldPrice() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
-    const response = await fetch(`https://pluang.com/api/asset/gold/pricing?daysLimit=${LM_HISTORY_DAYS_LIMIT}`, {
-      signal: ctl.signal
+    const response = await fetch('https://data-asg.goldprice.org/dbXRates/IDR', {
+      signal: ctl.signal,
+      cache: 'no-store'
     });
-    const data = await response.json();
-    if (data && data.statusCode === 200 && data.data && data.data.current) {
-      const currentBase = safeNumber(data.data.current.buy);
-      if (currentBase !== null) {
-        let previousBase = extractPreviousBase(data.data, currentBase);
-        const updatedAt = resolveEntryTime(data.data.current) || new Date();
-        const historySeries = prepareLmBaruHistorySeries(data.data, currentBase, LM_HISTORY_DAYS_LIMIT);
-        const pair = findLmBaruSeriesPair(historySeries, currentBase);
-        let previousPrice = null;
-        if (pair.previous && typeof pair.previous.base === 'number') {
-          previousBase = pair.previous.base;
-          previousPrice = pair.previous.price;
-        } else if (Number.isFinite(previousBase)) {
-          previousPrice = computeLmBaruPrice(previousBase);
-        }
-        REI_LAST_BASE_P = currentBase;
-        saveLastBasePrice(currentBase);
-        if (Array.isArray(historySeries)) {
-          resetRangeSeriesCache(historySeries);
-          if (historySeries.length >= 2) {
-            saveLastSparklineSeries(historySeries);
-          }
-        } else {
-          resetRangeSeriesCache([]);
-        }
-        LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE].slice();
-        const displayOptions = {
-          updatedAt: updatedAt
-        };
-        if (Number.isFinite(previousBase)) displayOptions.previousBase = previousBase;
-        if (Number.isFinite(previousPrice)) displayOptions.previousPrice = Math.round(previousPrice);
-        displayFromBasePrice(currentBase, displayOptions);
-        var sparklineOptions = {};
-        if (!Array.isArray(historySeries) || historySeries.length < 2) {
-          sparklineOptions.fallbackText = 'Riwayat harga belum tersedia dari penyedia data.';
-        }
-        setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, sparklineOptions);
-        return;
-      }
+    if (!response.ok) {
+      throw new Error('Gagal memuat harga emas: ' + response.status);
     }
-    handleGoldPriceFallback('Menggunakan riwayat harga yang tersimpan dari cache.', 'Grafik riwayat tidak tersedia karena respons layanan tidak lengkap.');
+    const payload = await response.json();
+    const items = Array.isArray(payload && payload.items) ? payload.items : [];
+    const entry = items.find(function(item) {
+      return item && item.curr === 'IDR';
+    }) || items[0];
+    if (!entry) {
+      throw new Error('Data harga emas tidak ditemukan.');
+    }
+    const perOunce = safeNumber(entry.xauPrice);
+    if (perOunce === null || perOunce <= 0) {
+      throw new Error('Harga emas tidak valid.');
+    }
+    const perGram = perOunce / TROY_OUNCE_IN_GRAMS;
+    const currentBase = computeBasePriceFromSpot(perGram);
+    if (currentBase === null) {
+      throw new Error('Gagal menghitung harga dasar.');
+    }
+    const closeOunce = safeNumber(entry.xauClose);
+    const closePerGram = closeOunce !== null && closeOunce > 0 ? closeOunce / TROY_OUNCE_IN_GRAMS : null;
+    const previousBase = closePerGram !== null ? computeBasePriceFromSpot(closePerGram) : null;
+    const updatedAt = resolveDate(payload.tsj || payload.ts || payload.date) || new Date();
+
+    REI_LAST_BASE_P = currentBase;
+    saveLastBasePrice(currentBase);
+    resetRangeSeriesCache([]);
+    LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE].slice();
+
+    const displayOptions = {
+      updatedAt: updatedAt
+    };
+    if (Number.isFinite(previousBase)) {
+      displayOptions.previousBase = previousBase;
+    }
+    displayFromBasePrice(currentBase, displayOptions);
+    setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, {
+      fallbackText: 'Riwayat harga belum tersedia untuk sumber data ini.',
+      summaryText: 'Riwayat harga belum tersedia untuk sumber data ini.'
+    });
+    return;
   } catch (err) {
     /* istanbul ignore next */
     console.warn('Harga gagal dimuat, pakai default:', err?.name || err);
@@ -3694,6 +3709,7 @@ function shouldFetchGoldPrice() {
 function shouldFetchGlobalGoldPrice() {
   return !!(document.getElementById('globalGoldPriceCard') || document.getElementById('globalGoldPriceTable'));
 }
+pruneUnavailableRangeButtons();
 setupHighlightRangeControls();
 if (shouldFetchGoldPrice()) {
   fetchGoldPrice();
