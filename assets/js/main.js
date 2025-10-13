@@ -899,6 +899,8 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
+const LM_PRICE_HISTORY_KEY = 'rei_lm_history_base_v1';
+const LM_PRICE_HISTORY_LIMIT = 7;
 const FACTOR_LM_BARU = 0.999472431;
 const FACTOR_LM_LAMA = 0.986146126;
 const PRICE_ADJUST_LM_IDR = 0;
@@ -1407,6 +1409,46 @@ function saveLastSparklineSeries(series) {
       localStorage.removeItem(LAST_SERIES_KEY);
     }
   } catch (_) {}
+}
+
+function readStoredBaseHistory() {
+  try {
+    var raw = localStorage.getItem(LM_PRICE_HISTORY_KEY);
+    if (!raw) return {};
+    var parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (_) {
+    return {};
+  }
+}
+
+function writeStoredBaseHistory(map) {
+  try {
+    if (!map || !Object.keys(map).length) {
+      localStorage.removeItem(LM_PRICE_HISTORY_KEY);
+    } else {
+      localStorage.setItem(LM_PRICE_HISTORY_KEY, JSON.stringify(map));
+    }
+  } catch (_) {}
+}
+
+function trimStoredBaseHistory(map, limit) {
+  if (!map) return {};
+  var keys = Object.keys(map).sort();
+  if (keys.length <= limit) return map;
+  var trimmed = {};
+  keys.slice(keys.length - limit).forEach(function(key) {
+    trimmed[key] = map[key];
+  });
+  return trimmed;
+}
+
+function getDateKeyFromDate(date) {
+  if (!(date instanceof Date) || isNaN(date.getTime())) return null;
+  var year = date.getFullYear();
+  var month = String(date.getMonth() + 1).padStart(2, '0');
+  var day = String(date.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
 }
 
 function readLastSparklineSeries() {
@@ -3591,6 +3633,22 @@ async function fetchGoldPrice() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
+    let pluangData = null;
+    try {
+      const pluangResp = await fetch(`https://pluang.com/api/asset/gold/pricing?daysLimit=${LM_HISTORY_DAYS_LIMIT}`, {
+        signal: ctl.signal
+      });
+      if (pluangResp.ok) {
+        pluangData = await pluangResp.json();
+      } else {
+        console.warn('Gagal memuat riwayat dari Pluang:', pluangResp.status);
+      }
+    } catch (pluangErr) {
+      if (pluangErr?.name !== 'AbortError') {
+        console.warn('Riwayat Pluang tidak tersedia:', pluangErr?.message || pluangErr);
+      }
+    }
+
     const response = await fetch('https://data-asg.goldprice.org/dbXRates/IDR', {
       signal: ctl.signal,
       cache: 'no-store'
@@ -3615,14 +3673,88 @@ async function fetchGoldPrice() {
     if (currentBase === null) {
       throw new Error('Gagal menghitung harga dasar.');
     }
+
     const closeOunce = safeNumber(entry.xauClose);
     const closePerGram = closeOunce !== null && closeOunce > 0 ? closeOunce / TROY_OUNCE_IN_GRAMS : null;
-    const previousBase = closePerGram !== null ? computeBasePriceFromSpot(closePerGram) : null;
+    let previousBase = closePerGram !== null ? computeBasePriceFromSpot(closePerGram) : null;
+    let previousPrice = Number.isFinite(previousBase) ? Math.round(computeLmBaruPrice(previousBase)) : null;
     const updatedAt = resolveDate(payload.tsj || payload.ts || payload.date) || new Date();
+    const todayKey = getDateKeyFromDate(updatedAt);
+
+    var storedHistory = readStoredBaseHistory();
+    var updatedHistory = Object.assign({}, storedHistory);
+
+    let historySeries = [];
+    if (pluangData && pluangData.statusCode === 200 && pluangData.data) {
+      const pluangCurrentBase = safeNumber(pluangData.data.current && pluangData.data.current.buy);
+      let ratio = 1;
+      if (Number.isFinite(pluangCurrentBase) && pluangCurrentBase > 0 && Number.isFinite(currentBase) && currentBase > 0) {
+        ratio = currentBase / pluangCurrentBase;
+      }
+      const prepared = prepareLmBaruHistorySeries(pluangData.data, pluangCurrentBase, LM_HISTORY_DAYS_LIMIT);
+      if (Array.isArray(prepared) && prepared.length) {
+        historySeries = prepared.map(function(point) {
+          if (!point || typeof point.base !== 'number' || !isFinite(point.base)) return point;
+          var normalizedBase = ratio === 1 ? point.base : point.base * ratio;
+          var timeKey = null;
+          if (point.time instanceof Date && !isNaN(point.time.getTime())) {
+            timeKey = getDateKeyFromDate(point.time);
+          }
+          if (timeKey) {
+            if (Object.prototype.hasOwnProperty.call(storedHistory, timeKey)) {
+              var storedBase = storedHistory[timeKey];
+              if (typeof storedBase === 'number' && isFinite(storedBase)) {
+                normalizedBase = storedBase;
+              }
+            } else if (typeof normalizedBase === 'number' && isFinite(normalizedBase)) {
+              updatedHistory[timeKey] = normalizedBase;
+            }
+          }
+          return Object.assign({}, point, {
+            base: normalizedBase,
+            price: computeLmBaruPrice(normalizedBase)
+          });
+        });
+        const pair = findLmBaruSeriesPair(historySeries, currentBase);
+        if (pair.previous && typeof pair.previous.base === 'number') {
+          previousBase = pair.previous.base;
+          previousPrice = Math.round(pair.previous.price);
+        }
+      }
+    }
 
     REI_LAST_BASE_P = currentBase;
     saveLastBasePrice(currentBase);
-    resetRangeSeriesCache([]);
+
+    if ((!Array.isArray(historySeries) || !historySeries.length) && storedHistory && Object.keys(storedHistory).length) {
+      var fallbackKeys = Object.keys(storedHistory).sort();
+      if (fallbackKeys.length) {
+        var limitConfig = getRangeConfig(LM_BARU_ACTIVE_RANGE);
+        var desired = limitConfig && typeof limitConfig.days === 'number' ? limitConfig.days : LM_HISTORY_DAYS_LIMIT;
+        if (desired > 0 && fallbackKeys.length > desired) {
+          fallbackKeys = fallbackKeys.slice(fallbackKeys.length - desired);
+        }
+        historySeries = fallbackKeys.map(function(key) {
+          var baseValue = storedHistory[key];
+          if (typeof baseValue !== 'number' || !isFinite(baseValue)) return null;
+          var timeValue = resolveDate(key + 'T00:00:00');
+          return {
+            base: baseValue,
+            price: computeLmBaruPrice(baseValue),
+            time: timeValue instanceof Date && !isNaN(timeValue.getTime()) ? timeValue : null
+          };
+        }).filter(Boolean);
+      }
+    }
+
+    if (Array.isArray(historySeries) && historySeries.length) {
+      resetRangeSeriesCache(historySeries);
+      if (historySeries.length >= 2) {
+        saveLastSparklineSeries(historySeries);
+      }
+    } else {
+      resetRangeSeriesCache([]);
+    }
     LM_BARU_PRICE_SERIES = LM_BARU_SERIES_BY_RANGE[LM_BARU_ACTIVE_RANGE].slice();
 
     const displayOptions = {
@@ -3631,11 +3763,24 @@ async function fetchGoldPrice() {
     if (Number.isFinite(previousBase)) {
       displayOptions.previousBase = previousBase;
     }
+    if (Number.isFinite(previousPrice)) {
+      displayOptions.previousPrice = previousPrice;
+    }
     displayFromBasePrice(currentBase, displayOptions);
-    setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, {
-      fallbackText: 'Riwayat harga belum tersedia untuk sumber data ini.',
-      summaryText: 'Riwayat harga belum tersedia untuk sumber data ini.'
-    });
+
+    if (todayKey && Number.isFinite(currentBase)) {
+      updatedHistory[todayKey] = currentBase;
+    }
+    writeStoredBaseHistory(trimStoredBaseHistory(updatedHistory, LM_PRICE_HISTORY_LIMIT));
+
+    if (Array.isArray(historySeries) && historySeries.length >= 2) {
+      setActiveSparklineRange(LM_BARU_ACTIVE_RANGE);
+    } else {
+      setActiveSparklineRange(LM_BARU_ACTIVE_RANGE, {
+        fallbackText: 'Riwayat harga belum tersedia untuk sumber data ini.',
+        summaryText: 'Riwayat harga belum tersedia untuk sumber data ini.'
+      });
+    }
     return;
   } catch (err) {
     /* istanbul ignore next */

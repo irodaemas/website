@@ -75,7 +75,6 @@ describe('main.js behaviours', () => {
           <div class="price-highlight-controls">
             <div id="lmBaruRangeToggle" class="price-range-toggle" role="group" aria-label="Rentang riwayat harga">
               <button type="button" class="price-range-btn is-active" data-range="7" aria-pressed="true">7 Hari</button>
-              <button type="button" class="price-range-btn" data-range="30" aria-pressed="false">30 Hari</button>
             </div>
             <span id="lmBaruTrendBadge" class="price-badge price-neutral">Menunggu</span>
           </div>
