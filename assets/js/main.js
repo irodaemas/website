@@ -3372,27 +3372,6 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
     });
   }
 
-  var KADAR_MAPPING = {
-    24: "99,9",
-    23: "95",
-    22: "91,6",
-    21: "87,5",
-    20: "85",
-    19: "80",
-    18: "75",
-    17: "75",
-    16: "70",
-    15: "65",
-    14: "58,5",
-    13: "50",
-    12: "45",
-    10: "42",
-    9:  "42",
-    8:  "37,5",
-    6:  "30",
-    5:  "25"
-  };
-
   (perhiasanEntries || []).forEach(function(entry) {
     var karatNum = entry.karat ? Number(entry.karat) : null;
     var iconType = 'jewelry';
@@ -3403,22 +3382,14 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       iconTitle = 'Perhiasan kadar menengah';
     }
     var catValue = karatNum === 24 ? 'perhiasan_24' : 'perhiasan_sub';
-      var kadarNumeric = null;
-    if (karatNum) {
-      if (KADAR_MAPPING.hasOwnProperty(karatNum)) {
-        kadarNumeric = KADAR_MAPPING[karatNum];
-      } else {
-        kadarNumeric = Number(((karatNum / 24) * 100).toFixed(2));
-      }
-    }
 
-    var kadarLabel = kadarNumeric !== null ? `(${kadarNumeric})` : '';
-
-    var label = `${entry.karat}K ${kadarLabel}`
+    var label = `${entry.karat}K`
     if (entry.karat == 18) {
-      label = `18K/17K (75)`
+      label = `18K/17K`
     } else if (entry.karat == 10) {
-      label = `10K/9K (24)`
+      label = `10K/9K`
+    } else if (entry.karat == 24){
+      label = `24K (99,9)`
     }
 
     rows.push({
