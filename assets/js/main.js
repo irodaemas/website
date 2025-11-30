@@ -922,15 +922,13 @@ const GOLD_KARAT_SERIES = [
   { karat: 21, purity: 0.9181976487010781 },
   { karat: 20, purity: 0.881469742753035  },
   { karat: 19, purity: 0.8263778838309703 },
-  { karat: 18, purity: 0.7502986500814524 },
-  { karat: 17, purity: 0.708323900426546  },
+  { karat: 18, purity: 0.7791562904692005 },
   { karat: 16, purity: 0.7319346971074309 },
   { karat: 15, purity: 0.6705466257371302 },
   { karat: 14, purity: 0.5551160641861376 },
   { karat: 13, purity: 0.525733739427703  },
   { karat: 12, purity: 0.5141906832726038 },
-  { karat: 10, purity: 0.4171240746956326 },
-  { karat: 9,  purity: 0.3751493250407262 },
+  { karat: 10, purity: 0.4118772309887693 },
   { karat: 8,  purity: 0.3594087939201363 },
   { karat: 6,  purity: 0.28595298202405006},
   { karat: 5,  purity: 0.23610796680884866} 
@@ -990,7 +988,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-23': {
     title: 'Perhiasan 23K',
-    meta: 'Kemurnian ±95,8% • Favorit perhiasan tradisional',
+    meta: 'Kemurnian ±95% • Favorit perhiasan tradisional',
     description: 'Kadar 23K banyak dipakai untuk gelang dan cincin adat karena warnanya tetap kuning pekat namun lebih kokoh dari 24K.',
     tips: [
       'Cek stempel 950/23K di bagian dalam perhiasan.',
@@ -1000,7 +998,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-22': {
     title: 'Perhiasan 22K',
-    meta: 'Kemurnian ±91,7% • Umum untuk perhiasan sehari-hari',
+    meta: 'Kemurnian ±91,6% • Umum untuk perhiasan sehari-hari',
     description: 'Kadar 22K menawarkan keseimbangan antara warna pekat dan ketahanan. Banyak ditemukan pada gelang rantai, kalung, dan cincin kawin.',
     tips: [
       'Perlihatkan cap 916/22K jika masih jelas.',
@@ -1020,7 +1018,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-20': {
     title: 'Perhiasan 20K',
-    meta: 'Kemurnian ±83,3% • Warna emas agak muda',
+    meta: 'Kemurnian ±85% • Warna emas agak muda',
     description: 'Kadar 20K sering ditemui pada perhiasan impor atau desain lama. Campuran logam tambahan memberi kekuatan namun mengurangi kilau kuning pekat.',
     tips: [
       'Lampirkan surat toko apabila masih ada untuk mengonfirmasi kadar.',
@@ -1030,7 +1028,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-19': {
     title: 'Perhiasan 19K',
-    meta: 'Kemurnian ±79,1% • Campuran logam tinggi',
+    meta: 'Kemurnian ±80% • Campuran logam tinggi',
     description: 'Kadar 19K relatif jarang namun tetap beredar pada koleksi lawas. Warna emas cenderung pucat dengan sedikit kilau kehijauan.',
     tips: [
       'Beritahu jika perhiasan pernah dilapisi ulang untuk memperkuat warna.',
@@ -1039,28 +1037,18 @@ const GOLD_INFO_CONTENT = {
     ]
   },
   'karat-18': {
-    title: 'Perhiasan 18K',
+    title: 'Perhiasan 18K/17K',
     meta: 'Kemurnian ±75% • Standar butik & brand global',
-    description: 'Perhiasan 18K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
+    description: 'Perhiasan 18K/17K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
     tips: [
       'Cantumkan merek/bukti pembelian bila berasal dari butik ternama.',
       'Periksa baut atau clasp agar tidak longgar saat penimbangan.',
       'Untuk cincin berlian, informasikan karat batu jika ingin dihitung terpisah.'
     ]
   },
-  'karat-17': {
-    title: 'Perhiasan 17K',
-    meta: 'Kemurnian ±70,8% • Banyak dijumpai pada perhiasan rumahan',
-    description: 'Campuran logam lebih tinggi membuat 17K cukup tahan banting dan berwarna kuning muda. Umum dipakai untuk kalung dan gelang harian.',
-    tips: [
-      'Jika ada bekas patri, sebutkan agar penaksir tahu bagian mana yang diperbaiki.',
-      'Bersihkan minyak atau lotion yang menempel sebelum pengecekan.',
-      'Simpan dalam kantong terpisah agar tidak tergores aksesoris lain.'
-    ]
-  },
   'karat-16': {
     title: 'Perhiasan 16K',
-    meta: 'Kemurnian ±66,7% • Warna keemasan lebih lembut',
+    meta: 'Kemurnian ±70% • Warna keemasan lebih lembut',
     description: 'Perhiasan 16K kerap dijadikan aksesori fashion dengan harga terjangkau namun tetap memuat kandungan emas signifikan.',
     tips: [
       'Ingatkan tim jika terdapat cat/lapisan tambahan di permukaan.',
@@ -1070,7 +1058,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-15': {
     title: 'Perhiasan 15K',
-    meta: 'Kemurnian ±62,5% • Biasanya buatan lama atau impor',
+    meta: 'Kemurnian ±65% • Biasanya buatan lama atau impor',
     description: 'Kadar 15K tidak lagi diproduksi massal namun masih ditemukan pada koleksi warisan. Warna condong kuning pucat dengan campuran perak tinggi.',
     tips: [
       'Sampaikan jika ingin menjual logam saja atau termasuk batu hias.',
@@ -1080,7 +1068,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-14': {
     title: 'Perhiasan 14K',
-    meta: 'Kemurnian ±58,3% • Favorit cincin tunangan',
+    meta: 'Kemurnian ±58,5% • Favorit cincin tunangan',
     description: 'Kadar 14K populer karena kuat, tidak mudah berubah warna, dan aman untuk pemakaian sehari-hari. Sering dipakai brand internasional dengan batu berlian.',
     tips: [
       'Bawa kartu garansi/asli brand bila tersedia.',
@@ -1088,10 +1076,21 @@ const GOLD_INFO_CONTENT = {
       'Pastikan screw/baut anting tidak hilang untuk menjaga nilai.'
     ]
   },
+  'karat-13': {
+    title: 'Perhiasan 13K',
+    meta: 'Kemurnian ±50% • Campuran logam cukup tinggi',
+    description: 'Perhiasan 13K tidak terlalu umum di pasaran. Biasanya berasal dari perhiasan impor atau koleksi lama. Kandungan emasnya berada di kisaran menengah sehingga tetap perlu uji kadar untuk memastikan nilainya.',
+    tips: [
+      'Sebutkan jika perhiasan pernah dipoles atau dilapis ulang.',
+      'Jika ada batu tambahan, informasikan untuk memudahkan proses penimbangan.',
+      'Pastikan perhiasan bersih dari lotion atau minyak agar uji kadar lebih akurat.'
+    ]
+  },
+
   'karat-12': {
     title: 'Perhiasan 12K',
-    meta: 'Kemurnian ±50% • Campuran logam hampir setengah',
-    description: 'Perhiasan 12K sering berupa fashion jewelry lama. Kandungan emasnya masih bernilai, namun uji kadar wajib dilakukan untuk kepastian.',
+    meta: 'Kemurnian ±45% • Campuran logam hampir setengah',
+    description: 'Perhiasan 12K banyak ditemukan pada fashion jewelry lama. Meski kadar emasnya rendah, tetap memiliki nilai dan memerlukan uji kadar untuk memastikan kandungan pastinya.',
     tips: [
       'Beritahu jika warna sudah memudar atau pernah dilapis ulang.',
       'Pisahkan rantai tipis agar tidak kusut ketika diukur.',
@@ -1099,28 +1098,18 @@ const GOLD_INFO_CONTENT = {
     ]
   },
   'karat-10': {
-    title: 'Perhiasan 10K',
-    meta: 'Kemurnian ±41,6% • Umum di pasar Amerika',
-    description: 'Kadar 10K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
+    title: 'Perhiasan 10K/9K',
+    meta: 'Kemurnian ±42% • Umum di pasar Amerika',
+    description: 'Kadar 10K/9K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
     tips: [
       'Bawa bukti pembelian luar negeri jika ada untuk mempercepat verifikasi.',
       'Warna pucat adalah normal karena campuran tembaga/perak cukup tinggi.',
       'Jika terdapat batu besar, siapkan assessment khusus untuk memperhitungkan nilainya.'
     ]
   },
-  'karat-9': {
-    title: 'Perhiasan 9K',
-    meta: 'Kemurnian ±37,5% • Kandungan emas rendah',
-    description: 'Perhiasan 9K termasuk kategori emas muda dengan kandungan emas di bawah 40%. Nilai buyback fokus pada berat bersih emas setelah dikurangi campuran.',
-    tips: [
-      'Harapkan proses uji kadar lebih intensif untuk memastikan kandungan emas.',
-      'Sampaikan bila terdapat bagian berlapis rhodium atau coating lain.',
-      'Kemas rapi agar detail ornamen tidak rusak saat transportasi.'
-    ]
-  },
   'karat-8': {
     title: 'Perhiasan 8K',
-    meta: 'Kemurnian ±33,3% • Lebih mirip logam campuran',
+    meta: 'Kemurnian ±37,5% • Lebih mirip logam campuran',
     description: 'Dengan kandungan emas sepertiga, perhiasan 8K sering dijual sebagai fashion jewelry. Buyback menilai kandungan emas bersih melalui uji kadar.',
     tips: [
       'Beritahu jika produk awalnya dijual sebagai gold-filled atau gold-plated.',
@@ -1130,7 +1119,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-6': {
     title: 'Perhiasan 6K',
-    meta: 'Kemurnian ±25% • Biasanya warisan lama',
+    meta: 'Kemurnian ±30% • Biasanya warisan lama',
     description: '6K memiliki kandungan emas seperempat. Banyak ditemukan pada koleksi antik yang telah melewati generasi.',
     tips: [
       'Sertakan cerita asal-usul jika ada; membantu menilai potensi nilai koleksi.',
@@ -1140,7 +1129,7 @@ const GOLD_INFO_CONTENT = {
   },
   'karat-5': {
     title: 'Perhiasan 5K',
-    meta: 'Kemurnian ±20,8% • Konten emas sangat rendah',
+    meta: 'Kemurnian ±25% • Konten emas sangat rendah',
     description: 'Perhiasan 5K lebih banyak terdiri dari logam campuran. Nilai buyback fokus pada kandungan emas murni yang tersisa.',
     tips: [
       'Pahami bahwa estimasi harga akan jauh di bawah perhiasan kadar tinggi.',
@@ -3384,23 +3373,24 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
   }
 
   var KADAR_MAPPING = {
-    24: 99.9,
-    23: 95.8,
-    22: 91.7,
-    21: 87.5,
-    20: 83.3,
-    19: 79.1,
-    18: 75.0,
-    17: 70.8,
-    16: 66.7,
-    15: 62.5,
-    14: 58.3,
-    12: 50.0,
-    10: 41.6,
-    9:  37.5,
-    8:  33.3,
-    6:  25.0,
-    5:  20.8
+    24: "99,9",
+    23: "95",
+    22: "91,6",
+    21: "87,5",
+    20: "85",
+    19: "80",
+    18: "75",
+    17: "75",
+    16: "70",
+    15: "65",
+    14: "58,5",
+    13: "50",
+    12: "45",
+    10: "42",
+    9:  "42",
+    8:  "37,5",
+    6:  "30",
+    5:  "25"
   };
 
   (perhiasanEntries || []).forEach(function(entry) {
@@ -3422,10 +3412,17 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       }
     }
 
-    var kadarLabel = kadarNumeric !== null ? `(${kadarNumeric}%)` : '';
+    var kadarLabel = kadarNumeric !== null ? `(${kadarNumeric})` : '';
+
+    var label = `${entry.karat}K ${kadarLabel}`
+    if (entry.karat == 18) {
+      label = `18K/17K (75)`
+    } else if (entry.karat == 10) {
+      label = `10K/9K (24)`
+    }
 
     rows.push({
-      label: `${entry.karat}K ${kadarLabel}`,    
+      label: label,    
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
       color: entry.color || GOLD_ROW_PRIMARY,
@@ -3927,6 +3924,29 @@ window.addEventListener('resize', function() {
     }
   }
 
+  // helper: cari purity dari GOLD_KARAT_SERIES
+function findPurityForKarat(k) {
+  if (k == null) return null;
+
+  // jika k berbentuk "18/17" atau "10/9", ambil karat tertinggi (first number)
+  var kStr = String(k);
+  if (kStr.indexOf('/') !== -1) {
+    kStr = kStr.split('/')[0];
+  }
+
+  var karatNum = Number(kStr);
+  if (!isFinite(karatNum) || karatNum <= 0) return null;
+
+  var found = GOLD_KARAT_SERIES.find(function(item){
+    return Number(item.karat) === karatNum;
+  });
+
+  if (found && typeof found.purity === 'number') return found.purity;
+
+  // fallback ke perhitungan sederhana (standar) jika tidak ada mapping
+  return Number((karatNum / 24).toFixed(6));
+}
+
   function calculateValues(catValue, kadarValue, beratValue) {
     var base = REI_LAST_BASE_P || (readLastBasePrice()?.p) || 1200000;
     var c = catValue || 'perhiasan_sub';
@@ -3945,13 +3965,12 @@ window.addEventListener('resize', function() {
     }
     var g = Math.max(0, Number(beratValue || 0));
     g = Math.round(g * 100) / 100;
-    var FACTOR_LM_BARU = 0.932;
-    var FACTOR_LM_LAMA = 0.917;
-    var FACTOR_24K = 0.862;
-    var FACTOR_SUB = 0.786;
+    var FACTOR_24K = FACTOR_PERHIASAN_24K;
+    var FACTOR_SUB = FACTOR_PERHIASAN_SUB;
     var ADJ_LM = PRICE_ADJUST_LM_IDR;
     var ADJ_PERHIASAN = PRICE_ADJUST_IDR;
     var perGram;
+    var purity = findPurityForKarat(k);
     if (c === 'lm_baru') {
       perGram = ceilStep(base * FACTOR_LM_BARU + ADJ_LM);
       k = 24;
@@ -3959,13 +3978,12 @@ window.addEventListener('resize', function() {
       perGram = ceilStep(base * FACTOR_LM_LAMA + ADJ_LM);
       k = 24;
     } else if (c === 'perhiasan_24') {
-      perGram = ceilStep(base * FACTOR_24K + ADJ_LM);
-      k = 24;
+      perGram = ceilStep(base * FACTOR_24K * purity + ADJ_PERHIASAN);
     } else {
-      perGram = ceilStep(base * FACTOR_SUB * purityFromK(k) + ADJ_PERHIASAN);
+      perGram = ceilStep(base * FACTOR_SUB * purity + ADJ_PERHIASAN);
     }
     var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
-    return {
+    return { 
       cat: c,
       kadar: k,
       berat: g,
