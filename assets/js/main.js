@@ -1483,87 +1483,6 @@ function escapeHTML(value) {
   });
 }
 
-function updateLmBaruHighlight(currentPrice, options) {
-  options = options || {};
-  var valueEl = document.getElementById('lmBaruCurrent');
-  var badgeEl = document.getElementById('lmBaruTrendBadge');
-  var deltaWrap = document.getElementById('lmBaruDelta');
-  var deltaTextEl = document.getElementById('lmBaruDeltaText');
-  var iconEl = deltaWrap ? deltaWrap.querySelector('.delta-icon') : null;
-
-  if (valueEl) {
-    if (typeof currentPrice === 'number' && isFinite(currentPrice)) {
-      valueEl.textContent = 'Rp ' + formatCurrencyIDR(currentPrice);
-    } else {
-      valueEl.textContent = 'Rp —';
-    }
-    valueEl.classList.remove('value-flash');
-    requestAnimationFrame(function() {
-      valueEl.classList.add('value-flash');
-    });
-  }
-
-  if (!deltaWrap) return;
-
-  var badgeLabel = options.badgeLabel || 'Menunggu';
-  var badgeState = options.badgeState || 'price-neutral';
-  var deltaMessage = options.deltaText || 'Selisih menunggu data sebelumnya';
-  var hasCurrent = typeof currentPrice === 'number' && isFinite(currentPrice);
-  var prevPrice = typeof options.previousPrice === 'number' && isFinite(options.previousPrice) ? options.previousPrice : null;
-  var iconState = 'pending';
-
-  deltaWrap.classList.remove('trend-up', 'trend-down', 'trend-flat', 'trend-pending');
-
-  if (hasCurrent && prevPrice !== null) {
-    var diff = Math.round(currentPrice - prevPrice);
-    var absDiff = Math.abs(diff);
-    if (diff > 0) {
-      deltaWrap.classList.add('trend-up');
-      deltaMessage = options.deltaText || ('Naik Rp ' + formatCurrencyIDR(absDiff) + ' dibanding kemarin');
-      iconState = 'up';
-      badgeLabel = options.badgeLabel || 'Naik';
-      badgeState = options.badgeState || 'price-up';
-    } else if (diff < 0) {
-      deltaWrap.classList.add('trend-down');
-      deltaMessage = options.deltaText || ('Turun Rp ' + formatCurrencyIDR(absDiff) + ' dibanding kemarin');
-      iconState = 'down';
-      badgeLabel = options.badgeLabel || 'Turun';
-      badgeState = options.badgeState || 'price-down';
-    } else {
-      deltaWrap.classList.add('trend-flat');
-      deltaMessage = options.deltaText || 'Tidak berubah dibanding kemarin';
-      iconState = 'flat';
-      badgeLabel = options.badgeLabel || 'Stabil';
-      badgeState = options.badgeState || 'price-neutral';
-    }
-  } else {
-    deltaWrap.classList.add('trend-pending');
-    iconState = 'pending';
-  }
-
-  if (deltaTextEl) deltaTextEl.textContent = deltaMessage;
-  if (iconEl) {
-    iconEl.textContent = '';
-    iconEl.setAttribute('data-trend', iconState);
-  }
-  if (badgeEl) {
-    badgeEl.classList.remove('price-up', 'price-down', 'price-neutral');
-    badgeEl.classList.add(badgeState);
-    badgeEl.textContent = badgeLabel;
-  }
-  deltaWrap.classList.remove('delta-flash');
-  requestAnimationFrame(function() {
-    deltaWrap.classList.add('delta-flash');
-  });
-  var highlightCard = document.getElementById('lmBaruHighlight');
-  if (highlightCard) {
-    highlightCard.classList.remove('is-updated');
-    requestAnimationFrame(function() {
-      highlightCard.classList.add('is-updated');
-    });
-  }
-}
-
 function getRangeConfig(rangeKey) {
   var key = rangeKey == null ? '' : String(rangeKey).trim();
   if (key && Object.prototype.hasOwnProperty.call(LM_HISTORY_RANGE_CONFIG, key)) {
@@ -3422,14 +3341,6 @@ function displayFromBasePrice(basePrice, options) {
 
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) highlightCard.setAttribute('aria-busy', 'false');
-
-  updateLmBaruHighlight(lmBaru, {
-    previousPrice: prevPrice,
-    updatedAt: options.updatedAt,
-    deltaText: options.deltaText,
-    badgeLabel: options.badgeLabel,
-    badgeState: options.badgeState
-  });
 
   var info = document.getElementById('lastUpdatedInfo');
   if (info) {
