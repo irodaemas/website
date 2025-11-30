@@ -869,7 +869,6 @@ if (typeof window !== 'undefined') {
 })();
 
 // Harga emas: fetch + fallback + waktu W.I.B
-const PRICE_ADJUST_IDR = -20000;
 const PRICE_TIMEOUT_MS = 5000;
 const LM_HISTORY_RANGE_CONFIG = {
   '7': {
@@ -905,16 +904,37 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.932;
-// const FACTOR_LM_BARU = 1;
-const FACTOR_LM_LAMA = 0.917;
-// const PRICE_ADJUST_LM_IDR = -240000;
-const PRICE_ADJUST_LM_IDR = 0;
-const FACTOR_PERHIASAN_24K = 0.862;
-const FACTOR_PERHIASAN_SUB = 0.786;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 
+const PRICE_ADJUST_LM_IDR = 0;
+const PRICE_ADJUST_IDR = 0;
+const FACTOR_LM_BARU = 0.9299663191355726;
+const FACTOR_LM_LAMA = 0.9093462233675998;
+
+const FACTOR_PERHIASAN_24K = 0.862;
+const FACTOR_PERHIASAN_SUB = 0.786;
+
+const GOLD_KARAT_SERIES = [
+  { karat: 24, purity: 1.0310047883986393 },
+  { karat: 23, purity: 1.0231345228383442 },
+  { karat: 22, purity: 0.9706660857697111 },
+  { karat: 21, purity: 0.9181976487010781 },
+  { karat: 20, purity: 0.881469742753035  },
+  { karat: 19, purity: 0.8263778838309703 },
+  { karat: 18, purity: 0.7502986500814524 },
+  { karat: 17, purity: 0.708323900426546  },
+  { karat: 16, purity: 0.7319346971074309 },
+  { karat: 15, purity: 0.6705466257371302 },
+  { karat: 14, purity: 0.5551160641861376 },
+  { karat: 13, purity: 0.525733739427703  },
+  { karat: 12, purity: 0.5141906832726038 },
+  { karat: 10, purity: 0.4171240746956326 },
+  { karat: 9,  purity: 0.3751493250407262 },
+  { karat: 8,  purity: 0.3594087939201363 },
+  { karat: 6,  purity: 0.28595298202405006},
+  { karat: 5,  purity: 0.23610796680884866} 
+];
 function getGmtPlus7DateString() {
   const now = new Date();
   const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -937,75 +957,6 @@ function getGlobalGoldEndpoints(dateStr) {
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
 let GLOBAL_GOLD_SPOT_CACHE = null;
 let GLOBAL_GOLD_SPOT_PROMISE = null;
-const GOLD_KARAT_SERIES = [{
-    karat: 24,
-    purity: 1
-  },
-  {
-    karat: 23,
-    purity: 0.9583
-  },
-  {
-    karat: 22,
-    purity: 0.9167
-  },
-  {
-    karat: 21,
-    purity: 0.875
-  },
-  {
-    karat: 20,
-    purity: 0.8333
-  },
-  {
-    karat: 19,
-    purity: 0.7917
-  },
-  {
-    karat: 18,
-    purity: 0.75
-  },
-  {
-    karat: 17,
-    purity: 0.7083
-  },
-  {
-    karat: 16,
-    purity: 0.6667
-  },
-  {
-    karat: 15,
-    purity: 0.625
-  },
-  {
-    karat: 14,
-    purity: 0.5833
-  },
-  {
-    karat: 12,
-    purity: 0.5
-  },
-  {
-    karat: 10,
-    purity: 0.4167
-  },
-  {
-    karat: 9,
-    purity: 0.375
-  },
-  {
-    karat: 8,
-    purity: 0.3333
-  },
-  {
-    karat: 6,
-    purity: 0.25
-  },
-  {
-    karat: 5,
-    purity: 0.2083
-  }
-];
 const GOLD_INFO_CONTENT = {
   'lm_baru': {
     title: 'Logam Mulia (LM) Baru',
