@@ -3431,7 +3431,29 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       addKadar: '24'
     });
   }
+
+  var KADAR_MAPPING = {
+    24: 99.9,
+    23: 95.8,
+    22: 91.7,
+    21: 87.5,
+    20: 83.3,
+    19: 79.1,
+    18: 75.0,
+    17: 70.8,
+    16: 66.7,
+    15: 62.5,
+    14: 58.3,
+    12: 50.0,
+    10: 41.6,
+    9:  37.5,
+    8:  33.3,
+    6:  25.0,
+    5:  20.8
+  };
+
   (perhiasanEntries || []).forEach(function(entry) {
+    var karatNum = entry.karat ? Number(entry.karat) : null;
     var iconType = 'jewelry';
     var iconTitle = 'Perhiasan emas';
     var iconTooltip = `Perhiasan ${entry.karat}K`;
@@ -3439,9 +3461,20 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       iconType = 'jewelry-low';
       iconTitle = 'Perhiasan kadar menengah';
     }
-    var catValue = entry.karat === 24 ? 'perhiasan_24' : 'perhiasan_sub';
+    var catValue = karatNum === 24 ? 'perhiasan_24' : 'perhiasan_sub';
+      var kadarNumeric = null;
+    if (karatNum) {
+      if (KADAR_MAPPING.hasOwnProperty(karatNum)) {
+        kadarNumeric = KADAR_MAPPING[karatNum];
+      } else {
+        kadarNumeric = Number(((karatNum / 24) * 100).toFixed(2));
+      }
+    }
+
+    var kadarLabel = kadarNumeric !== null ? `(${kadarNumeric}%)` : '';
+
     rows.push({
-      label: `${entry.karat}K`,
+      label: `${entry.karat}K ${kadarLabel}`,    
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
       color: entry.color || GOLD_ROW_PRIMARY,
