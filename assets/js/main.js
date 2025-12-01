@@ -958,14 +958,14 @@ const GOLD_KARAT_SERIES = [
   { karat: 21, purity: 0.875 },
   { karat: 20, purity: 0.8333 },
   { karat: 19, purity: 0.7917 },
-  { karat: 18, purity: 0.75 },
+  { karat: 17, purity: 0.7083 },
   { karat: 16, purity: 0.6667 },
   { karat: 15, purity: 0.625 },
   { karat: 14, purity: 0.5833 },
   { karat: 13, purity: 0.5417 },
   { karat: 12, purity: 0.5 },
   { karat: 11, purity: 0.4583 },
-  { karat: 10, purity: 0.4167 },
+  { karat: 9, purity: 0.375 },
   { karat: 8, purity: 0.3333 },
   { karat: 7, purity: 0.2917 },
   { karat: 6, purity: 0.25 },
@@ -1052,7 +1052,7 @@ const GOLD_INFO_CONTENT = {
       'Gunakan pouch terpisah agar tidak bergesekan dengan perhiasan lain.'
     ]
   },
-  'karat-18': {
+  'karat-17': {
     title: 'Perhiasan 18K/17K',
     meta: 'Kemurnian ±75% • Standar butik & brand global',
     description: 'Perhiasan 18K/17K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
@@ -1102,7 +1102,7 @@ const GOLD_INFO_CONTENT = {
       'Siapkan kesabaran karena proses uji kadar memerlukan beberapa menit.'
     ]
   },
-  'karat-10': {
+  'karat-9': {
     title: 'Perhiasan 10K/9K',
     meta: 'Kemurnian ±41,6% • Umum di pasar Amerika',
     description: 'Kadar 10K/9K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
@@ -3429,9 +3429,9 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
     var catValue = entry.karat === 24 ? 'perhiasan_24' : 'perhiasan_sub';
 
     var label = `${entry.karat}K`
-    if (entry.karat == 18) {
+    if (entry.karat == 17) {
       label = `18K/17K`
-    } else if (entry.karat == 10) {
+    } else if (entry.karat == 9) {
       label = `10K/9K`
     } else if (entry.karat == 24){
       label = `24K (99,9)`
@@ -3987,9 +3987,9 @@ window.addEventListener('resize', function() {
       }, 0);
       var lines = items.map(function(item, index) {
         var itemKadar = item.kadar + 'K';
-        if (item.kadar == 18) {
+        if (item.kadar == 17) {
           itemKadar = '18K/17K';
-        }else if (item.kadar == 10) {
+        }else if (item.kadar == 9) {
           itemKadar = '10K/9K';
         }
 
@@ -4044,9 +4044,9 @@ window.addEventListener('resize', function() {
 
       textContent = 'Kadar ' + item.kadar + 'K';
 
-      if (item.kadar == 18) {
+      if (item.kadar == 17) {
         textContent = `Kadar 18K/17K`
-      } else if (item.kadar == 10) {
+      } else if (item.kadar == 9) {
         textContent = `Kadar 10K/9K`
       }
 
