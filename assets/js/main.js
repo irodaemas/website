@@ -951,86 +951,25 @@ function getGlobalGoldEndpoints(dateStr) {
 const TROY_OUNCE_IN_GRAMS = 31.1034768;
 let GLOBAL_GOLD_SPOT_CACHE = null;
 let GLOBAL_GOLD_SPOT_PROMISE = null;
-const GOLD_KARAT_SERIES = [{
-    karat: 24,
-    purity: 1
-  },
-  {
-    karat: 23,
-    purity: 0.9583
-  },
-  {
-    karat: 22,
-    purity: 0.9167
-  },
-  {
-    karat: 21,
-    purity: 0.875
-  },
-  {
-    karat: 20,
-    purity: 0.8333
-  },
-  {
-    karat: 19,
-    purity: 0.7917
-  },
-  {
-    karat: 18,
-    purity: 0.75
-  },
-  {
-    karat: 17,
-    purity: 0.7083
-  },
-  {
-    karat: 16,
-    purity: 0.6667
-  },
-  {
-    karat: 15,
-    purity: 0.625
-  },
-  {
-    karat: 14,
-    purity: 0.5833
-  },
-  {
-    karat: 13,
-    purity: 0.5417
-  },
-  {
-    karat: 12,
-    purity: 0.5
-  },
-  {
-    karat: 11,
-    purity: 0.4583
-  },
-  {
-    karat: 10,
-    purity: 0.4167
-  },
-  {
-    karat: 9,
-    purity: 0.375
-  },
-  {
-    karat: 8,
-    purity: 0.3333
-  },
-  {
-    karat: 7,
-    purity: 0.2917
-  },
-  {
-    karat: 6,
-    purity: 0.25
-  },
-  {
-    karat: 5,
-    purity: 0.2083
-  }
+const GOLD_KARAT_SERIES = [
+  { karat: 24, purity: 1 },
+  { karat: 23, purity: 0.9583 },
+  { karat: 22, purity: 0.9167 },
+  { karat: 21, purity: 0.875 },
+  { karat: 20, purity: 0.8333 },
+  { karat: 19, purity: 0.7917 },
+  { karat: 18, purity: 0.75 },
+  { karat: 16, purity: 0.6667 },
+  { karat: 15, purity: 0.625 },
+  { karat: 14, purity: 0.5833 },
+  { karat: 13, purity: 0.5417 },
+  { karat: 12, purity: 0.5 },
+  { karat: 11, purity: 0.4583 },
+  { karat: 10, purity: 0.4167 },
+  { karat: 8, purity: 0.3333 },
+  { karat: 7, purity: 0.2917 },
+  { karat: 6, purity: 0.25 },
+  { karat: 5, purity: 0.2083 }
 ];
 const GOLD_INFO_CONTENT = {
   'lm_baru': {
@@ -1054,7 +993,7 @@ const GOLD_INFO_CONTENT = {
     ]
   },
   'karat-24': {
-    title: 'Perhiasan 24K',
+    title: 'Perhiasan 24K (99,9)',
     meta: 'Kemurnian ±99,9% • Sangat lunak dan kuning terang',
     description: 'Perhiasan 24K identik dengan kadar emas tertinggi. Biasanya berbentuk gelang/cincin polos atau emas batangan kecil dengan ornamen minim.',
     tips: [
@@ -1114,23 +1053,13 @@ const GOLD_INFO_CONTENT = {
     ]
   },
   'karat-18': {
-    title: 'Perhiasan 18K',
+    title: 'Perhiasan 18K/17K',
     meta: 'Kemurnian ±75% • Standar butik & brand global',
-    description: 'Perhiasan 18K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
+    description: 'Perhiasan 18K/17K populer di butik internasional karena kuat dan cocok memegang batu permata. Warna emas lebih netral sehingga cocok untuk berbagai desain.',
     tips: [
       'Cantumkan merek/bukti pembelian bila berasal dari butik ternama.',
       'Periksa baut atau clasp agar tidak longgar saat penimbangan.',
       'Untuk cincin berlian, informasikan karat batu jika ingin dihitung terpisah.'
-    ]
-  },
-  'karat-17': {
-    title: 'Perhiasan 17K',
-    meta: 'Kemurnian ±70,8% • Banyak dijumpai pada perhiasan rumahan',
-    description: 'Campuran logam lebih tinggi membuat 17K cukup tahan banting dan berwarna kuning muda. Umum dipakai untuk kalung dan gelang harian.',
-    tips: [
-      'Jika ada bekas patri, sebutkan agar penaksir tahu bagian mana yang diperbaiki.',
-      'Bersihkan minyak atau lotion yang menempel sebelum pengecekan.',
-      'Simpan dalam kantong terpisah agar tidak tergores aksesoris lain.'
     ]
   },
   'karat-16': {
@@ -1174,23 +1103,13 @@ const GOLD_INFO_CONTENT = {
     ]
   },
   'karat-10': {
-    title: 'Perhiasan 10K',
+    title: 'Perhiasan 10K/9K',
     meta: 'Kemurnian ±41,6% • Umum di pasar Amerika',
-    description: 'Kadar 10K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
+    description: 'Kadar 10K/9K memiliki warna lebih putih dan keras. Banyak dijual di luar negeri sebagai alternatif ekonomis namun tetap berunsur emas.',
     tips: [
       'Bawa bukti pembelian luar negeri jika ada untuk mempercepat verifikasi.',
       'Warna pucat adalah normal karena campuran tembaga/perak cukup tinggi.',
       'Jika terdapat batu besar, siapkan assessment khusus untuk memperhitungkan nilainya.'
-    ]
-  },
-  'karat-9': {
-    title: 'Perhiasan 9K',
-    meta: 'Kemurnian ±37,5% • Kandungan emas rendah',
-    description: 'Perhiasan 9K termasuk kategori emas muda dengan kandungan emas di bawah 40%. Nilai buyback fokus pada berat bersih emas setelah dikurangi campuran.',
-    tips: [
-      'Harapkan proses uji kadar lebih intensif untuk memastikan kandungan emas.',
-      'Sampaikan bila terdapat bagian berlapis rhodium atau coating lain.',
-      'Kemas rapi agar detail ornamen tidak rusak saat transportasi.'
     ]
   },
   'karat-8': {
@@ -3508,8 +3427,18 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       iconTitle = 'Perhiasan kadar menengah';
     }
     var catValue = entry.karat === 24 ? 'perhiasan_24' : 'perhiasan_sub';
+
+    var label = `${entry.karat}K`
+    if (entry.karat == 18) {
+      label = `18K/17K`
+    } else if (entry.karat == 10) {
+      label = `10K/9K`
+    } else if (entry.karat == 24){
+      label = `24K (99,9)`
+    }
+
     rows.push({
-      label: `${entry.karat}K`,
+      label: label, 
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
       color: entry.color || GOLD_ROW_PRIMARY,
@@ -4057,7 +3986,14 @@ window.addEventListener('resize', function() {
         return sum + (item.estimasi || 0);
       }, 0);
       var lines = items.map(function(item, index) {
-        return (index + 1) + '. ' + labelCat(item.cat) + ' • ' + item.kadar + 'K • ' + formatWeight(item.berat) + ' gram • Estimasi: Rp ' + formatIDR(item.estimasi || 0);
+        var itemKadar = item.kadar + 'K';
+        if (item.kadar == 18) {
+          itemKadar = '18K/17K';
+        }else if (item.kadar == 10) {
+          itemKadar = '10K/9K';
+        }
+
+        return (index + 1) + '. ' + labelCat(item.cat) + ' • ' + itemKadar + ' • ' + formatWeight(item.berat) + ' gram • Estimasi: Rp ' + formatIDR(item.estimasi || 0);
       });
       var parts = ['Halo Sentral Emas,', '', 'Saya ingin konsultasi buyback. Berikut daftar barang:']
         .concat(lines, ['', 'Total estimasi: Rp ' + formatIDR(totalValue), '', 'Mohon info lebih lanjut, terima kasih.']);
@@ -4105,7 +4041,16 @@ window.addEventListener('resize', function() {
       name.textContent = labelCat(item.cat);
       var meta = document.createElement('div');
       meta.className = 'calc-item-meta';
-      meta.textContent = 'Kadar ' + item.kadar + 'K';
+
+      textContent = 'Kadar ' + item.kadar + 'K';
+
+      if (item.kadar == 18) {
+        textContent = `Kadar 18K/17K`
+      } else if (item.kadar == 10) {
+        textContent = `Kadar 10K/9K`
+      }
+
+      meta.textContent = textContent;
       mainCell.appendChild(name);
       mainCell.appendChild(meta);
 
