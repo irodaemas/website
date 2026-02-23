@@ -1,5 +1,5 @@
 /* Sentral Emas – Service Worker (subfolder-friendly) */
-const CACHE_NAME = 'sentralemas-v41';
+const CACHE_NAME = 'sentralemas-v42';
 const FONT_CACHE = 'sentralemas-fonts-v2';
 
 // Core assets gunakan path relatif terhadap scope
@@ -176,7 +176,7 @@ async function refreshAsset(cache, request) {
         if (prepared) {
             await cacheResponse(cache, request, prepared);
         }
-    } catch (_) {}
+    } catch (_) { }
 }
 
 async function refreshFont(cache, request) {
@@ -188,7 +188,7 @@ async function refreshFont(cache, request) {
         if (prepared) {
             await cacheResponse(cache, request, prepared);
         }
-    } catch (_) {}
+    } catch (_) { }
 }
 
 // ===== Install: precache core assets
@@ -208,7 +208,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(
         (async () => {
             if (self.registration.navigationPreload) {
-                try { await self.registration.navigationPreload.enable(); } catch (_) {}
+                try { await self.registration.navigationPreload.enable(); } catch (_) { }
             }
             const keys = await caches.keys();
             return Promise.all(
@@ -358,6 +358,6 @@ self.addEventListener('sync', (event) => {
                 method: 'GET',
                 credentials: 'omit'
             });
-        } catch (_) {}
+        } catch (_) { }
     })());
 });
