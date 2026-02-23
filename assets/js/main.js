@@ -7,7 +7,7 @@ function normalizeSearchText(value) {
     if (text.normalize) {
       text = text.normalize('NFD');
     }
-  } catch (e) {}
+  } catch (e) { }
   return text.replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
@@ -21,31 +21,31 @@ function applyAlternateSectionBackgrounds(doc) {
     sections = Array.prototype.slice.call(mainEl.querySelectorAll(':scope > section'));
   } catch (_err) {
     var childNodes = mainEl.children ? Array.prototype.slice.call(mainEl.children) : [];
-    sections = childNodes.filter(function(node) {
+    sections = childNodes.filter(function (node) {
       return node && typeof node.tagName === 'string' && node.tagName.toLowerCase() === 'section';
     });
   }
   var assignments = [];
   var useSecondary = true;
 
-  sections.forEach(function(section) {
+  sections.forEach(function (section) {
     if (!section || !section.style) return;
     try {
       section.style.backgroundColor = '';
-    } catch (_e) {}
+    } catch (_e) { }
     if (section.classList && section.classList.contains('has-alt-background')) {
       section.classList.remove('has-alt-background');
     }
     if (section.dataset && section.dataset.altBgIndex) {
       try {
         delete section.dataset.altBgIndex;
-      } catch (_err) {}
+      } catch (_err) { }
     }
   });
 
   var getStyle = null;
   if (rootDoc && rootDoc.defaultView && typeof rootDoc.defaultView.getComputedStyle === 'function') {
-    getStyle = function(node) {
+    getStyle = function (node) {
       try {
         return rootDoc.defaultView.getComputedStyle(node);
       } catch (_err) {
@@ -53,7 +53,7 @@ function applyAlternateSectionBackgrounds(doc) {
       }
     };
   } else if (typeof window !== 'undefined' && typeof window.getComputedStyle === 'function') {
-    getStyle = function(node) {
+    getStyle = function (node) {
       try {
         return window.getComputedStyle(node);
       } catch (_err) {
@@ -61,12 +61,12 @@ function applyAlternateSectionBackgrounds(doc) {
       }
     };
   } else {
-    getStyle = function() {
+    getStyle = function () {
       return null;
     };
   }
 
-  sections.forEach(function(section) {
+  sections.forEach(function (section) {
     if (!section || !section.style || !section.classList) return;
     if (section.classList.contains('hero')) return;
     if (section.dataset && (section.dataset.altSkip === 'true' || section.dataset.skipAlt === 'true')) return;
@@ -87,133 +87,133 @@ function applyAlternateSectionBackgrounds(doc) {
         element: section,
         color: color
       });
-    } catch (_err) {}
+    } catch (_err) { }
     useSecondary = !useSecondary;
   });
 
   return assignments;
 }
 
-const SEARCH_INDEX = (function() {
+const SEARCH_INDEX = (function () {
   const entries = [{
-      id: 'home',
-      url: '/',
-      title: 'Sentral Emas – Terima Jual Emas & Berlian COD',
-      description: 'Menerima jual emas, berlian, jam tangan mewah, batu mulia via COD aman se-Jabodetabek. Ikuti harga pasar, proses cepat, transparan, terpercaya.',
-      excerpt: 'Layanan buyback emas, berlian, jam tangan mewah, serta batu mulia dengan COD aman dan appraisal transparan.',
-      type: 'Halaman',
-      category: 'Layanan',
-      date: '2025-01-05',
-      readingTime: '',
-      keywords: ['jual emas', 'jual emas jabodetabek', 'buyback emas', 'cod', 'berlian', 'jam tangan mewah', 'batu mulia', 'jual emas tanpa surat'],
-      priority: 6,
-      content: 'Sentral Emas menyediakan konsultasi buyback emas, berlian, jam tangan mewah, dan batu mulia dengan penjemputan COD Jabodetabek, estimasi harga pasar, proses appraisal terbuka, serta layanan cepat dan aman melalui WhatsApp.'
-    },
-    {
-      id: 'harga',
-      url: '/harga/',
-      title: 'Harga Buyback Emas COD | Sentral Emas',
-      description: 'Cek harga buyback emas, logam mulia, dan perhiasan terkini. Dilengkapi kalkulator estimasi dan kontak WhatsApp untuk update real-time.',
-      excerpt: 'Update harga buyback emas & logam mulia lengkap dengan kalkulator estimasi COD Sentral Emas.',
-      type: 'Halaman',
-      category: 'Harga',
-      date: '2025-10-03',
-      readingTime: '',
-      keywords: ['harga emas hari ini', 'harga buyback', 'kalkulator emas', 'logam mulia'],
-      priority: 5,
-      content: 'Halaman harga buyback menghadirkan tabel perhiasan, logam mulia baru dan lama, highlight pergerakan harga harian, waktu update WIB, tombol WhatsApp, dan kalkulator berat serta kadar emas untuk simulasi COD.'
-    },
-    {
-      id: 'blog',
-      url: '/blog/',
-      title: 'Blog Sentral Emas – Tips Jual Beli Emas COD',
-      description: 'Artikel dan panduan Sentral Emas seputar tips jual beli emas & berlian via COD yang aman dan transparan.',
-      excerpt: 'Kumpulan artikel, panduan, dan insight jual beli emas, berlian, serta layanan COD Sentral Emas.',
-      type: 'Blog',
-      category: 'Blog',
-      date: '2025-10-03',
-      readingTime: '',
-      keywords: ['blog emas', 'tips jual emas', 'panduan berlian', 'keaslian emas'],
-      priority: 4,
-      content: 'Blog Sentral Emas menyajikan edukasi jual beli emas dan berlian, referensi keaslian, strategi transaksi COD aman, hingga insight perhiasan, harga pasar, dan cara jual emas tanpa surat.'
-    },
-    {
-      id: 'panduan-jual-emas-tanpa-surat',
-      url: '/blog/panduan-jual-emas-tanpa-surat/',
-      title: 'Panduan Jual Emas Tanpa Surat: Syarat, Risiko, dan Solusi Aman',
-      description: 'Pelajari cara jual emas tanpa surat resmi beserta syarat minimum, risiko yang perlu diwaspadai, dan solusi aman via COD Sentral Emas.',
-      excerpt: 'Strategi menjual emas tanpa surat lengkap dengan dokumen pendukung, mitigasi risiko, dan tips memaksimalkan nilai COD.',
-      type: 'Blog',
-      category: 'Panduan',
-      date: '2025-10-03',
-      readingTime: '±9 menit',
-      keywords: ['jual emas tanpa surat', 'syarat jual emas', 'risiko jual emas', 'cod emas aman'],
-      priority: 8,
-      content: 'Panduan menyajikan langkah menyiapkan identitas dan bukti pendukung, alur konsultasi WhatsApp, strategi mitigasi risiko, hingga proses COD transparan bersama Sentral Emas.'
-    },
-    {
-      id: 'checklist-foto-emas-cod',
-      url: '/blog/checklist-foto-emas-cod/',
-      title: 'Checklist Foto & Dokumen Emas Sebelum Konsultasi COD',
-      description: 'Lengkapi permintaan buyback Sentral Emas dengan foto dan dokumen yang tepat agar estimasi COD lebih cepat dan akurat.',
-      excerpt: 'Panduan menyiapkan foto detail, bukti pendukung, dan tips pengambilan gambar agar appraisal COD berjalan cepat.',
-      type: 'Blog',
-      category: 'Panduan',
-      date: '2025-09-23',
-      readingTime: '±8 menit',
-      keywords: ['checklist foto emas', 'dokumen buyback', 'persiapan cod emas', 'foto perhiasan'],
-      priority: 7,
-      content: 'Artikel menjelaskan foto yang dibutuhkan, dokumen tambahan seperti bukti pembelian atau servis, teknik foto smartphone, dan kesalahan umum yang perlu dihindari sebelum konsultasi COD.'
-    },
-    {
-      id: 'panduan-buyback-berlian',
-      url: '/blog/panduan-buyback-berlian/',
-      title: 'Panduan Buyback Berlian: Kenali 4C, Bentuk, & Sertifikat',
-      description: 'Pelajari 4C berlian, variasi bentuk populer, dan panduan sertifikat untuk buyback berlian COD di Sentral Emas.',
-      excerpt: 'Ringkasan kualitas berlian, skala warna komersial, bentuk favorit, dan tips menyiapkan sertifikat saat buyback.',
-      type: 'Blog',
-      category: 'Panduan',
-      date: '2025-09-17',
-      readingTime: '±10 menit',
-      keywords: ['berlian', '4c', 'sertifikat gia', 'buyback berlian', 'panduan berlian'],
-      priority: 7,
-      content: 'Artikel membahas empat pilar 4C (cut, color, clarity, carat), tabel warna D sampai K, bentuk round, princess, cushion, hingga tips sertifikat GIA, perawatan, dan persiapan konsultasi buyback berlian COD bersama Sentral Emas.'
-    },
-    {
-      id: 'panduan-keaslian-emas',
-      url: '/blog/panduan-menilai-keaslian-emas-sebelum-cod/',
-      title: 'Panduan Menilai Keaslian Emas Sebelum COD',
-      description: 'Cara sederhana memeriksa keaslian emas di rumah sebelum transaksi COD bersama Sentral Emas. Lengkap dengan tips dokumentasi dan kapan perlu ahli.',
-      excerpt: 'Langkah memeriksa stempel, warna, densitas, uji magnet, dan dokumentasi sebelum transaksi emas COD.',
-      type: 'Blog',
-      category: 'Panduan',
-      date: '2025-09-12',
-      readingTime: '±7 menit',
-      keywords: ['keaslian emas', 'uji emas', 'uji magnet', 'uji asam', 'sentral emas'],
-      priority: 6,
-      content: 'Panduan menilai emas asli mencakup pemeriksaan stempel, perubahan warna, uji magnet dan uji asam, cara menimbang berat, menyiapkan foto atau video sebelum buyback, serta kapan berkonsultasi dengan tim Sentral Emas.'
-    },
-    {
-      id: 'keuntungan-jual-emas-cod',
-      url: '/blog/keuntungan-jual-emas-cod/',
-      title: 'Keuntungan Jual Emas via COD yang Aman',
-      description: 'Pelajari keuntungan menggunakan layanan buyback emas COD Sentral Emas beserta tips menyiapkan transaksi agar proses aman dan transparan.',
-      excerpt: 'Keunggulan transaksi buyback emas COD, keamanan penjemputan, dan tips menyiapkan barang sebelum tim datang.',
-      type: 'Blog',
-      category: 'Panduan',
-      date: '2025-09-05',
-      readingTime: '±6 menit',
-      keywords: ['jual emas cod', 'buyback emas', 'keamanan cod', 'tips jual emas'],
-      priority: 5,
-      content: 'Artikel merangkum manfaat buyback COD seperti appraisal transparan, pembayaran instan, transaksi di lokasi pelanggan, serta saran menata perhiasan dan dokumen sebelum tim Sentral Emas tiba.'
-    }
+    id: 'home',
+    url: '/',
+    title: 'Sentral Emas – Terima Jual Emas & Berlian COD',
+    description: 'Menerima jual emas, berlian, jam tangan mewah, batu mulia via COD aman se-Jabodetabek. Ikuti harga pasar, proses cepat, transparan, terpercaya.',
+    excerpt: 'Layanan buyback emas, berlian, jam tangan mewah, serta batu mulia dengan COD aman dan appraisal transparan.',
+    type: 'Halaman',
+    category: 'Layanan',
+    date: '2025-01-05',
+    readingTime: '',
+    keywords: ['jual emas', 'jual emas jabodetabek', 'buyback emas', 'cod', 'berlian', 'jam tangan mewah', 'batu mulia', 'jual emas tanpa surat'],
+    priority: 6,
+    content: 'Sentral Emas menyediakan konsultasi buyback emas, berlian, jam tangan mewah, dan batu mulia dengan penjemputan COD Jabodetabek, estimasi harga pasar, proses appraisal terbuka, serta layanan cepat dan aman melalui WhatsApp.'
+  },
+  {
+    id: 'harga',
+    url: '/harga/',
+    title: 'Harga Buyback Emas COD | Sentral Emas',
+    description: 'Cek harga buyback emas, logam mulia, dan perhiasan terkini. Dilengkapi kalkulator estimasi dan kontak WhatsApp untuk update real-time.',
+    excerpt: 'Update harga buyback emas & logam mulia lengkap dengan kalkulator estimasi COD Sentral Emas.',
+    type: 'Halaman',
+    category: 'Harga',
+    date: '2025-10-03',
+    readingTime: '',
+    keywords: ['harga emas hari ini', 'harga buyback', 'kalkulator emas', 'logam mulia'],
+    priority: 5,
+    content: 'Halaman harga buyback menghadirkan tabel perhiasan, logam mulia baru dan lama, highlight pergerakan harga harian, waktu update WIB, tombol WhatsApp, dan kalkulator berat serta kadar emas untuk simulasi COD.'
+  },
+  {
+    id: 'blog',
+    url: '/blog/',
+    title: 'Blog Sentral Emas – Tips Jual Beli Emas COD',
+    description: 'Artikel dan panduan Sentral Emas seputar tips jual beli emas & berlian via COD yang aman dan transparan.',
+    excerpt: 'Kumpulan artikel, panduan, dan insight jual beli emas, berlian, serta layanan COD Sentral Emas.',
+    type: 'Blog',
+    category: 'Blog',
+    date: '2025-10-03',
+    readingTime: '',
+    keywords: ['blog emas', 'tips jual emas', 'panduan berlian', 'keaslian emas'],
+    priority: 4,
+    content: 'Blog Sentral Emas menyajikan edukasi jual beli emas dan berlian, referensi keaslian, strategi transaksi COD aman, hingga insight perhiasan, harga pasar, dan cara jual emas tanpa surat.'
+  },
+  {
+    id: 'panduan-jual-emas-tanpa-surat',
+    url: '/blog/panduan-jual-emas-tanpa-surat/',
+    title: 'Panduan Jual Emas Tanpa Surat: Syarat, Risiko, dan Solusi Aman',
+    description: 'Pelajari cara jual emas tanpa surat resmi beserta syarat minimum, risiko yang perlu diwaspadai, dan solusi aman via COD Sentral Emas.',
+    excerpt: 'Strategi menjual emas tanpa surat lengkap dengan dokumen pendukung, mitigasi risiko, dan tips memaksimalkan nilai COD.',
+    type: 'Blog',
+    category: 'Panduan',
+    date: '2025-10-03',
+    readingTime: '±9 menit',
+    keywords: ['jual emas tanpa surat', 'syarat jual emas', 'risiko jual emas', 'cod emas aman'],
+    priority: 8,
+    content: 'Panduan menyajikan langkah menyiapkan identitas dan bukti pendukung, alur konsultasi WhatsApp, strategi mitigasi risiko, hingga proses COD transparan bersama Sentral Emas.'
+  },
+  {
+    id: 'checklist-foto-emas-cod',
+    url: '/blog/checklist-foto-emas-cod/',
+    title: 'Checklist Foto & Dokumen Emas Sebelum Konsultasi COD',
+    description: 'Lengkapi permintaan buyback Sentral Emas dengan foto dan dokumen yang tepat agar estimasi COD lebih cepat dan akurat.',
+    excerpt: 'Panduan menyiapkan foto detail, bukti pendukung, dan tips pengambilan gambar agar appraisal COD berjalan cepat.',
+    type: 'Blog',
+    category: 'Panduan',
+    date: '2025-09-23',
+    readingTime: '±8 menit',
+    keywords: ['checklist foto emas', 'dokumen buyback', 'persiapan cod emas', 'foto perhiasan'],
+    priority: 7,
+    content: 'Artikel menjelaskan foto yang dibutuhkan, dokumen tambahan seperti bukti pembelian atau servis, teknik foto smartphone, dan kesalahan umum yang perlu dihindari sebelum konsultasi COD.'
+  },
+  {
+    id: 'panduan-buyback-berlian',
+    url: '/blog/panduan-buyback-berlian/',
+    title: 'Panduan Buyback Berlian: Kenali 4C, Bentuk, & Sertifikat',
+    description: 'Pelajari 4C berlian, variasi bentuk populer, dan panduan sertifikat untuk buyback berlian COD di Sentral Emas.',
+    excerpt: 'Ringkasan kualitas berlian, skala warna komersial, bentuk favorit, dan tips menyiapkan sertifikat saat buyback.',
+    type: 'Blog',
+    category: 'Panduan',
+    date: '2025-09-17',
+    readingTime: '±10 menit',
+    keywords: ['berlian', '4c', 'sertifikat gia', 'buyback berlian', 'panduan berlian'],
+    priority: 7,
+    content: 'Artikel membahas empat pilar 4C (cut, color, clarity, carat), tabel warna D sampai K, bentuk round, princess, cushion, hingga tips sertifikat GIA, perawatan, dan persiapan konsultasi buyback berlian COD bersama Sentral Emas.'
+  },
+  {
+    id: 'panduan-keaslian-emas',
+    url: '/blog/panduan-menilai-keaslian-emas-sebelum-cod/',
+    title: 'Panduan Menilai Keaslian Emas Sebelum COD',
+    description: 'Cara sederhana memeriksa keaslian emas di rumah sebelum transaksi COD bersama Sentral Emas. Lengkap dengan tips dokumentasi dan kapan perlu ahli.',
+    excerpt: 'Langkah memeriksa stempel, warna, densitas, uji magnet, dan dokumentasi sebelum transaksi emas COD.',
+    type: 'Blog',
+    category: 'Panduan',
+    date: '2025-09-12',
+    readingTime: '±7 menit',
+    keywords: ['keaslian emas', 'uji emas', 'uji magnet', 'uji asam', 'sentral emas'],
+    priority: 6,
+    content: 'Panduan menilai emas asli mencakup pemeriksaan stempel, perubahan warna, uji magnet dan uji asam, cara menimbang berat, menyiapkan foto atau video sebelum buyback, serta kapan berkonsultasi dengan tim Sentral Emas.'
+  },
+  {
+    id: 'keuntungan-jual-emas-cod',
+    url: '/blog/keuntungan-jual-emas-cod/',
+    title: 'Keuntungan Jual Emas via COD yang Aman',
+    description: 'Pelajari keuntungan menggunakan layanan buyback emas COD Sentral Emas beserta tips menyiapkan transaksi agar proses aman dan transparan.',
+    excerpt: 'Keunggulan transaksi buyback emas COD, keamanan penjemputan, dan tips menyiapkan barang sebelum tim datang.',
+    type: 'Blog',
+    category: 'Panduan',
+    date: '2025-09-05',
+    readingTime: '±6 menit',
+    keywords: ['jual emas cod', 'buyback emas', 'keamanan cod', 'tips jual emas'],
+    priority: 5,
+    content: 'Artikel merangkum manfaat buyback COD seperti appraisal transparan, pembayaran instan, transaksi di lokasi pelanggan, serta saran menata perhiasan dan dokumen sebelum tim Sentral Emas tiba.'
+  }
   ];
 
-  return entries.map(function(entry, index) {
+  return entries.map(function (entry, index) {
     const keywordList = Array.isArray(entry.keywords) ? entry.keywords : String(entry.keywords || '').split(',');
-    const keywords = keywordList.map(function(k) {
+    const keywords = keywordList.map(function (k) {
       return String(k || '').trim();
-    }).filter(function(k) {
+    }).filter(function (k) {
       return k.length;
     });
     const normalizedTitle = normalizeSearchText(entry.title);
@@ -248,7 +248,7 @@ if (typeof window !== 'undefined') {
 }
 
 /* istanbul ignore next */
-(function() {
+(function () {
   // ---- Scroll progress + Parallax (class-based; minimize reflow) ----
   var bar = document.querySelector('.scroll-progress');
   var hero = document.querySelector('.hero');
@@ -265,9 +265,9 @@ if (typeof window !== 'undefined') {
     ticking = false,
     maxScroll = 1,
     maxPending = false;
-  var schedule = window.requestAnimationFrame ? function(cb) {
+  var schedule = window.requestAnimationFrame ? function (cb) {
     return window.requestAnimationFrame(cb);
-  } : function(cb) {
+  } : function (cb) {
     return setTimeout(cb, 16);
   };
 
@@ -342,7 +342,7 @@ if (typeof window !== 'undefined') {
       viewportFactor = 0.75;
     }
     var effective = amount * viewportFactor;
-    parallaxLayers.forEach(function(layer) {
+    parallaxLayers.forEach(function (layer) {
       if (!layer || !layer.el) return;
       var depth = layer.depth;
       if (!depth) {
@@ -369,7 +369,7 @@ if (typeof window !== 'undefined') {
     if (!parallaxRoot) return;
     parallaxRoot.classList.add('is-parallax-disabled');
     var nodes = parallaxRoot.querySelectorAll('[data-parallax-layer]');
-    nodes.forEach(function(node) {
+    nodes.forEach(function (node) {
       if (node && node.style && node.style.removeProperty) {
         node.style.removeProperty('--parallax-shift');
       }
@@ -390,7 +390,7 @@ if (typeof window !== 'undefined') {
     } catch (_err) {
       nodes = [];
     }
-    parallaxLayers = nodes.map(function(node) {
+    parallaxLayers = nodes.map(function (node) {
       var depthAttr = node ? (node.getAttribute('data-parallax-depth') || (node.dataset && node.dataset.parallaxDepth)) : 0;
       var maxAttr = node ? (node.getAttribute('data-parallax-max') || (node.dataset && node.dataset.parallaxMax)) : null;
       var minAttr = node ? (node.getAttribute('data-parallax-min') || (node.dataset && node.dataset.parallaxMin)) : null;
@@ -417,7 +417,7 @@ if (typeof window !== 'undefined') {
     if (!parallaxRoot || prefersReducedMotion) return;
     if (parallaxRefreshPending) return;
     parallaxRefreshPending = true;
-    schedule(function() {
+    schedule(function () {
       parallaxRefreshPending = false;
       refreshParallaxLayers();
       if (!prefersReducedMotion) {
@@ -449,13 +449,13 @@ if (typeof window !== 'undefined') {
       } else {
         ro.observe(document.documentElement);
       }
-    } catch (e) {}
+    } catch (e) { }
   }
   if ('ResizeObserver' in window && parallaxRoot) {
     try {
       var parallaxObserver = new ResizeObserver(queueParallaxRefresh);
       parallaxObserver.observe(parallaxRoot);
-    } catch (_err) {}
+    } catch (_err) { }
   }
   scheduleMaxScroll();
   onScroll();
@@ -464,7 +464,7 @@ if (typeof window !== 'undefined') {
     try {
       reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       prefersReducedMotion = !!reduceMotionQuery.matches;
-      var handleMotionPreference = function(event) {
+      var handleMotionPreference = function (event) {
         prefersReducedMotion = !!(event && event.matches);
         if (prefersReducedMotion) {
           disableParallax();
@@ -478,7 +478,7 @@ if (typeof window !== 'undefined') {
       } else if (typeof reduceMotionQuery.addListener === 'function') {
         reduceMotionQuery.addListener(handleMotionPreference);
       }
-    } catch (_err) {}
+    } catch (_err) { }
   }
 
   if (parallaxRoot) {
@@ -490,10 +490,10 @@ if (typeof window !== 'undefined') {
   }
 
   // ---- WA click pulse (no inline styles) ----
-  document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function(el) {
-    el.addEventListener('click', function() {
+  document.querySelectorAll('a[href^="https://wa.me"], [data-track^="wa-"]').forEach(function (el) {
+    el.addEventListener('click', function () {
       el.classList.add('pulse');
-      setTimeout(function() {
+      setTimeout(function () {
         el.classList.remove('pulse');
       }, 500);
     });
@@ -511,15 +511,15 @@ if (typeof window !== 'undefined') {
     } catch (_err) {
       tiltCards = [];
     }
-    tiltCards.forEach(function(card) {
+    tiltCards.forEach(function (card) {
       var rect;
-      card.addEventListener('mouseenter', function() {
+      card.addEventListener('mouseenter', function () {
         rect = card.getBoundingClientRect();
         if (prefersReducedMotion) {
           resetTiltTransform(card);
         }
       });
-      card.addEventListener('mousemove', function(ev) {
+      card.addEventListener('mousemove', function (ev) {
         if (prefersReducedMotion) {
           resetTiltTransform(card);
           return;
@@ -531,7 +531,7 @@ if (typeof window !== 'undefined') {
         var ry = (px * 6);
         card.style.transform = 'perspective(700px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg) translateZ(0)';
       });
-      card.addEventListener('mouseleave', function() {
+      card.addEventListener('mouseleave', function () {
         resetTiltTransform(card);
       });
     });
@@ -539,12 +539,12 @@ if (typeof window !== 'undefined') {
 })();
 
 /* istanbul ignore next */
-(function() {
+(function () {
   if (typeof document === 'undefined') return;
   var mainEl = document.querySelector('main');
   if (!mainEl) return;
 
-  var apply = function() {
+  var apply = function () {
     applyAlternateSectionBackgrounds(document);
   };
 
@@ -559,7 +559,7 @@ if (typeof window !== 'undefined') {
 
   if (typeof window !== 'undefined' && typeof window.MutationObserver === 'function') {
     try {
-      var observer = new MutationObserver(function(mutations) {
+      var observer = new MutationObserver(function (mutations) {
         for (var i = 0; i < mutations.length; i++) {
           var mutation = mutations[i];
           if (mutation.type !== 'attributes' || mutation.attributeName !== 'hidden') continue;
@@ -576,7 +576,7 @@ if (typeof window !== 'undefined') {
         subtree: true,
         attributeFilter: ['hidden']
       });
-    } catch (_err) {}
+    } catch (_err) { }
   }
 
   if (typeof window !== 'undefined') {
@@ -585,8 +585,8 @@ if (typeof window !== 'undefined') {
 })();
 
 /* istanbul ignore next */
-(function() {
-  const ease = function(t) {
+(function () {
+  const ease = function (t) {
     return t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t
   };
 
@@ -612,8 +612,8 @@ if (typeof window !== 'undefined') {
   }
 
   // Observe numbers on first view
-  const io = new IntersectionObserver(function(entries) {
-    entries.forEach(function(e) {
+  const io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
       if (e.isIntersecting) {
         const el = e.target;
         const to = Number(el.getAttribute('data-to') || 0);
@@ -624,13 +624,13 @@ if (typeof window !== 'undefined') {
   }, {
     threshold: .3
   });
-  document.querySelectorAll('.count, .num').forEach(function(n) {
+  document.querySelectorAll('.count, .num').forEach(function (n) {
     io.observe(n);
   });
 
   // Re-animate numbers after price table refresh
-  document.addEventListener('prices:updated', function() {
-    document.querySelectorAll('.num').forEach(function(n) {
+  document.addEventListener('prices:updated', function () {
+    document.querySelectorAll('.num').forEach(function (n) {
       const to = Number(n.getAttribute('data-to') || 0);
       if (!n.getAttribute('data-from')) n.setAttribute('data-from', '0');
       animateNumber(n, to, 800);
@@ -640,7 +640,7 @@ if (typeof window !== 'undefined') {
 
 // Fallback untuk gambar/video + lazy load + reveal + date badge + typewriter
 /* istanbul ignore next */
-(function() {
+(function () {
   const placeholder = 'data:image/svg+xml;charset=utf8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480">\
       <defs>\
@@ -653,11 +653,11 @@ if (typeof window !== 'undefined') {
     </svg>'
   );
   // Seed placeholder for LQIP images
-  document.querySelectorAll('img[data-src]').forEach(function(img) {
+  document.querySelectorAll('img[data-src]').forEach(function (img) {
     if (!img.src) img.src = placeholder;
   });
-  document.querySelectorAll('img').forEach(function(img) {
-    img.addEventListener('error', function() {
+  document.querySelectorAll('img').forEach(function (img) {
+    img.addEventListener('error', function () {
       img.src = placeholder;
       img.style.objectFit = 'cover';
       img.style.background = '#013D39';
@@ -666,11 +666,11 @@ if (typeof window !== 'undefined') {
     });
   });
   // Videos
-  document.querySelectorAll('video').forEach(function(v) {
+  document.querySelectorAll('video').forEach(function (v) {
     try {
       v.setAttribute('poster', placeholder);
-    } catch (e) {}
-    v.addEventListener('error', function() {
+    } catch (e) { }
+    v.addEventListener('error', function () {
       const img = document.createElement('img');
       img.src = placeholder;
       img.alt = 'video unavailable';
@@ -683,7 +683,7 @@ if (typeof window !== 'undefined') {
     try {
       v.removeAttribute('controls');
       v.controls = false;
-    } catch (e) {}
+    } catch (e) { }
     v.muted = true;
     v.loop = true;
     v.playsInline = true;
@@ -698,7 +698,7 @@ if (typeof window !== 'undefined') {
           if (vid.preload !== 'auto') {
             vid.preload = 'auto';
           }
-          vid.play().catch(() => {});
+          vid.play().catch(() => { });
         } else {
           vid.pause();
         }
@@ -707,7 +707,7 @@ if (typeof window !== 'undefined') {
       threshold: 0.5
     });
     document.querySelectorAll('video').forEach(v => vio.observe(v));
-  } catch (_) {}
+  } catch (_) { }
   // Lazy load images with blur-up
   try {
     const iio = new IntersectionObserver((entries) => {
@@ -716,7 +716,7 @@ if (typeof window !== 'undefined') {
         const img = e.target;
         const real = img.getAttribute('data-src');
         if (real) {
-          img.addEventListener('load', function() {
+          img.addEventListener('load', function () {
             img.classList.add('loaded');
           }, {
             once: true
@@ -731,10 +731,10 @@ if (typeof window !== 'undefined') {
     });
     document.querySelectorAll('img[data-src]').forEach(img => iio.observe(img));
   } catch (_) {
-    document.querySelectorAll('img[data-src]').forEach(function(img) {
+    document.querySelectorAll('img[data-src]').forEach(function (img) {
       const real = img.getAttribute('data-src');
       if (real) {
-        img.addEventListener('load', function() {
+        img.addEventListener('load', function () {
           img.classList.add('loaded');
         }, {
           once: true
@@ -746,7 +746,7 @@ if (typeof window !== 'undefined') {
   }
 
   // Lazy load background images (e.g., hostess card)
-  const loadBackground = function(el) {
+  const loadBackground = function (el) {
     if (!el) return;
     const src = el.getAttribute('data-bg');
     if (!src) return;
@@ -755,11 +755,12 @@ if (typeof window !== 'undefined') {
     try {
       img.decoding = 'async';
     } catch (_) {
-      /* noop */ }
+      /* noop */
+}
     if ('fetchPriority' in img) {
       img.fetchPriority = 'low';
     }
-    img.addEventListener('load', function() {
+    img.addEventListener('load', function () {
       try {
         el.style.backgroundImage = 'url(' + JSON.stringify(src) + ')';
       } catch (_) {
@@ -769,7 +770,7 @@ if (typeof window !== 'undefined') {
       const fallback = el.querySelector('.bg-hostess__fallback');
       if (fallback) {
         fallback.classList.add('is-hidden');
-        const cleanup = function() {
+        const cleanup = function () {
           if (fallback && fallback.parentNode) {
             fallback.parentNode.removeChild(fallback);
           }
@@ -782,7 +783,7 @@ if (typeof window !== 'undefined') {
     }, {
       once: true
     });
-    img.addEventListener('error', function() {
+    img.addEventListener('error', function () {
       el.classList.add('bg-error');
     }, {
       once: true
@@ -791,7 +792,7 @@ if (typeof window !== 'undefined') {
   };
   try {
     const bio = new IntersectionObserver((entries) => {
-      entries.forEach(function(e) {
+      entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         const el = e.target;
         loadBackground(el);
@@ -800,7 +801,7 @@ if (typeof window !== 'undefined') {
     }, {
       rootMargin: '200px 0px'
     });
-    document.querySelectorAll('[data-bg]').forEach(function(el) {
+    document.querySelectorAll('[data-bg]').forEach(function (el) {
       bio.observe(el);
     });
   } catch (_) {
@@ -881,7 +882,7 @@ const LM_HISTORY_RANGE_CONFIG = {
 };
 const LM_HISTORY_DEFAULT_RANGE_KEY = '7';
 const LM_HISTORY_RANGE_KEYS = Object.keys(LM_HISTORY_RANGE_CONFIG);
-const LM_HISTORY_DAYS_LIMIT = LM_HISTORY_RANGE_KEYS.reduce(function(max, key) {
+const LM_HISTORY_DAYS_LIMIT = LM_HISTORY_RANGE_KEYS.reduce(function (max, key) {
   var config = LM_HISTORY_RANGE_CONFIG[key];
   var days = config && typeof config.days === 'number' ? config.days : 0;
   return days > max ? days : max;
@@ -901,7 +902,9 @@ const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
 const FACTOR_LM_BARU = 0.999472431;
 const FACTOR_LM_LAMA = 0.986146126;
-const PRICE_ADJUST_LM_IDR = 0;
+const PRICE_ADJUST_LM_IDR = -50000;
+const PRICE_ADJUST_PERHIASAN_HIGH_IDR = -50000;
+const PRICE_ADJUST_PERHIASAN_LOW_IDR = -30000;
 const FACTOR_PERHIASAN_24K = 0.964548321;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
@@ -1154,134 +1157,134 @@ const GOLD_INFO_CONTENT = {
   }
 };
 const GOLD_UNIT_DEFS = [{
-    id: 'gram',
-    label: 'Gram (g)',
-    toGram: 1
-  },
-  {
-    id: 'ameh',
-    label: 'Ameh (2,5 g)',
-    toGram: 2.5
-  },
-  {
-    id: 'suku',
-    label: 'Suku (3,75 g)',
-    toGram: 3.75
-  },
-  {
-    id: 'mayam',
-    label: 'Mayam (±3,33 g)',
-    toGram: 3.33
-  },
-  {
-    id: 'tael',
-    label: 'Tael (37,5 g)',
-    toGram: 37.5
-  },
-  {
-    id: 'troy',
-    label: 'Troy Ounce (31,103 g)',
-    toGram: 31.1034768
-  },
-  {
-    id: 'tola',
-    label: 'Tola (11,664 g)',
-    toGram: 11.6638038
-  },
-  {
-    id: 'baht',
-    label: 'Baht (15,244 g)',
-    toGram: 15.244
-  },
-  {
-    id: 'kupang',
-    label: 'Kupang (0,6 g)',
-    toGram: 0.6
-  }
+  id: 'gram',
+  label: 'Gram (g)',
+  toGram: 1
+},
+{
+  id: 'ameh',
+  label: 'Ameh (2,5 g)',
+  toGram: 2.5
+},
+{
+  id: 'suku',
+  label: 'Suku (3,75 g)',
+  toGram: 3.75
+},
+{
+  id: 'mayam',
+  label: 'Mayam (±3,33 g)',
+  toGram: 3.33
+},
+{
+  id: 'tael',
+  label: 'Tael (37,5 g)',
+  toGram: 37.5
+},
+{
+  id: 'troy',
+  label: 'Troy Ounce (31,103 g)',
+  toGram: 31.1034768
+},
+{
+  id: 'tola',
+  label: 'Tola (11,664 g)',
+  toGram: 11.6638038
+},
+{
+  id: 'baht',
+  label: 'Baht (15,244 g)',
+  toGram: 15.244
+},
+{
+  id: 'kupang',
+  label: 'Kupang (0,6 g)',
+  toGram: 0.6
+}
 ];
 const DEFAULT_PRICE_TABLE = {
   lmBaru: 2151000,
   lmLama: 2111000,
   perhiasan: [{
-      karat: 24,
-      price: 2060000
-    },
-    {
-      karat: 23,
-      price: 1797000
-    },
-    {
-      karat: 22,
-      price: 1724000
-    },
-    {
-      karat: 21,
-      price: 1652000
-    },
-    {
-      karat: 20,
-      price: 1579000
-    },
-    {
-      karat: 19,
-      price: 1505000
-    },
-    {
-      karat: 18,
-      price: 1434000
-    },
-    {
-      karat: 17,
-      price: 1360000
-    },
-    {
-      karat: 16,
-      price: 1287000
-    },
-    {
-      karat: 15,
-      price: 1145000
-    },
-    {
-      karat: 14,
-      price: 1071000
-    },
-    {
-      karat: 13,
-      price: 998000
-    },
-    {
-      karat: 12,
-      price: 926000
-    },
-    {
-      karat: 11,
-      price: 853000
-    },
-    {
-      karat: 10,
-      price: 779000
-    },
-    {
-      karat: 9,
-      price: 708000
-    },
-    {
-      karat: 8,
-      price: 634000
-    },
-    {
-      karat: 7,
-      price: 561000
-    },
-    {
-      karat: 6,
-      price: 489000
-    },
-    {
-      karat: 5,
-      price: 415000
-    }
+    karat: 24,
+    price: 2060000
+  },
+  {
+    karat: 23,
+    price: 1797000
+  },
+  {
+    karat: 22,
+    price: 1724000
+  },
+  {
+    karat: 21,
+    price: 1652000
+  },
+  {
+    karat: 20,
+    price: 1579000
+  },
+  {
+    karat: 19,
+    price: 1505000
+  },
+  {
+    karat: 18,
+    price: 1434000
+  },
+  {
+    karat: 17,
+    price: 1360000
+  },
+  {
+    karat: 16,
+    price: 1287000
+  },
+  {
+    karat: 15,
+    price: 1145000
+  },
+  {
+    karat: 14,
+    price: 1071000
+  },
+  {
+    karat: 13,
+    price: 998000
+  },
+  {
+    karat: 12,
+    price: 926000
+  },
+  {
+    karat: 11,
+    price: 853000
+  },
+  {
+    karat: 10,
+    price: 779000
+  },
+  {
+    karat: 9,
+    price: 708000
+  },
+  {
+    karat: 8,
+    price: 634000
+  },
+  {
+    karat: 7,
+    price: 561000
+  },
+  {
+    karat: 6,
+    price: 489000
+  },
+  {
+    karat: 5,
+    price: 415000
+  }
   ]
 };
 
@@ -1291,14 +1294,14 @@ function saveLastBasePrice(p) {
       p,
       t: Date.now()
     }));
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function readLastBasePrice() {
   try {
     const o = JSON.parse(localStorage.getItem(LAST_PRICE_KEY) || ''); /* istanbul ignore next */
     if (o && typeof o.p === 'number') return o;
-  } catch (_) {}
+  } catch (_) { }
   return null;
 }
 
@@ -1308,7 +1311,7 @@ function saveLastSparklineSeries(series) {
       localStorage.removeItem(LAST_SERIES_KEY);
       return;
     }
-    const payload = series.map(function(point) {
+    const payload = series.map(function (point) {
       if (point == null) return null;
       const baseValue = typeof point.base === 'number' ? point.base : (typeof point === 'number' ? point : null);
       if (baseValue === null || !isFinite(baseValue)) return null;
@@ -1325,14 +1328,14 @@ function saveLastSparklineSeries(series) {
     } else {
       localStorage.removeItem(LAST_SERIES_KEY);
     }
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function readLastSparklineSeries() {
   try {
     const raw = JSON.parse(localStorage.getItem(LAST_SERIES_KEY) || '[]');
     if (!Array.isArray(raw)) return [];
-    return raw.map(function(entry) {
+    return raw.map(function (entry) {
       if (!Array.isArray(entry) || entry.length < 2) return null;
       const baseValue = safeNumber(entry[1]);
       if (baseValue === null) return null;
@@ -1349,7 +1352,7 @@ function readLastSparklineSeries() {
 }
 let LM_BARU_PRICE_SERIES = readLastSparklineSeries();
 let LM_BARU_ACTIVE_RANGE = LM_HISTORY_DEFAULT_RANGE_KEY;
-let LM_BARU_SERIES_BY_RANGE = LM_HISTORY_RANGE_KEYS.reduce(function(acc, key) {
+let LM_BARU_SERIES_BY_RANGE = LM_HISTORY_RANGE_KEYS.reduce(function (acc, key) {
   acc[key] = [];
   return acc;
 }, {});
@@ -1384,7 +1387,7 @@ function updatePriceSchema(items) {
       "@type": "ItemList",
       "@id": "https://sentralemas.com/#price-list",
       "name": "Referensi Harga Buyback Emas & Perhiasan",
-      "itemListElement": items.map(function(item, idx) {
+      "itemListElement": items.map(function (item, idx) {
         return {
           "@type": "ListItem",
           "position": idx + 1,
@@ -1410,7 +1413,7 @@ function updatePriceSchema(items) {
       document.head.appendChild(el);
     }
     el.textContent = JSON.stringify(data);
-  } catch (_) {}
+  } catch (_) { }
 }
 
 function roundUpPrice(n, step) {
@@ -1419,11 +1422,11 @@ function roundUpPrice(n, step) {
 }
 
 function computeLmBaruPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_BARU);
+  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_LM_IDR);
 }
 
 function computeLmLamaPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_LAMA);
+  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_LM_IDR);
 }
 
 function safeNumber(v) {
@@ -1493,7 +1496,7 @@ function escapeAttr(value) {
 }
 
 function escapeHTML(value) {
-  return String(value == null ? '' : value).replace(/[&<>]/g, function(chr) {
+  return String(value == null ? '' : value).replace(/[&<>]/g, function (chr) {
     if (chr === '&') return '&amp;';
     if (chr === '<') return '&lt;';
     return '&gt;';
@@ -1515,7 +1518,7 @@ function updateLmBaruHighlight(currentPrice, options) {
       valueEl.textContent = 'Rp —';
     }
     valueEl.classList.remove('value-flash');
-    requestAnimationFrame(function() {
+    requestAnimationFrame(function () {
       valueEl.classList.add('value-flash');
     });
   }
@@ -1569,13 +1572,13 @@ function updateLmBaruHighlight(currentPrice, options) {
     badgeEl.textContent = badgeLabel;
   }
   deltaWrap.classList.remove('delta-flash');
-  requestAnimationFrame(function() {
+  requestAnimationFrame(function () {
     deltaWrap.classList.add('delta-flash');
   });
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) {
     highlightCard.classList.remove('is-updated');
-    requestAnimationFrame(function() {
+    requestAnimationFrame(function () {
       highlightCard.classList.add('is-updated');
     });
   }
@@ -1591,7 +1594,7 @@ function getRangeConfig(rangeKey) {
 
 function deriveSeriesForRange(series, config) {
   if (!Array.isArray(series)) return [];
-  var sanitized = series.filter(function(point) {
+  var sanitized = series.filter(function (point) {
     return point && typeof point.price === 'number' && isFinite(point.price);
   });
   if (!sanitized.length) return [];
@@ -1604,7 +1607,7 @@ function deriveSeriesForRange(series, config) {
 
 function resetRangeSeriesCache(series) {
   var normalized = Array.isArray(series) ? series.slice() : [];
-  LM_HISTORY_RANGE_KEYS.forEach(function(key) {
+  LM_HISTORY_RANGE_KEYS.forEach(function (key) {
     var rangeConfig = getRangeConfig(key);
     LM_BARU_SERIES_BY_RANGE[key] = deriveSeriesForRange(normalized, rangeConfig);
   });
@@ -1614,7 +1617,7 @@ function updateRangeToggleState(activeKey) {
   var toggle = document.getElementById('lmBaruRangeToggle');
   if (!toggle) return;
   var buttons = toggle.querySelectorAll('button[data-range]');
-  Array.prototype.forEach.call(buttons, function(button) {
+  Array.prototype.forEach.call(buttons, function (button) {
     var key = (button.getAttribute('data-range') || '').trim();
     var isActive = key === String(activeKey || '');
     if (isActive) {
@@ -1638,9 +1641,9 @@ function refreshRangeMetrics(series, meta) {
   var rangeLabel = document.getElementById('lmBaruRangeValue');
   var displayLabel = meta.displayLabel || (config && (config.displayLabel || config.label)) || DEFAULT_SPARKLINE_PERIOD;
   if (rangeLabel) rangeLabel.textContent = displayLabel;
-  var values = Array.isArray(series) ? series.map(function(point) {
+  var values = Array.isArray(series) ? series.map(function (point) {
     return point && typeof point.price === 'number' && isFinite(point.price) ? Math.round(point.price) : null;
-  }).filter(function(value) {
+  }).filter(function (value) {
     return value !== null;
   }) : [];
   var lowEl = document.getElementById('lmBaruRangeLow');
@@ -1728,7 +1731,7 @@ function pruneUnavailableRangeButtons() {
   var toggle = document.getElementById('lmBaruRangeToggle');
   if (!toggle) return;
   var buttons = toggle.querySelectorAll('button[data-range]');
-  Array.prototype.forEach.call(buttons, function(button) {
+  Array.prototype.forEach.call(buttons, function (button) {
     var key = (button.getAttribute('data-range') || '').trim();
     if (!key) return;
     if (!Object.prototype.hasOwnProperty.call(LM_HISTORY_RANGE_CONFIG, key)) {
@@ -1741,7 +1744,7 @@ function setupHighlightRangeControls() {
   var toggle = document.getElementById('lmBaruRangeToggle');
   if (!toggle || toggle.dataset.bound === 'true') return;
   toggle.dataset.bound = 'true';
-  toggle.addEventListener('click', function(ev) {
+  toggle.addEventListener('click', function (ev) {
     var button = ev.target.closest('button[data-range]');
     if (!button) return;
     var rangeKey = button.getAttribute('data-range');
@@ -1768,7 +1771,7 @@ function prepareLmBaruHistorySeries(source, currentBase, limit) {
     });
   }
   if (source) {
-    if (Array.isArray(source.history)) source.history.forEach(function(item) {
+    if (Array.isArray(source.history)) source.history.forEach(function (item) {
       pushEntry(item, 'history');
     });
     pushEntry(source.previous, 'previous');
@@ -1776,7 +1779,7 @@ function prepareLmBaruHistorySeries(source, currentBase, limit) {
     pushEntry(source.current, 'current');
   }
   if (typeof currentBase === 'number' && isFinite(currentBase)) {
-    var alreadyIncluded = entries.some(function(entry) {
+    var alreadyIncluded = entries.some(function (entry) {
       return Math.abs(entry.base - currentBase) < 0.5;
     });
     if (!alreadyIncluded) {
@@ -1789,7 +1792,7 @@ function prepareLmBaruHistorySeries(source, currentBase, limit) {
     }
   }
   if (!entries.length) return [];
-  entries.sort(function(a, b) {
+  entries.sort(function (a, b) {
     if (a.time && b.time) {
       return a.time.getTime() - b.time.getTime();
     }
@@ -1837,7 +1840,7 @@ function findLmBaruSeriesPair(series, currentBase) {
     }
     return result;
   }
-  var points = series.filter(function(point) {
+  var points = series.filter(function (point) {
     return point && typeof point.base === 'number' && isFinite(point.base);
   });
   if (!points.length) {
@@ -2106,7 +2109,7 @@ function showSparklineTooltip(point, index, rect) {
   tooltip.classList.toggle('is-flip', shouldFlip);
   if (typeof index === 'number') tooltip.dataset.index = String(index);
   else delete tooltip.dataset.index;
-  requestAnimationFrame(function() {
+  requestAnimationFrame(function () {
     tooltip.classList.add('is-visible');
   });
   updateSparklinePointSummary(formatSparklinePointAnnouncement(point));
@@ -2190,36 +2193,36 @@ function attachSparklineInteractions() {
   var canvas = document.getElementById('lmBaruSparkline');
   if (!canvas) return;
   LM_BARU_SPARKLINE_EVENTS_BOUND = true;
-  canvas.addEventListener('pointerenter', function(ev) {
+  canvas.addEventListener('pointerenter', function (ev) {
     if (LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return;
     handleSparklinePointerEvent(ev, false);
   });
-  canvas.addEventListener('pointermove', function(ev) {
+  canvas.addEventListener('pointermove', function (ev) {
     if (ev.pointerType === 'touch' && !LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return;
     handleSparklinePointerEvent(ev, false);
   });
-  canvas.addEventListener('pointerdown', function(ev) {
+  canvas.addEventListener('pointerdown', function (ev) {
     handleSparklinePointerEvent(ev, true);
   });
-  canvas.addEventListener('click', function(ev) {
+  canvas.addEventListener('click', function (ev) {
     handleSparklinePointerEvent(ev, true);
   });
-  canvas.addEventListener('pointerleave', function() {
+  canvas.addEventListener('pointerleave', function () {
     if (LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return;
     hideSparklineTooltip({
       unlock: false
     });
   });
-  canvas.addEventListener('focus', function() {
+  canvas.addEventListener('focus', function () {
     showSparklinePointAtIndex(LM_BARU_SPARKLINE_POINTS.length - 1, canvas, true);
   });
-  canvas.addEventListener('blur', function() {
+  canvas.addEventListener('blur', function () {
     hideSparklineTooltip({
       unlock: true
     });
   });
   canvas.addEventListener('keydown', handleSparklineKeyNavigation);
-  document.addEventListener('pointerdown', function(ev) {
+  document.addEventListener('pointerdown', function (ev) {
     if (!LM_BARU_SPARKLINE_TOOLTIP_LOCKED) return;
     if (canvas.contains(ev.target)) return;
     var tooltip = document.getElementById('lmBaruSparklineTooltip');
@@ -2266,7 +2269,7 @@ function updateLmBaruSparkline(series, options) {
   var canvas = document.getElementById('lmBaruSparkline');
   var fallbackEl = document.getElementById('lmBaruChartFallback');
   var summaryEl = document.getElementById('lmBaruTrendSummary');
-  var hasSeries = Array.isArray(series) && series.length >= 2 && series.every(function(point) {
+  var hasSeries = Array.isArray(series) && series.length >= 2 && series.every(function (point) {
     return point && typeof point.price === 'number' && isFinite(point.price);
   });
 
@@ -2290,7 +2293,7 @@ function updateLmBaruSparkline(series, options) {
           ctxClear.setTransform(1, 0, 0, 1, 0, 0);
           ctxClear.clearRect(0, 0, canvas.width || 0, canvas.height || 0);
         }
-      } catch (_) {}
+      } catch (_) { }
       canvas.classList.remove('sparkline-visible');
       canvas.setAttribute('aria-hidden', 'true');
     }
@@ -2334,7 +2337,7 @@ function updateLmBaruSparkline(series, options) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(dpr, dpr);
-      var prices = series.map(function(point) {
+      var prices = series.map(function (point) {
         return Number(point.price) || 0;
       });
       var min = Math.min.apply(null, prices);
@@ -2361,7 +2364,7 @@ function updateLmBaruSparkline(series, options) {
 
       var points = [];
       ctx.beginPath();
-      prices.forEach(function(price, idx) {
+      prices.forEach(function (price, idx) {
         var x = idx * step;
         var norm = (price - min) / range;
         var y = height - verticalPadding - norm * usableHeight;
@@ -2388,7 +2391,7 @@ function updateLmBaruSparkline(series, options) {
       ctx.fill();
 
       ctx.beginPath();
-      prices.forEach(function(price, idx) {
+      prices.forEach(function (price, idx) {
         var x = idx * step;
         var norm = (price - min) / range;
         var y = height - verticalPadding - norm * usableHeight;
@@ -2400,7 +2403,7 @@ function updateLmBaruSparkline(series, options) {
       ctx.stroke();
 
       ctx.lineWidth = 1.1;
-      points.forEach(function(plotPoint, idx) {
+      points.forEach(function (plotPoint, idx) {
         if (!plotPoint) return;
         ctx.beginPath();
         ctx.arc(plotPoint.x, plotPoint.y, idx === points.length - 1 ? 3.4 : 2.4, 0, Math.PI * 2);
@@ -2483,12 +2486,12 @@ function extractPreviousBase(data, currentBase) {
   }
   pushCandidate(data.previous, 1);
   if (Array.isArray(data.history)) {
-    data.history.forEach(function(item) {
+    data.history.forEach(function (item) {
       pushCandidate(item, 1);
     });
   }
   if (!candidates.length) return null;
-  candidates.sort(function(a, b) {
+  candidates.sort(function (a, b) {
     if (a.priority !== b.priority) return b.priority - a.priority;
     if (a.time !== null && b.time !== null && a.time !== b.time) return b.time - a.time;
     if (a.time !== null && b.time === null) return -1;
@@ -2532,10 +2535,11 @@ function getMultiplierForCategory(catValue, karat) {
 }
 
 function buildPerhiasanPricesFromBase(basePrice) {
-  return GOLD_KARAT_SERIES.map(function(entry) {
+  return GOLD_KARAT_SERIES.map(function (entry) {
     var multiplier = getPerhiasanMultiplier(entry.karat);
     if (typeof multiplier !== 'number') return null;
-    var harga = roundUpPrice(basePrice * multiplier);
+    var adjust = entry.karat >= 14 ? PRICE_ADJUST_PERHIASAN_HIGH_IDR : PRICE_ADJUST_PERHIASAN_LOW_IDR;
+    var harga = roundUpPrice(basePrice * multiplier + adjust);
     return {
       karat: entry.karat,
       price: harga,
@@ -2551,7 +2555,7 @@ function renderPriceTable(rows) {
   tbody.setAttribute('aria-busy', 'true');
   tbody.innerHTML = '';
   var priceEntries = [];
-  rows.forEach(function(row) {
+  rows.forEach(function (row) {
     if (!row || typeof row.price !== 'number' || !isFinite(row.price)) return;
     var color = row.color || GOLD_ROW_PRIMARY;
     var infoAttr = row.infoKey ? ` data-info-key="${row.infoKey}" tabindex="0" role="button" aria-label="Detail ${row.label}"` : '';
@@ -2727,7 +2731,7 @@ async function fetchGlobalGoldSpot() {
 
   setGlobalGoldBusy(elements, true);
   if (!GLOBAL_GOLD_SPOT_PROMISE) {
-    GLOBAL_GOLD_SPOT_PROMISE = (async function() {
+    GLOBAL_GOLD_SPOT_PROMISE = (async function () {
       let lastError = null;
       for (const endpoint of getGlobalGoldEndpoints()) {
         try {
@@ -2771,15 +2775,15 @@ var SHARE_LOGO_PROMISE = null;
 
 function loadShareLogo() {
   if (SHARE_LOGO_PROMISE) return SHARE_LOGO_PROMISE;
-  SHARE_LOGO_PROMISE = new Promise(function(resolve) {
+  SHARE_LOGO_PROMISE = new Promise(function (resolve) {
     try {
       var img = new Image();
       img.decoding = 'async';
       img.crossOrigin = 'anonymous';
-      img.onload = function() {
+      img.onload = function () {
         resolve(img);
       };
-      img.onerror = function() {
+      img.onerror = function () {
         resolve(null);
       };
       img.src = '/assets/icons/logo-192.png';
@@ -2846,7 +2850,7 @@ function bindHighlightAddButton() {
   if (HIGHLIGHT_ADD_BOUND) return;
   var highlightAdd = document.getElementById('highlight-add');
   if (!highlightAdd) return;
-  highlightAdd.addEventListener('click', function(ev) {
+  highlightAdd.addEventListener('click', function (ev) {
     ev.preventDefault();
     triggerCalculatorSelection(highlightAdd);
   });
@@ -2857,7 +2861,7 @@ function collectSharePriceRows() {
   var tbody = document.getElementById('goldPriceTable');
   if (!tbody) return [];
   var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.price-row'));
-  return rows.map(function(row) {
+  return rows.map(function (row) {
     var labelEl = row.querySelector('.price-label');
     var priceEl = row.querySelector('.price-amount .num');
     var label = labelEl ? labelEl.textContent.trim() : '';
@@ -2881,7 +2885,7 @@ function buildShareMetaInfo() {
   var cached = null;
   try {
     cached = readLastBasePrice();
-  } catch (_) {}
+  } catch (_) { }
   if (cached && typeof cached.t === 'number') {
     var cachedDate = new Date(cached.t);
     if (!isNaN(cachedDate.getTime())) {
@@ -3146,7 +3150,7 @@ function drawPriceShareCanvas(rows, meta, logoImage) {
     var labelLines;
     if (forcedLines) {
       ctx.font = labelFontMulti;
-      labelLines = forcedLines.map(function(line) {
+      labelLines = forcedLines.map(function (line) {
         return truncateTextToWidth(ctx, line, labelMaxWidth);
       }).filter(Boolean);
     } else {
@@ -3198,7 +3202,7 @@ function drawPriceShareCanvas(rows, meta, logoImage) {
       if (meta.updatedFooter) infoY += noteGap;
       ctx.font = '400 28px "Inter", "Helvetica Neue", Arial, sans-serif';
       ctx.fillStyle = '#6A5C3E';
-      noteLines.forEach(function(line, idx) {
+      noteLines.forEach(function (line, idx) {
         ctx.fillText(line, tableX, infoY + idx * noteLineHeight);
       });
     }
@@ -3214,13 +3218,13 @@ function drawPriceShareCanvas(rows, meta, logoImage) {
 }
 
 function canvasToBlob(canvas) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     if (!canvas) {
       reject(new Error('Canvas tidak tersedia'));
       return;
     }
     if (typeof canvas.toBlob === 'function') {
-      canvas.toBlob(function(blob) {
+      canvas.toBlob(function (blob) {
         if (blob) resolve(blob);
         else reject(new Error('Gagal membuat blob')); // coverage
       }, 'image/png', 0.95);
@@ -3252,7 +3256,7 @@ function triggerDownload(blob, filename) {
   link.download = filename;
   document.body.appendChild(link);
   link.click();
-  setTimeout(function() {
+  setTimeout(function () {
     URL.revokeObjectURL(url);
     document.body.removeChild(link);
   }, 0);
@@ -3285,7 +3289,7 @@ async function sharePriceTable(button) {
   button.textContent = 'Menyiapkan...';
   try {
     var meta = buildShareMetaInfo();
-    var logoImage = await loadShareLogo().catch(function() {
+    var logoImage = await loadShareLogo().catch(function () {
       return null;
     });
     var canvas = drawPriceShareCanvas(rows, meta, logoImage);
@@ -3372,7 +3376,7 @@ function setupSharePriceButton() {
   if (fallbackEl && fallbackEl.dataset && !fallbackEl.dataset.default) {
     fallbackEl.dataset.default = fallbackEl.textContent.trim();
   }
-  var updateAvailability = function() {
+  var updateAvailability = function () {
     var hasData = collectSharePriceRows().length > 0;
     button.disabled = !hasData;
     if (hasData) {
@@ -3383,7 +3387,7 @@ function setupSharePriceButton() {
   };
   updateAvailability();
   document.addEventListener('prices:updated', updateAvailability);
-  button.addEventListener('click', function() {
+  button.addEventListener('click', function () {
     sharePriceTable(button);
   });
 }
@@ -3418,7 +3422,7 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       addKadar: '24'
     });
   }
-  (perhiasanEntries || []).forEach(function(entry) {
+  (perhiasanEntries || []).forEach(function (entry) {
     var iconType = 'jewelry';
     var iconTitle = 'Perhiasan emas';
     var iconTooltip = `Perhiasan ${entry.karat}K`;
@@ -3433,12 +3437,12 @@ function renderPriceTableFromNumbers(lmBaru, lmLama, perhiasanEntries) {
       label = `18K/17K`
     } else if (entry.karat == 9) {
       label = `10K/9K`
-    } else if (entry.karat == 24){
+    } else if (entry.karat == 24) {
       label = `24K (99,9)`
     }
 
     rows.push({
-      label: label, 
+      label: label,
       schemaName: `Perhiasan ${entry.karat}K`,
       price: entry.price,
       color: entry.color || GOLD_ROW_PRIMARY,
@@ -3529,7 +3533,7 @@ async function fetchGoldPrice() {
     }
     const payload = await response.json();
     const items = Array.isArray(payload && payload.items) ? payload.items : [];
-    const entry = items.find(function(item) {
+    const entry = items.find(function (item) {
       return item && item.curr === 'IDR';
     }) || items[0];
     if (!entry) {
@@ -3647,13 +3651,13 @@ if (shouldFetchGlobalGoldPrice()) {
   fetchGlobalGoldSpot();
 }
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
   if (!LM_BARU_SPARKLINE_META || !LM_BARU_SPARKLINE_META.hasSeries) return;
   if (!Array.isArray(LM_BARU_PRICE_SERIES) || LM_BARU_PRICE_SERIES.length < 2) return;
   if (LM_BARU_SPARKLINE_RESIZE_FRAME) {
     cancelAnimationFrame(LM_BARU_SPARKLINE_RESIZE_FRAME);
   }
-  LM_BARU_SPARKLINE_RESIZE_FRAME = requestAnimationFrame(function() {
+  LM_BARU_SPARKLINE_RESIZE_FRAME = requestAnimationFrame(function () {
     LM_BARU_SPARKLINE_RESIZE_FRAME = null;
     updateLmBaruSparkline(LM_BARU_PRICE_SERIES, getSparklineReuseOptions());
   });
@@ -3663,7 +3667,7 @@ window.addEventListener('resize', function() {
 
 // Modal detail kadar emas dari tabel harga
 /* istanbul ignore next */
-(function() {
+(function () {
   var table = document.getElementById('goldPriceTable');
   var modal = document.getElementById('goldInfoModal');
   if (!table || !modal) return;
@@ -3699,7 +3703,7 @@ window.addEventListener('resize', function() {
     if (tipsEl) {
       tipsEl.innerHTML = '';
       var tips = Array.isArray(data.tips) ? data.tips : [];
-      tips.forEach(function(tip) {
+      tips.forEach(function (tip) {
         var li = document.createElement('li');
         li.textContent = tip;
         tipsEl.appendChild(li);
@@ -3749,14 +3753,14 @@ window.addEventListener('resize', function() {
       modal.hidden = true;
       document.body.classList.remove('modal-open');
       if (lastFocusEl && typeof lastFocusEl.focus === 'function') {
-        requestAnimationFrame(function() {
+        requestAnimationFrame(function () {
           lastFocusEl.focus();
         });
       }
     }
   }
 
-  table.addEventListener('click', function(ev) {
+  table.addEventListener('click', function (ev) {
     var addBtn = ev.target.closest('button[data-add-cat]');
     if (addBtn) {
       ev.preventDefault();
@@ -3770,7 +3774,7 @@ window.addEventListener('resize', function() {
     openModal(row.getAttribute('data-info-key'), row);
   });
 
-  table.addEventListener('keydown', function(ev) {
+  table.addEventListener('keydown', function (ev) {
     if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') return;
     if (ev.target.closest('button')) return;
     var row = ev.target.closest('tr[data-info-key]');
@@ -3780,18 +3784,18 @@ window.addEventListener('resize', function() {
   });
 
   if (closeBtn) {
-    closeBtn.addEventListener('click', function() {
+    closeBtn.addEventListener('click', function () {
       closeModal();
     });
   }
 
-  modal.addEventListener('click', function(ev) {
+  modal.addEventListener('click', function (ev) {
     if (ev.target === modal) {
       closeModal();
     }
   });
 
-  document.addEventListener('keydown', function(ev) {
+  document.addEventListener('keydown', function (ev) {
     if (ev.key === 'Escape') {
       closeModal();
     }
@@ -3799,7 +3803,7 @@ window.addEventListener('resize', function() {
 
   modal.addEventListener('keydown', trapFocus);
   if (dialog) {
-    dialog.addEventListener('click', function(ev) {
+    dialog.addEventListener('click', function (ev) {
       ev.stopPropagation();
     });
   }
@@ -3807,7 +3811,7 @@ window.addEventListener('resize', function() {
 
 // Kalkulator Emas + WA Prefill
 /* istanbul ignore next */
-(function() {
+(function () {
   var cat = document.getElementById('cal-cat');
   var kadar = document.getElementById('cal-kadar');
   var berat = document.getElementById('cal-berat');
@@ -3830,7 +3834,7 @@ window.addEventListener('resize', function() {
   function getAvailableSubKadarValues() {
     if (!kadar || !kadar.options) return [];
     var options = Array.prototype.slice.call(kadar.options);
-    var numericOptions = options.reduce(function(list, opt) {
+    var numericOptions = options.reduce(function (list, opt) {
       var num = Number(opt && opt.value);
       if (Number.isFinite(num) && num < 24) {
         list.push({
@@ -3840,10 +3844,10 @@ window.addEventListener('resize', function() {
       }
       return list;
     }, []);
-    numericOptions.sort(function(a, b) {
+    numericOptions.sort(function (a, b) {
       return b.weight - a.weight;
     });
-    return numericOptions.map(function(entry) {
+    return numericOptions.map(function (entry) {
       return entry.value;
     });
   }
@@ -3967,7 +3971,8 @@ window.addEventListener('resize', function() {
     if (c === 'lm_baru' || c === 'lm_lama' || c === 'perhiasan_24') {
       k = 24;
     }
-    var perGram = typeof multiplier === 'number' ? ceilStep(base * multiplier, 1000) : 0;
+    var priceAdjust = (c === 'lm_baru' || c === 'lm_lama') ? PRICE_ADJUST_LM_IDR : (k >= 14 ? PRICE_ADJUST_PERHIASAN_HIGH_IDR : PRICE_ADJUST_PERHIASAN_LOW_IDR);
+    var perGram = typeof multiplier === 'number' ? ceilStep(base * multiplier + priceAdjust, 1000) : 0;
     var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
     return {
       cat: c,
@@ -3982,14 +3987,14 @@ window.addEventListener('resize', function() {
     var baseUrl = 'https://wa.me/6285591088503?text=';
     var message;
     if (items.length) {
-      var totalValue = items.reduce(function(sum, item) {
+      var totalValue = items.reduce(function (sum, item) {
         return sum + (item.estimasi || 0);
       }, 0);
-      var lines = items.map(function(item, index) {
+      var lines = items.map(function (item, index) {
         var itemKadar = item.kadar + 'K';
         if (item.kadar == 17) {
           itemKadar = '18K/17K';
-        }else if (item.kadar == 9) {
+        } else if (item.kadar == 9) {
           itemKadar = '10K/9K';
         }
 
@@ -4025,7 +4030,7 @@ window.addEventListener('resize', function() {
     if (itemsBody) {
       itemsBody.innerHTML = '';
     }
-    items.forEach(function(item) {
+    items.forEach(function (item) {
       var computed = calculateValues(item.cat, item.kadar, item.berat);
       item.kadar = computed.kadar;
       item.berat = computed.berat;
@@ -4143,7 +4148,7 @@ window.addEventListener('resize', function() {
   }
 
   function removeItem(id) {
-    var index = items.findIndex(function(item) {
+    var index = items.findIndex(function (item) {
       return item.id === id;
     });
     if (index === -1) return;
@@ -4155,7 +4160,7 @@ window.addEventListener('resize', function() {
   }
 
   function updateItemWeight(id, nextWeight, options) {
-    var item = items.find(function(entry) {
+    var item = items.find(function (entry) {
       return entry.id === id;
     });
     if (!item) return;
@@ -4190,12 +4195,12 @@ window.addEventListener('resize', function() {
           } catch (_) {
             try {
               focusInput.setSelectionRange(len, len);
-            } catch (__) {}
+            } catch (__) { }
           }
         } else {
           try {
             focusInput.setSelectionRange(len, len);
-          } catch (_) {}
+          } catch (_) { }
         }
       }
     }
@@ -4237,24 +4242,24 @@ window.addEventListener('resize', function() {
     previousCategory = currentCat;
   }
 
-  ['input', 'change'].forEach(function(ev) {
+  ['input', 'change'].forEach(function (ev) {
     berat.addEventListener(ev, updatePreview);
-    kadar.addEventListener(ev, function() {
+    kadar.addEventListener(ev, function () {
       enforceKadarForCategory();
       updatePreview();
     });
   });
-  cat.addEventListener('change', function() {
+  cat.addEventListener('change', function () {
     toggleKadar();
     updatePreview();
   });
-  cat.addEventListener('input', function() {
+  cat.addEventListener('input', function () {
     toggleKadar();
     updatePreview();
   });
 
   if (addBtn) {
-    addBtn.addEventListener('click', function() {
+    addBtn.addEventListener('click', function () {
       var safeKadar = enforceKadarForCategory() || kadar.value;
       if (!addItem(cat.value, safeKadar, berat.value) && berat) {
         berat.focus();
@@ -4264,13 +4269,13 @@ window.addEventListener('resize', function() {
   }
 
   if (itemsBody) {
-    itemsBody.addEventListener('click', function(ev) {
+    itemsBody.addEventListener('click', function (ev) {
       var btn = ev.target.closest('button[data-remove-id]');
       if (!btn) return;
       var id = Number(btn.getAttribute('data-remove-id'));
       removeItem(id);
     });
-    itemsBody.addEventListener('input', function(ev) {
+    itemsBody.addEventListener('input', function (ev) {
       var field = ev.target.closest('input[data-edit-id]');
       if (!field) return;
       var raw = field.value;
@@ -4282,7 +4287,7 @@ window.addEventListener('resize', function() {
         source: field
       });
     });
-    itemsBody.addEventListener('change', function(ev) {
+    itemsBody.addEventListener('change', function (ev) {
       var field = ev.target.closest('input[data-edit-id]');
       if (!field) return;
       var id = Number(field.getAttribute('data-edit-id'));
@@ -4292,7 +4297,7 @@ window.addEventListener('resize', function() {
         forceRefresh: true
       });
     });
-    itemsBody.addEventListener('keydown', function(ev) {
+    itemsBody.addEventListener('keydown', function (ev) {
       if (ev.key !== 'Enter') return;
       var field = ev.target.closest('input[data-edit-id]');
       if (!field) return;
@@ -4307,7 +4312,7 @@ window.addEventListener('resize', function() {
     });
   }
 
-  document.addEventListener('prices:updated', function() {
+  document.addEventListener('prices:updated', function () {
     refreshList();
     if (!items.length) {
       updatePreview();
@@ -4328,7 +4333,7 @@ window.addEventListener('resize', function() {
     };
     if (options.cat) {
       var desired = String(options.cat);
-      var hasOption = Array.prototype.some.call(cat.options, function(opt) {
+      var hasOption = Array.prototype.some.call(cat.options, function (opt) {
         return opt.value === desired;
       });
       if (hasOption) {
@@ -4338,7 +4343,7 @@ window.addEventListener('resize', function() {
     }
     if (options.kadar !== undefined && options.kadar !== null) {
       var val = String(options.kadar);
-      var hasKadar = Array.prototype.some.call(kadar.options, function(opt) {
+      var hasKadar = Array.prototype.some.call(kadar.options, function (opt) {
         return opt.value === val;
       });
       if (hasKadar || kadar.disabled) {
@@ -4388,10 +4393,10 @@ window.addEventListener('resize', function() {
     window.testing.updateWaLink = updateWaLink;
     Object.defineProperty(window.testing, 'lastPreview', {
       configurable: true,
-      get: function() {
+      get: function () {
         return lastPreview;
       },
-      set: function(value) {
+      set: function (value) {
         lastPreview = value;
         if (!items.length) {
           updateWaLink();
@@ -4406,7 +4411,7 @@ window.addEventListener('resize', function() {
 
 // Konverter satuan emas
 /* istanbul ignore next */
-(function() {
+(function () {
   var fromValue = document.getElementById('conv-from-value');
   var toValue = document.getElementById('conv-to-value');
   var fromUnit = document.getElementById('conv-from-unit');
@@ -4418,7 +4423,7 @@ window.addEventListener('resize', function() {
 
   function populate(select) {
     select.innerHTML = '';
-    GOLD_UNIT_DEFS.forEach(function(unit) {
+    GOLD_UNIT_DEFS.forEach(function (unit) {
       var opt = document.createElement('option');
       opt.value = unit.id;
       opt.textContent = unit.label;
@@ -4427,7 +4432,7 @@ window.addEventListener('resize', function() {
   }
 
   function unitById(id) {
-    return GOLD_UNIT_DEFS.find(function(u) {
+    return GOLD_UNIT_DEFS.find(function (u) {
       return u.id === id;
     }) || GOLD_UNIT_DEFS[0];
   }
@@ -4493,7 +4498,7 @@ window.addEventListener('resize', function() {
   toUnit.addEventListener('change', convertFrom);
   toValue.addEventListener('input', convertTo);
   if (swapBtn) {
-    swapBtn.addEventListener('click', function() {
+    swapBtn.addEventListener('click', function () {
       swap();
     });
   }
@@ -4501,7 +4506,7 @@ window.addEventListener('resize', function() {
 
 // Tahun pada footer + 404 helpers
 /* istanbul ignore next */
-(function() {
+(function () {
   var nowY = new Date().getFullYear().toString();
   var yrEl = document.getElementById('yr');
   if (yrEl) {
@@ -4519,7 +4524,7 @@ window.addEventListener('resize', function() {
 
 // Tracking klik CTA (WA/telepon)
 /* istanbul ignore next */
-(function() {
+(function () {
   const ENABLE_BEACON = false;
 
   function track(evt, label) {
@@ -4538,18 +4543,18 @@ window.addEventListener('resize', function() {
       } else {
         console.log('[track]', evt, label);
       }
-    } catch (e) {}
+    } catch (e) { }
   }
-  document.querySelectorAll('[data-track]').forEach(function(el) {
-    el.addEventListener('click', function() {
+  document.querySelectorAll('[data-track]').forEach(function (el) {
+    el.addEventListener('click', function () {
       var label = el.getAttribute('data-track');
       track('cta_click', label);
       if (label && label.indexOf('wa-') === 0 && 'serviceWorker' in navigator) {
         try {
-          navigator.serviceWorker.ready.then(function(reg) {
+          navigator.serviceWorker.ready.then(function (reg) {
             var tag = 'wa-click:' + label + ':' + Date.now();
             if ('sync' in reg) {
-              reg.sync.register(tag).catch( /* istanbul ignore next */ function() {});
+              reg.sync.register(tag).catch( /* istanbul ignore next */ function () { });
             }
             /* istanbul ignore next */
             if (ENABLE_BEACON && navigator.sendBeacon) {
@@ -4561,17 +4566,17 @@ window.addEventListener('resize', function() {
                 })], {
                   type: 'application/json'
                 }));
-              } catch (e) {}
+              } catch (e) { }
             }
           });
-        } catch (e) {}
+        } catch (e) { }
       }
     });
   });
 })();
 
 /* istanbul ignore next */
-(function() {
+(function () {
   var searchSection = document.getElementById('searchResults');
   var body = document.body || document.documentElement;
   var docEl = document.documentElement;
@@ -4594,7 +4599,7 @@ window.addEventListener('resize', function() {
     if (window.matchMedia) {
       mobileMedia = window.matchMedia('(max-width: 720px)');
     }
-  } catch (e) {}
+  } catch (e) { }
   var mobileBackdrop = null;
   var forms = Array.prototype.slice.call(document.querySelectorAll('[data-search-form]'));
   var inputs = Array.prototype.slice.call(document.querySelectorAll('[data-search-input]'));
@@ -4618,7 +4623,7 @@ window.addEventListener('resize', function() {
   }
 
   if (headerToggle) {
-    headerToggle.addEventListener('click', function() {
+    headerToggle.addEventListener('click', function () {
       if (isHeaderSearchOpen()) {
         closeHeaderSearch();
       } else {
@@ -4628,7 +4633,7 @@ window.addEventListener('resize', function() {
   }
 
   if (mobileMedia) {
-    var handleMediaChange = function(ev) {
+    var handleMediaChange = function (ev) {
       if (ev && ev.matches === false) {
         closeHeaderSearch();
       }
@@ -4641,7 +4646,7 @@ window.addEventListener('resize', function() {
   }
 
   if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
-    window.addEventListener('resize', function() {
+    window.addEventListener('resize', function () {
       if (!isMobile()) {
         closeHeaderSearch();
       }
@@ -4651,7 +4656,7 @@ window.addEventListener('resize', function() {
   }
 
   if (typeof document !== 'undefined' && typeof document.addEventListener === 'function') {
-    document.addEventListener('keydown', function(ev) {
+    document.addEventListener('keydown', function (ev) {
       if (!ev) return;
       var key = ev.key || ev.keyCode;
       if ((key === 'Escape' || key === 'Esc' || key === 27) && isHeaderSearchOpen()) {
@@ -4659,7 +4664,7 @@ window.addEventListener('resize', function() {
         if (headerToggle && typeof headerToggle.focus === 'function') {
           try {
             headerToggle.focus();
-          } catch (_) {}
+          } catch (_) { }
         }
       }
     });
@@ -4683,7 +4688,7 @@ window.addEventListener('resize', function() {
 
   rawQuery = (rawQuery || '').replace(/\+/g, ' ').trim();
 
-  inputs.forEach(function(input) {
+  inputs.forEach(function (input) {
     if (!input) return;
     input.value = rawQuery;
   });
@@ -4711,7 +4716,7 @@ window.addEventListener('resize', function() {
       if (searchSection && typeof searchSection.focus === 'function') {
         try {
           searchSection.focus();
-        } catch (_) {}
+        } catch (_) { }
       }
     } else {
       removeSearchActiveClass();
@@ -4725,9 +4730,9 @@ window.addEventListener('resize', function() {
     }
   }
 
-  forms.forEach(function(form) {
+  forms.forEach(function (form) {
     if (!form) return;
-    form.addEventListener('submit', function(ev) {
+    form.addEventListener('submit', function (ev) {
       var input = form.querySelector('[data-search-input]');
       if (!input) return;
       var value = (input.value || '').trim();
@@ -4744,11 +4749,11 @@ window.addEventListener('resize', function() {
     });
   });
 
-  suggestionButtons.forEach(function(button) {
-    button.addEventListener('click', function() {
+  suggestionButtons.forEach(function (button) {
+    button.addEventListener('click', function () {
       var value = button.getAttribute('data-search-suggestion') || '';
       if (!value) return;
-      inputs.forEach(function(input) {
+      inputs.forEach(function (input) {
         if (input) {
           input.value = value;
         }
@@ -4803,7 +4808,7 @@ window.addEventListener('resize', function() {
         if (typeof headerInput.select === 'function') {
           headerInput.select();
         }
-      } catch (e) {}
+      } catch (e) { }
       if ((typeof document !== 'undefined' && document.activeElement !== headerInput) && attempt < maxAttempts) {
         setTimeout(tryFocus, delays[attempt] || 0);
       }
@@ -4877,9 +4882,9 @@ window.addEventListener('resize', function() {
     var matches = [];
 
     if (tokens.length) {
-      SEARCH_INDEX.forEach(function(entry) {
+      SEARCH_INDEX.forEach(function (entry) {
         if (!entry || !entry.normalized) return;
-        var matchesAll = tokens.every(function(token) {
+        var matchesAll = tokens.every(function (token) {
           return entry.normalized.indexOf(token) !== -1;
         });
         if (!matchesAll) return;
@@ -4891,7 +4896,7 @@ window.addEventListener('resize', function() {
       });
     }
 
-    matches.sort(function(a, b) {
+    matches.sort(function (a, b) {
       if (b.score !== a.score) return b.score - a.score;
       var priorityDiff = (b.entry.priority || 0) - (a.entry.priority || 0);
       if (priorityDiff) return priorityDiff;
@@ -4915,7 +4920,7 @@ window.addEventListener('resize', function() {
     }
 
     var frag = document.createDocumentFragment();
-    matches.forEach(function(match) {
+    matches.forEach(function (match) {
       var entry = match.entry;
       var item = document.createElement('li');
       item.className = 'search-result card';
@@ -4961,7 +4966,7 @@ window.addEventListener('resize', function() {
 
   function computeScore(entry, tokens, fullQuery) {
     var score = entry.priority || 0;
-    tokens.forEach(function(token) {
+    tokens.forEach(function (token) {
       if (entry.normalizedTitle && entry.normalizedTitle.indexOf(token) !== -1) score += 10;
       if (entry.normalizedKeywords && entry.normalizedKeywords.indexOf(token) !== -1) score += 6;
       if (entry.normalizedDescription && entry.normalizedDescription.indexOf(token) !== -1) score += 4;
@@ -4988,7 +4993,7 @@ window.addEventListener('resize', function() {
     if (!text) return '';
     var safe = escapeHtml(text);
     if (!tokens || !tokens.length) return safe;
-    var escapedTokens = tokens.map(function(token) {
+    var escapedTokens = tokens.map(function (token) {
       return token.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }).filter(Boolean);
     if (!escapedTokens.length) return safe;
@@ -4997,7 +5002,7 @@ window.addEventListener('resize', function() {
   }
 
   function escapeHtml(str) {
-    return String(str).replace(/[&<>"']/g, function(ch) {
+    return String(str).replace(/[&<>"']/g, function (ch) {
       switch (ch) {
         case '&':
           return '&amp;';
@@ -5026,7 +5031,7 @@ window.addEventListener('resize', function() {
           month: 'long',
           year: 'numeric'
         }).format(date);
-      } catch (e) {}
+      } catch (e) { }
     }
     var months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     var month = months[date.getMonth()] || '';
@@ -5041,7 +5046,7 @@ window.addEventListener('resize', function() {
       if (base.toLowerCase().indexOf('sentral emas') !== -1) {
         document.title = 'Cari "' + query + '" | Sentral Emas';
       }
-    } catch (e) {}
+    } catch (e) { }
   }
 })();
 
@@ -5052,38 +5057,38 @@ if ('serviceWorker' in navigator) {
   var hadController = !!navigator.serviceWorker.controller;
   var isReloadingAfterUpdate = false;
 
-  navigator.serviceWorker.addEventListener('controllerchange', function() {
+  navigator.serviceWorker.addEventListener('controllerchange', function () {
     if (!hadController || isReloadingAfterUpdate) return;
     isReloadingAfterUpdate = true;
     window.location.reload();
   });
 
-  window.addEventListener('load', function() {
+  window.addEventListener('load', function () {
     navigator.serviceWorker.register('/sw.js', {
-        scope: '/'
-      })
-      .then(function(reg) {
+      scope: '/'
+    })
+      .then(function (reg) {
         if (!hadController) return;
         if (reg.waiting) {
           if (typeof reg.waiting.postMessage === 'function') {
             try {
               reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-            } catch (_) {}
+            } catch (_) { }
           }
           if (!isReloadingAfterUpdate) {
             isReloadingAfterUpdate = true;
             window.location.reload();
           }
         }
-        reg.addEventListener('updatefound', function() {
+        reg.addEventListener('updatefound', function () {
           var nw = reg.installing;
           if (nw) {
-            nw.addEventListener('statechange', function() {
+            nw.addEventListener('statechange', function () {
               if (nw.state === 'installed' && navigator.serviceWorker.controller) {
                 if (typeof nw.postMessage === 'function') {
                   try {
                     nw.postMessage({ type: 'SKIP_WAITING' });
-                  } catch (_) {}
+                  } catch (_) { }
                 }
                 if (!isReloadingAfterUpdate) {
                   isReloadingAfterUpdate = true;
@@ -5094,7 +5099,7 @@ if ('serviceWorker' in navigator) {
           }
         });
       })
-      .catch(function(err) {
+      .catch(function (err) {
         console.warn('SW registration failed', err);
       });
   });
@@ -5102,10 +5107,10 @@ if ('serviceWorker' in navigator) {
 
 // Back to top button (remove inline handler)
 /* istanbul ignore next */
-(function() {
+(function () {
   var btn = document.getElementById('backToTop');
   if (!btn) return;
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function () {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
@@ -5116,9 +5121,9 @@ if ('serviceWorker' in navigator) {
   var scrollThreshold = 200; // Show after scrolling 200px
   var lastVisible = null;
   var togglePending = false;
-  var schedule = window.requestAnimationFrame ? function(cb) {
+  var schedule = window.requestAnimationFrame ? function (cb) {
     return window.requestAnimationFrame(cb);
-  } : function(cb) {
+  } : function (cb) {
     return setTimeout(cb, 16);
   };
 
@@ -5152,15 +5157,15 @@ if ('serviceWorker' in navigator) {
 
 // Nav aria-current
 /* istanbul ignore next */
-(function() {
+(function () {
   var links = Array.from(document.querySelectorAll('nav.menu a'));
 
   function apply() {
     var h = location.hash || '#home';
-    links.forEach(function(a) {
+    links.forEach(function (a) {
       a.removeAttribute('aria-current');
     });
-    var cur = links.find(function(a) {
+    var cur = links.find(function (a) {
       return a.getAttribute('href') === h;
     });
     if (cur) {
@@ -5173,7 +5178,7 @@ if ('serviceWorker' in navigator) {
 
 // Scroll reveal for sections
 /* istanbul ignore next */
-(function() {
+(function () {
   if (typeof window === 'undefined' || typeof document === 'undefined') return;
 
   function revealSections() {
@@ -5184,14 +5189,14 @@ if ('serviceWorker' in navigator) {
     if (!sections.length) return;
 
     if (!('IntersectionObserver' in window)) {
-      sections.forEach(function(section) {
+      sections.forEach(function (section) {
         section.classList.add('is-visible');
       });
       return;
     }
 
-    var observer = new IntersectionObserver(function(entries) {
-      entries.forEach(function(entry) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
         var target = entry.target;
         if (!target || !entry.isIntersecting) return;
         target.classList.add('is-visible');
@@ -5202,7 +5207,7 @@ if ('serviceWorker' in navigator) {
       rootMargin: '0px 0px -10% 0px'
     });
 
-    sections.forEach(function(section) {
+    sections.forEach(function (section) {
       if (!section.classList.contains('is-visible')) {
         observer.observe(section);
       }
@@ -5220,7 +5225,7 @@ if ('serviceWorker' in navigator) {
 
 // PWA Install Prompt
 /* istanbul ignore next */
-(function() {
+(function () {
   let deferredPrompt;
 
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -5268,7 +5273,7 @@ if ('serviceWorker' in navigator) {
 
 // Dark Mode Toggle
 /* istanbul ignore next */
-(function() {
+(function () {
   const THEME_KEY = 'sentral_emas_theme';
   const toggle = document.getElementById('darkModeToggle');
 
@@ -5313,7 +5318,7 @@ if ('serviceWorker' in navigator) {
   toggle.addEventListener('click', cycleTheme);
 
   if (window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
       const currentTheme = localStorage.getItem(THEME_KEY) || 'auto';
       if (currentTheme === 'auto') {
         applyTheme('auto');
@@ -5323,7 +5328,7 @@ if ('serviceWorker' in navigator) {
 })();
 
 /* istanbul ignore next */
-(function() {
+(function () {
   if (typeof window === 'undefined') return;
 
   var hasScheduled = false;
@@ -5350,7 +5355,7 @@ if ('serviceWorker' in navigator) {
 
   function scheduleLoad() {
     if ('requestIdleCallback' in window) {
-      requestIdleCallback(function() {
+      requestIdleCallback(function () {
         loadWebVitals();
       });
     } else {
