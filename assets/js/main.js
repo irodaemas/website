@@ -900,36 +900,33 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.999472431;
-const FACTOR_LM_LAMA = 0.986146126;
-const PRICE_ADJUST_LM_IDR = -50000;
-const PRICE_ADJUST_PERHIASAN_HIGH_IDR = -50000;
-const PRICE_ADJUST_PERHIASAN_LOW_IDR = -30000;
-const PRICE_ADJUST_PERHIASAN_MID_IDR = -15000;
-const FACTOR_PERHIASAN_24K = 0.964548321;
+const FACTOR_LM_BARU = 0.982048692;
+const FACTOR_LM_LAMA = 0.968823651;
+const PRICE_ADJUST_LM_IDR = 0;
+const FACTOR_PERHIASAN_24K = 0.947020204;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
-  23: 0.849666379,
-  22: 0.815661325,
-  21: 0.782575326,
-  20: 0.748570271,
-  19: 0.714565216,
-  18: 0.681938745,
-  17: 0.647933690,
-  16: 0.614388163,
-  15: 0.542701832,
-  14: 0.509156305,
-  13: 0.475151250,
-  12: 0.442065251,
-  11: 0.408060196,
-  10: 0.374514670,
-  9: 0.341428670,
-  8: 0.307423616,
-  7: 0.273418561,
-  6: 0.240332562,
-  5: 0.207246563
+  23: 0.832284033,
+  22: 0.798327845,
+  21: 0.765086524,
+  20: 0.731130337,
+  19: 0.697174149,
+  18: 0.624972571,
+  17: 0.624972571,
+  16: 0.591373817,
+  15: 0.519529672,
+  14: 0.486288351,
+  13: 0.459123401,
+  12: 0.426239514,
+  11: 0.392283327,
+  10: 0.330804755,
+  9: 0.330804755,
+  8: 0.296848567,
+  7: 0.262892380,
+  6: 0.229651059,
+  5: 0.196767172
 };
-const DEFAULT_BASE_PRICE = 2176000;
+const DEFAULT_BASE_PRICE = 2797723;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 
@@ -1204,87 +1201,87 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2101000,
-  lmLama: 2061000,
+  lmBaru: 2748000,
+  lmLama: 2711000,
   perhiasan: [{
     karat: 24,
-    price: 2010000
+    price: 2650000
   },
   {
     karat: 23,
-    price: 1747000
+    price: 2329000
   },
   {
     karat: 22,
-    price: 1674000
+    price: 2234000
   },
   {
     karat: 21,
-    price: 1602000
+    price: 2141000
   },
   {
     karat: 20,
-    price: 1529000
+    price: 2046000
   },
   {
     karat: 19,
-    price: 1455000
+    price: 1951000
   },
   {
     karat: 18,
-    price: 1369000
+    price: 1749000
   },
   {
     karat: 17,
-    price: 1295000
+    price: 1749000
   },
   {
     karat: 16,
-    price: 1222000
+    price: 1655000
   },
   {
     karat: 15,
-    price: 1080000
+    price: 1454000
   },
   {
     karat: 14,
-    price: 1006000
+    price: 1361000
   },
   {
     karat: 13,
-    price: 953000
+    price: 1285000
   },
   {
     karat: 12,
-    price: 881000
+    price: 1193000
   },
   {
     karat: 11,
-    price: 808000
+    price: 1098000
   },
   {
     karat: 10,
-    price: 749000
+    price: 926000
   },
   {
     karat: 9,
-    price: 678000
+    price: 926000
   },
   {
     karat: 8,
-    price: 604000
+    price: 831000
   },
   {
     karat: 7,
-    price: 531000
+    price: 736000
   },
   {
     karat: 6,
-    price: 459000
+    price: 643000
   },
   {
     karat: 5,
-    price: 385000
+    price: 551000
   }
   ]
 };
@@ -1423,11 +1420,11 @@ function roundUpPrice(n, step) {
 }
 
 function computeLmBaruPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_BARU + PRICE_ADJUST_LM_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_BARU);
 }
 
 function computeLmLamaPrice(basePrice) {
-  return roundUpPrice(basePrice * FACTOR_LM_LAMA + PRICE_ADJUST_LM_IDR);
+  return roundUpPrice(basePrice * FACTOR_LM_LAMA);
 }
 
 function safeNumber(v) {
@@ -2539,9 +2536,7 @@ function buildPerhiasanPricesFromBase(basePrice) {
   return GOLD_KARAT_SERIES.map(function (entry) {
     var multiplier = getPerhiasanMultiplier(entry.karat);
     if (typeof multiplier !== 'number') return null;
-    var adjust = entry.karat >= 14 ? PRICE_ADJUST_PERHIASAN_HIGH_IDR : PRICE_ADJUST_PERHIASAN_LOW_IDR;
-    if (entry.karat >= 11 && entry.karat <= 18) adjust += PRICE_ADJUST_PERHIASAN_MID_IDR;
-    var harga = roundUpPrice(basePrice * multiplier + adjust);
+    var harga = roundUpPrice(basePrice * multiplier);
     return {
       karat: entry.karat,
       price: harga,
@@ -3973,9 +3968,7 @@ window.addEventListener('resize', function () {
     if (c === 'lm_baru' || c === 'lm_lama' || c === 'perhiasan_24') {
       k = 24;
     }
-    var priceAdjust = (c === 'lm_baru' || c === 'lm_lama') ? PRICE_ADJUST_LM_IDR : (k >= 14 ? PRICE_ADJUST_PERHIASAN_HIGH_IDR : PRICE_ADJUST_PERHIASAN_LOW_IDR);
-    if (c !== 'lm_baru' && c !== 'lm_lama' && k >= 11 && k <= 18) priceAdjust += PRICE_ADJUST_PERHIASAN_MID_IDR;
-    var perGram = typeof multiplier === 'number' ? ceilStep(base * multiplier + priceAdjust, 1000) : 0;
+    var perGram = typeof multiplier === 'number' ? ceilStep(base * multiplier, 1000) : 0;
     var est = g > 0 ? ceilStep(perGram * g, 1000) : 0;
     return {
       cat: c,
