@@ -1201,87 +1201,87 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2748000,
-  lmLama: 2711000,
+  lmBaru: 2750000,
+  lmLama: 2640000,
   perhiasan: [{
     karat: 24,
-    price: 2650000
+    price: 2615000
   },
   {
     karat: 23,
-    price: 2329000
+    price: 2385000
   },
   {
     karat: 22,
-    price: 2234000
+    price: 2250000
   },
   {
     karat: 21,
-    price: 2141000
+    price: 2120000
   },
   {
     karat: 20,
-    price: 2046000
+    price: 1990000
   },
   {
     karat: 19,
-    price: 1951000
+    price: 1925000
   },
   {
     karat: 18,
-    price: 1749000
+    price: 1790000
   },
   {
     karat: 17,
-    price: 1749000
+    price: 1790000
   },
   {
     karat: 16,
-    price: 1655000
+    price: 1670000
   },
   {
     karat: 15,
-    price: 1454000
+    price: 1505000
   },
   {
     karat: 14,
-    price: 1361000
+    price: 1402000
   },
   {
     karat: 13,
-    price: 1285000
+    price: 1300000
   },
   {
     karat: 12,
-    price: 1193000
+    price: 1207000
   },
   {
     karat: 11,
-    price: 1098000
+    price: 1105000
   },
   {
     karat: 10,
-    price: 926000
+    price: 925000
   },
   {
     karat: 9,
-    price: 926000
+    price: 925000
   },
   {
     karat: 8,
-    price: 831000
+    price: 805000
   },
   {
     karat: 7,
-    price: 736000
+    price: 725000
   },
   {
     karat: 6,
-    price: 643000
+    price: 660000
   },
   {
     karat: 5,
-    price: 551000
+    price: 535000
   }
   ]
 };
@@ -3577,22 +3577,30 @@ async function fetchGoldPrice() {
 }
 
 function displayDefaultPrices() {
-  var approxBase = DEFAULT_BASE_PRICE;
-  REI_LAST_BASE_P = approxBase;
+  var table = DEFAULT_PRICE_TABLE;
+  var lmBaru = table.lmBaru;
+  var lmLama = table.lmLama;
+  var perhiasan = table.perhiasan || [];
+  REI_LAST_BASE_P = DEFAULT_BASE_PRICE;
   var highlightCard = document.getElementById('lmBaruHighlight');
   if (highlightCard) highlightCard.setAttribute('aria-busy', 'false');
   resetRangeSeriesCache([]);
   LM_BARU_PRICE_SERIES = [];
-  displayFromBasePrice(approxBase, {
+  renderPriceTableFromNumbers(lmBaru, lmLama, perhiasan);
+  updateLmBaruHighlight(lmBaru, {
     previousPrice: null,
-    infoText: 'Terakhir diperbarui: menggunakan harga default',
     deltaText: 'Gunakan data live untuk melihat perbandingan',
-    badgeLabel: 'Menunggu',
+    badgeLabel: 'Offline',
     badgeState: 'price-neutral'
   });
+  var info = document.getElementById('lastUpdatedInfo');
+  if (info) {
+    info.textContent = 'Terakhir diperbarui: menggunakan harga manual (offline)';
+  }
+  bindHighlightAddButton();
   updateLmBaruSparkline(null, {
-    fallbackText: 'Grafik riwayat tidak tersedia saat menggunakan harga default.',
-    summaryText: 'Grafik riwayat tidak tersedia saat menggunakan harga default.'
+    fallbackText: 'Grafik riwayat tidak tersedia saat menggunakan harga manual.',
+    summaryText: 'Grafik riwayat tidak tersedia saat menggunakan harga manual.'
   });
 }
 
@@ -3641,8 +3649,12 @@ function shouldFetchGlobalGoldPrice() {
 }
 pruneUnavailableRangeButtons();
 setupHighlightRangeControls();
+// [OFFLINE MODE] Tim bisnis: pakai harga dari offline list saja, tidak dari internet
+// if (shouldFetchGoldPrice()) {
+//   fetchGoldPrice();
+// }
 if (shouldFetchGoldPrice()) {
-  fetchGoldPrice();
+  displayDefaultPrices();
 }
 if (shouldFetchGlobalGoldPrice()) {
   fetchGlobalGoldSpot();
