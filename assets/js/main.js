@@ -1227,10 +1227,10 @@ const DEFAULT_PRICE_TABLE = {
     karat: 19,
     price: 1925000
   },
-  {
-    karat: 18,
-    price: 1790000
-  },
+  // {
+  //   karat: 18,
+  //   price: 1790000
+  // },
   {
     karat: 17,
     price: 1790000
