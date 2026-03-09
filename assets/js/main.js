@@ -1201,87 +1201,87 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2750000,
+  lmBaru: 2700000,
   lmLama: 2640000,
   perhiasan: [{
     karat: 24,
-    price: 2615000
+    price: 2515000
   },
   {
     karat: 23,
-    price: 2385000
+    price: 2305000
   },
   {
     karat: 22,
-    price: 2250000
+    price: 2150000
   },
   {
     karat: 21,
-    price: 2120000
+    price: 2040000
   },
   {
     karat: 20,
-    price: 1990000
+    price: 1950000
   },
   {
     karat: 19,
-    price: 1925000
+    price: 1885000
   },
   // {
   //   karat: 18,
-  //   price: 1790000
+  //   price: 1720000
   // },
   {
     karat: 17,
-    price: 1790000
+    price: 1720000
   },
   {
     karat: 16,
-    price: 1670000
+    price: 1630000
   },
   {
     karat: 15,
-    price: 1505000
+    price: 1475000
   },
   {
     karat: 14,
-    price: 1402000
+    price: 1362000
   },
   {
     karat: 13,
-    price: 1300000
+    price: 1270000
   },
   {
     karat: 12,
-    price: 1207000
+    price: 1177000
   },
   {
     karat: 11,
-    price: 1105000
+    price: 1085000
   },
   // {
   //   karat: 10,
-  //   price: 925000
+  //   price: 905000
   // },
   {
     karat: 9,
-    price: 925000
+    price: 905000
   },
   {
     karat: 8,
-    price: 805000
+    price: 775000
   },
   {
     karat: 7,
-    price: 725000
+    price: 705000
   },
   {
     karat: 6,
-    price: 660000
+    price: 620000
   },
   {
     karat: 5,
-    price: 535000
+    price: 505000
   }
   ]
 };
