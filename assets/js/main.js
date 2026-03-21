@@ -1201,87 +1201,79 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2500000,
-  lmLama: 2400000,
+  lmBaru: 2400000,
+  lmLama: 2250000,
   perhiasan: [{
     karat: 24,
-    price: 2350000
+    price: 2200000
   },
   {
     karat: 23,
-    price: 2150000
+    price: 2000000
   },
   {
     karat: 22,
-    price: 2050000
+    price: 1915000
   },
   {
     karat: 21,
-    price: 1950000
+    price: 1800000
   },
   {
     karat: 20,
-    price: 1850000
+    price: 1720000
   },
   {
     karat: 19,
-    price: 1800000
+    price: 1680000
   },
-  // {
-  //   karat: 18,
-  //   price: 1630000
-  // },
   {
     karat: 17,
-    price: 1630000
+    price: 1530000
   },
   {
     karat: 16,
-    price: 1510000
+    price: 1410000
   },
   {
     karat: 15,
-    price: 1280000
-  },
-  {
-    karat: 14,
     price: 1200000
   },
   {
+    karat: 14,
+    price: 1120000
+  },
+  {
     karat: 13,
-    price: 1150000
+    price: 1050000
   },
   {
     karat: 12,
-    price: 1080000
+    price: 950000
   },
   {
     karat: 11,
-    price: 985000
+    price: 900000
   },
-  // {
-  //   karat: 10,
-  //   price: 840000
-  // },
   {
     karat: 9,
-    price: 840000
+    price: 800000
   },
   {
     karat: 8,
-    price: 725000
+    price: 650000
   },
   {
     karat: 7,
-    price: 680000
-  },
-  {
-    karat: 6,
     price: 600000
   },
   {
+    karat: 6,
+    price: 530000
+  },
+  {
     karat: 5,
-    price: 480000
+    price: 420000
   }
   ]
 };
@@ -3492,23 +3484,7 @@ function displayFromBasePrice(basePrice, options) {
 }
 
 function handleGoldPriceFallback(summarySuffix, fallbackSummary) {
-  var last = readLastBasePrice();
-  /* istanbul ignore next */
-  if (last) {
-    REI_LAST_BASE_P = last.p;
-    displayFromBasePrice(last.p, {
-      updatedAt: last.t,
-      infoText: last.t ? 'Terakhir diperbarui (cache): ' + formatDateTimeIndo(new Date(last.t)) : 'Terakhir diperbarui: data cache',
-      badgeLabel: 'Cache',
-      badgeState: 'price-neutral'
-    });
-    applySparklineFromCache(
-      typeof summarySuffix === 'string' ? summarySuffix : 'Menggunakan riwayat harga yang tersimpan.',
-      typeof fallbackSummary === 'string' ? fallbackSummary : 'Grafik riwayat tidak tersedia saat data cache digunakan.'
-    );
-  } else {
-    displayDefaultPrices();
-  }
+  displayDefaultPrices();
 }
 
 function computeBasePriceFromSpot(perGramSpot) {
