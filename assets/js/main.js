@@ -900,31 +900,31 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.982048692;
-const FACTOR_LM_LAMA = 0.968823651;
+const FACTOR_LM_BARU = 0.979753129;
+const FACTOR_LM_LAMA = 0.918505799;
 const PRICE_ADJUST_LM_IDR = 0;
-const FACTOR_PERHIASAN_24K = 0.947020204;
+const FACTOR_PERHIASAN_24K = 0.898090022;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
-  23: 0.832284033,
-  22: 0.798327845,
-  21: 0.765086524,
-  20: 0.731130337,
-  19: 0.697174149,
-  18: 0.624972571,
-  17: 0.624972571,
-  16: 0.591373817,
-  15: 0.519529672,
-  14: 0.486288351,
-  13: 0.459123401,
-  12: 0.426239514,
-  11: 0.392283327,
-  10: 0.330804755,
-  9: 0.330804755,
-  8: 0.296848567,
-  7: 0.262892380,
-  6: 0.229651059,
-  5: 0.196767172
+  23: 0.816426915,
+  22: 0.781720094,
+  21: 0.734763807,
+  20: 0.702098564,
+  19: 0.685765943,
+  18: 0.624518613,
+  17: 0.624518613,
+  16: 0.575520748,
+  15: 0.489774486,
+  14: 0.457109243,
+  13: 0.428527155,
+  12: 0.387695602,
+  11: 0.367279825,
+  10: 0.326448271,
+  9: 0.326448271,
+  8: 0.265200941,
+  7: 0.244785164,
+  6: 0.216203076,
+  5: 0.171288367
 };
 const DEFAULT_BASE_PRICE = 2797723;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
@@ -3649,12 +3649,8 @@ function shouldFetchGlobalGoldPrice() {
 }
 pruneUnavailableRangeButtons();
 setupHighlightRangeControls();
-// [OFFLINE MODE] Tim bisnis: pakai harga dari offline list saja, tidak dari internet
-// if (shouldFetchGoldPrice()) {
-//   fetchGoldPrice();
-// }
 if (shouldFetchGoldPrice()) {
-  displayDefaultPrices();
+  fetchGoldPrice();
 }
 if (shouldFetchGlobalGoldPrice()) {
   fetchGlobalGoldSpot();
