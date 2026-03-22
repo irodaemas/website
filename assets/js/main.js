@@ -900,28 +900,28 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.979753129;
+const FACTOR_LM_BARU = 1.000168906;
 const FACTOR_LM_LAMA = 0.918505799;
 const PRICE_ADJUST_LM_IDR = 0;
 const FACTOR_PERHIASAN_24K = 0.898090022;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
   23: 0.816426915,
-  22: 0.781720094,
-  21: 0.734763807,
+  22: 0.785803249,
+  21: 0.755179584,
   20: 0.702098564,
   19: 0.685765943,
   18: 0.624518613,
   17: 0.624518613,
   16: 0.575520748,
-  15: 0.489774486,
-  14: 0.457109243,
-  13: 0.428527155,
-  12: 0.387695602,
-  11: 0.367279825,
+  15: 0.532647617,
+  14: 0.495899219,
+  13: 0.442818199,
+  12: 0.428527155,
+  11: 0.408111378,
   10: 0.326448271,
   9: 0.326448271,
-  8: 0.265200941,
+  8: 0.287658295,
   7: 0.244785164,
   6: 0.216203076,
   5: 0.171288367
@@ -1201,7 +1201,7 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2400000,
+  lmBaru: 2450000,
   lmLama: 2250000,
   perhiasan: [{
     karat: 24,
@@ -1213,11 +1213,11 @@ const DEFAULT_PRICE_TABLE = {
   },
   {
     karat: 22,
-    price: 1915000
+    price: 1925000
   },
   {
     karat: 21,
-    price: 1800000
+    price: 1850000
   },
   {
     karat: 20,
@@ -1237,23 +1237,23 @@ const DEFAULT_PRICE_TABLE = {
   },
   {
     karat: 15,
-    price: 1200000
+    price: 1305000
   },
   {
     karat: 14,
-    price: 1120000
+    price: 1215000
   },
   {
     karat: 13,
-    price: 1050000
+    price: 1085000
   },
   {
     karat: 12,
-    price: 950000
+    price: 1050000
   },
   {
     karat: 11,
-    price: 900000
+    price: 1000000
   },
   {
     karat: 9,
@@ -1261,7 +1261,7 @@ const DEFAULT_PRICE_TABLE = {
   },
   {
     karat: 8,
-    price: 650000
+    price: 705000
   },
   {
     karat: 7,
