@@ -900,31 +900,31 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 1.000168906;
-const FACTOR_LM_LAMA = 0.918505799;
+const FACTOR_LM_BARU = 0.972016481;
+const FACTOR_LM_LAMA = 0.892652000;
 const PRICE_ADJUST_LM_IDR = 0;
-const FACTOR_PERHIASAN_24K = 0.898090022;
+const FACTOR_PERHIASAN_24K = 0.872810880;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
-  23: 0.816426915,
-  22: 0.785803249,
-  21: 0.755179584,
-  20: 0.702098564,
-  19: 0.685765943,
-  18: 0.624518613,
-  17: 0.624518613,
-  16: 0.575520748,
-  15: 0.532647617,
-  14: 0.495899219,
-  13: 0.442818199,
-  12: 0.428527155,
-  11: 0.408111378,
-  10: 0.326448271,
-  9: 0.326448271,
-  8: 0.287658295,
-  7: 0.244785164,
-  6: 0.216203076,
-  5: 0.171288367
+  23: 0.793446399,
+  22: 0.763684718,
+  21: 0.733923038,
+  20: 0.682336125,
+  19: 0.666463229,
+  18: 0.606939868,
+  17: 0.606939868,
+  16: 0.559321180,
+  15: 0.517654827,
+  14: 0.481940811,
+  13: 0.430353898,
+  12: 0.416465114,
+  11: 0.396623994,
+  10: 0.317259513,
+  9: 0.317259513,
+  8: 0.279561384,
+  7: 0.237895032,
+  6: 0.210117463,
+  5: 0.166466999
 };
 const DEFAULT_BASE_PRICE = 2797723;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
@@ -3497,7 +3497,7 @@ async function fetchGoldPrice() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
-    const response = await fetch('https://data-asg.goldprice.org/dbXRates/IDR', {
+    const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=1', {
       signal: ctl.signal,
       cache: 'no-store'
     });
@@ -3505,26 +3505,26 @@ async function fetchGoldPrice() {
       throw new Error('Gagal memuat harga emas: ' + response.status);
     }
     const payload = await response.json();
-    const items = Array.isArray(payload && payload.items) ? payload.items : [];
-    const entry = items.find(function (item) {
-      return item && item.curr === 'IDR';
-    }) || items[0];
-    if (!entry) {
+    const current = payload && payload.data && payload.data.current;
+    if (!current) {
       throw new Error('Data harga emas tidak ditemukan.');
     }
-    const perOunce = safeNumber(entry.xauPrice);
-    if (perOunce === null || perOunce <= 0) {
-      throw new Error('Harga emas tidak valid.');
+    const buyPrice = safeNumber(current.buy);
+    if (buyPrice === null || buyPrice <= 0) {
+      throw new Error('Harga beli emas tidak valid.');
     }
-    const perGram = perOunce / TROY_OUNCE_IN_GRAMS;
-    const currentBase = computeBasePriceFromSpot(perGram);
-    if (currentBase === null) {
-      throw new Error('Gagal menghitung harga dasar.');
+    const currentBase = buyPrice;
+    const updatedAt = resolveDate(current.updated_at) || new Date();
+
+    // Cek harga sebelumnya dari history
+    const history = payload.data.history;
+    let previousBase = null;
+    if (Array.isArray(history) && history.length > 1) {
+      const prevBuy = safeNumber(history[history.length - 1].buy);
+      if (prevBuy !== null && prevBuy > 0) {
+        previousBase = prevBuy;
+      }
     }
-    const closeOunce = safeNumber(entry.xauClose);
-    const closePerGram = closeOunce !== null && closeOunce > 0 ? closeOunce / TROY_OUNCE_IN_GRAMS : null;
-    const previousBase = closePerGram !== null ? computeBasePriceFromSpot(closePerGram) : null;
-    const updatedAt = resolveDate(payload.tsj || payload.ts || payload.date) || new Date();
 
     REI_LAST_BASE_P = currentBase;
     saveLastBasePrice(currentBase);
