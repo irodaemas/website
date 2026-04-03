@@ -3497,7 +3497,7 @@ async function fetchGoldPrice() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
-    const response = await fetch('https://pluang.com/api/asset/gold/pricing?daysLimit=1', {
+    const response = await fetch('https://api-pluang.pluang.com/api/v3/asset/gold/pricing?daysLimit=1', {
       signal: ctl.signal,
       cache: 'no-store'
     });
