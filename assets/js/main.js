@@ -900,33 +900,33 @@ const ENTRY_TIME_FIELDS = [
 let REI_LAST_BASE_P = null;
 const LAST_PRICE_KEY = 'rei_last_base_price_v1';
 const LAST_SERIES_KEY = 'rei_lm_sparkline_series_v1';
-const FACTOR_LM_BARU = 0.972016481;
-const FACTOR_LM_LAMA = 0.892652000;
+const FACTOR_LM_BARU = 0.982004906;
+const FACTOR_LM_LAMA = 0.931655314;
 const PRICE_ADJUST_LM_IDR = 0;
-const FACTOR_PERHIASAN_24K = 0.872810880;
+const FACTOR_PERHIASAN_24K = 0.910989437;
 const PERHIASAN_KARAT_MULTIPLIERS = {
   24: FACTOR_PERHIASAN_24K,
-  23: 0.793446399,
-  22: 0.763684718,
-  21: 0.733923038,
-  20: 0.682336125,
-  19: 0.666463229,
-  18: 0.606939868,
-  17: 0.606939868,
-  16: 0.559321180,
-  15: 0.517654827,
-  14: 0.481940811,
-  13: 0.430353898,
-  12: 0.416465114,
-  11: 0.396623994,
-  10: 0.317259513,
-  9: 0.317259513,
-  8: 0.279561384,
-  7: 0.237895032,
-  6: 0.210117463,
-  5: 0.166466999
+  23: 0.835840793,
+  22: 0.798266471,
+  21: 0.751298569,
+  20: 0.704330666,
+  19: 0.657362764,
+  18: 0.631060738,
+  17: 0.631060738,
+  16: 0.582214120,
+  15: 0.535246217,
+  14: 0.492035747,
+  13: 0.454461425,
+  12: 0.418765819,
+  11: 0.383070213,
+  10: 0.347374607,
+  9: 0.347374607,
+  8: 0.281619543,
+  7: 0.247802654,
+  6: 0.225258060,
+  5: 0.176411442
 };
-const DEFAULT_BASE_PRICE = 2797723;
+const DEFAULT_BASE_PRICE = 2661392;
 const GOLD_ROW_PRIMARY = 'var(--accent-green)';
 const GOLD_ROW_SECONDARY = 'var(--accent-green-light)';
 
@@ -1201,79 +1201,79 @@ const GOLD_UNIT_DEFS = [{
 }
 ];
 const DEFAULT_PRICE_TABLE = {
-  lmBaru: 2450000,
-  lmLama: 2250000,
+  lmBaru: 2614000,
+  lmLama: 2480000,
   perhiasan: [{
     karat: 24,
-    price: 2200000
+    price: 2425000
   },
   {
     karat: 23,
-    price: 2000000
+    price: 2225000
   },
   {
     karat: 22,
-    price: 1925000
+    price: 2125000
   },
   {
     karat: 21,
-    price: 1850000
+    price: 2000000
   },
   {
     karat: 20,
-    price: 1720000
+    price: 1875000
   },
   {
     karat: 19,
-    price: 1680000
+    price: 1750000
   },
   {
     karat: 17,
-    price: 1530000
+    price: 1680000
   },
   {
     karat: 16,
-    price: 1410000
+    price: 1550000
   },
   {
     karat: 15,
-    price: 1305000
+    price: 1425000
   },
   {
     karat: 14,
-    price: 1215000
+    price: 1310000
   },
   {
     karat: 13,
-    price: 1085000
+    price: 1210000
   },
   {
     karat: 12,
-    price: 1050000
+    price: 1115000
   },
   {
     karat: 11,
-    price: 1000000
+    price: 1020000
   },
   {
     karat: 9,
-    price: 800000
+    price: 925000
   },
   {
     karat: 8,
-    price: 705000
+    price: 750000
   },
   {
     karat: 7,
-    price: 600000
+    price: 660000
   },
   {
     karat: 6,
-    price: 530000
+    price: 600000
   },
   {
     karat: 5,
-    price: 420000
+    price: 470000
   }
   ]
 };
