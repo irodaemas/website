@@ -872,6 +872,8 @@ if (typeof window !== 'undefined') {
 // Harga emas: fetch + fallback + waktu W.I.B
 const PRICE_ADJUST_IDR = 0;
 const PRICE_TIMEOUT_MS = 5000;
+// Cloudflare Worker proxy — deploy workers/gold-price-proxy lalu isi URL di sini
+const GOLD_PRICE_PROXY_URL = 'https://gold-price-proxy.ytprmsalt.workers.dev';
 const LM_HISTORY_RANGE_CONFIG = {
   '7': {
     key: '7',
@@ -3497,7 +3499,7 @@ async function fetchGoldPrice() {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), PRICE_TIMEOUT_MS);
   try {
-    const response = await fetch('https://data-asg.goldprice.org/dbXRates/IDR', {
+    const response = await fetch(GOLD_PRICE_PROXY_URL, {
       signal: ctl.signal,
       cache: 'no-store'
     });

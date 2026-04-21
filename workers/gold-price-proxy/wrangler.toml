@@ -1,0 +1,8 @@
+name = "gold-price-proxy"
+main = "index.js"
+compatibility_date = "2024-01-01"
+
+# Setelah deploy, URL worker akan muncul seperti:
+# https://gold-price-proxy.<account-name>.workers.dev
+#
+# Salin URL tersebut ke GOLD_PRICE_PROXY_URL di assets/js/main.js
